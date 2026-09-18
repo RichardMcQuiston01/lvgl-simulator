@@ -10,11 +10,10 @@ draws and drives interaction for that scene in the browser.
 
 ## Why a pure-TS simulator (vs. the WASM approach)
 
-[`html2lvgl-platform`](https://github.com/RichardMcQuiston01/html2lvgl-platform)'s
-`docs/lvgl_wasm_typescript_guide.md` documents a different, complementary
-approach: compiling LVGL's actual C source to WebAssembly via Emscripten for
-pixel-perfect fidelity. Both approaches are expected to coexist long-term;
-this repo intentionally takes the other tradeoff:
+A different, complementary approach exists: compiling LVGL's actual C
+source to WebAssembly via Emscripten for pixel-perfect fidelity. Both
+approaches are expected to coexist long-term; this repo intentionally
+takes the other tradeoff:
 
 |                 | This simulator (Canvas + TS)                       | WASM (Emscripten + real LVGL C)                  |
 | --------------- | -------------------------------------------------- | ------------------------------------------------ |
@@ -33,21 +32,21 @@ way the converter engine (`html-to-lvgl`) tracks a fidelity percentage.
 
 - **Done:** published standalone to npm as
   [`@richardmcquiston01/lvgl-simulator`](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator)
-  (mirrors how `html-to-lvgl` stays a separate, independently-versioned
-  repo rather than living inside the `html2lvgl-platform` monorepo — see
-  that repo's `docs/PLAN.md`).
+  — a separate, independently-versioned package rather than folded into a
+  larger monorepo.
 - **Done:** input contract — a versioned JSON scene description
   (`docs/SCENE_SCHEMA.md`), standalone rather than adopting
   `html-to-lvgl`'s internal AST directly (see Stage 5 below and
   `docs/ROADMAP.md`'s "Open items" for why). If `html-to-lvgl`'s output
-  needs to feed this library, that repo gets a thin adapter mapping its
-  AST to this schema, keeping the two repos decoupled.
-- **Future work, not this repo's job:** consumed by `apps/web` (Next.js)
-  in `html2lvgl-platform` as a normal dependency, to drive the GUI
-  editor's live-preview pane — a separate PR against that repo, once it
-  adds this package as a dependency.
-- This repo has no dependency on `html2lvgl-platform` or `html-to-lvgl`
-  and must build/test/run standalone; that remains true after publishing.
+  needs to feed this library, that project gets a thin adapter mapping
+  its AST to this schema, keeping the two decoupled.
+- **Future work, not this repo's job:** consumed by a separate web-based
+  UI editor project as a normal npm dependency, to drive its
+  live-preview pane — integration happens as a separate PR in that other
+  project, once it adds this package as a dependency.
+- This repo has no dependency on `html-to-lvgl` or any other consumer
+  project and must build/test/run standalone; that remains true after
+  publishing.
 
 ## Conventions (matching the sibling repos)
 
@@ -55,7 +54,7 @@ way the converter engine (`html-to-lvgl`) tracks a fidelity percentage.
 - Package manager / build: plain `tsc` (or `tsup`) for the library build;
   a Vite-based playground app for local visual development and manual
   testing (per-project preference for Vite on single-page apps).
-- Prettier + ESLint (`typescript-eslint`) matching `html2lvgl-platform`'s
+- Prettier + ESLint (`typescript-eslint`) matching the sibling repos'
   root config where reasonable.
 - Tables/DB are not applicable here (no backend); this is a client-side
   rendering library only.
@@ -73,7 +72,7 @@ sequential. See `docs/ROADMAP.md` for status tracking.
 **Agent role:** Scaffold Agent
 
 - `package.json` (`type: module`, `exports` map, no runtime deps yet),
-  `tsconfig.json` (strict, ES2022, matches `html2lvgl-platform`'s
+  `tsconfig.json` (strict, ES2022, matching the sibling repos' shared
   `tsconfig.base.json` shape), ESLint + Prettier config, Vitest.
 - `playground/` — a minimal Vite app that imports the library and mounts a
   canvas, used as the manual test bed for every later stage.
@@ -154,6 +153,6 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   `CHANGELOG.md` entries per release, an npm publish workflow (tag/branch
   triggered, matching `html-to-lvgl`'s release pattern).
 - Follow-up (separate PR, separate repo): wire the published package into
-  `html2lvgl-platform`'s `apps/web` live-preview pane.
+  a consumer web editor's live-preview pane.
 - **Exit criteria:** Package is published (or publish-ready) and consumed
-  successfully from a spike branch of `apps/web`.
+  successfully from a spike branch of that consumer project.
