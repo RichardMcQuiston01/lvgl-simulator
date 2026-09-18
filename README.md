@@ -4,6 +4,16 @@
 
 TypeScript LVGL simulator for running in the browser.  Designed to be as package for incorporation into other repositories.
 
+Renders LVGL-style UIs to an HTML5 `<canvas>` by re-implementing widget,
+layout, and style behavior in pure TypeScript (no WASM/Emscripten build of
+LVGL itself). Intended for future consumption by
+[`html2lvgl-platform`](https://github.com/RichardMcQuiston01/html2lvgl-platform)'s
+web editor as a fast, low-fidelity-tradeoff live preview.
+
+See [`docs/PLAN.md`](./docs/PLAN.md) for the architecture rationale and the
+multi-agent, multi-stage development plan, and
+[`docs/ROADMAP.md`](./docs/ROADMAP.md) for current stage status.
+
 ## Getting Started
 
 ### Prerequisites
