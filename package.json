@@ -1,8 +1,24 @@
 {
   "name": "@richardmcquiston01/lvgl-simulator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "TypeScript LVGL simulator that renders LVGL-style UIs to an HTML5 canvas.",
   "license": "Apache-2.0",
+  "author": "Richard McQuiston",
+  "homepage": "https://github.com/RichardMcQuiston01/lvgl-simulator#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RichardMcQuiston01/lvgl-simulator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RichardMcQuiston01/lvgl-simulator/issues"
+  },
+  "keywords": [
+    "lvgl",
+    "canvas",
+    "simulator",
+    "typescript",
+    "embedded-ui"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,9 +31,13 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --check .",
