@@ -87,4 +87,44 @@ describe('LvObject', () => {
 
     expect(calls).toEqual(['root', 'first', 'second']);
   });
+
+  it('runs updateLayout, then paintSelf, then children, on every render (subclass hook order)', () => {
+    const context = createFakeContext();
+    const calls: string[] = [];
+
+    class RecordingObject extends LvObject {
+      protected override updateLayout(): void {
+        calls.push('updateLayout');
+      }
+      protected override paintSelf(): void {
+        calls.push('paintSelf');
+      }
+    }
+
+    const root = new RecordingObject({ width: 10, height: 10 });
+    const child = new LvObject({ width: 1, height: 1 });
+    root.addChild(child);
+
+    root.render(context);
+
+    expect(calls).toEqual(['updateLayout', 'paintSelf']);
+  });
+
+  it('carries optional flex/grid layout hints as plain fields', () => {
+    const child = new LvObject({
+      width: 10,
+      height: 10,
+      flexGrow: 2,
+      gridColumn: 1,
+      gridRow: 2,
+      gridColumnSpan: 3,
+      gridRowSpan: 4,
+    });
+
+    expect(child.flexGrow).toBe(2);
+    expect(child.gridColumn).toBe(1);
+    expect(child.gridRow).toBe(2);
+    expect(child.gridColumnSpan).toBe(3);
+    expect(child.gridRowSpan).toBe(4);
+  });
 });

@@ -1,4 +1,4 @@
-import { createSimulator } from '@lvgl-simulator';
+import { Button, Checkbox, createSimulator, Label, Slider, Switch } from '@lvgl-simulator';
 
 const DEFAULT_WIDTH = 320;
 const DEFAULT_HEIGHT = 240;
@@ -22,4 +22,18 @@ if (!container) {
 const { width, height } = readResolutionFromQuery();
 
 // Override the resolution via query params, e.g. ?width=480&height=320
-createSimulator(container, { width, height });
+const simulator = createSimulator(container, {
+  width,
+  height,
+  padding: 16,
+  layout: { type: 'flex', direction: 'column', rowGap: 16, crossAlign: 'start' },
+});
+
+simulator.screen.addChild(new Label({ width: 200, height: 20, text: 'Stage 2 widget gallery' }));
+simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Press me' }));
+simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Checked', checked: true }));
+simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Unchecked' }));
+simulator.screen.addChild(new Switch({ width: 44, height: 24, checked: true }));
+simulator.screen.addChild(new Slider({ width: 200, height: 20, value: 60 }));
+
+simulator.renderOnce();
