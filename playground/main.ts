@@ -1,4 +1,13 @@
-import { Button, Checkbox, createSimulator, Label, Slider, Switch } from '@lvgl-simulator';
+import {
+  Button,
+  Checkbox,
+  createSimulator,
+  Label,
+  loadScreen,
+  Slider,
+  Switch,
+  type Scene,
+} from '@lvgl-simulator';
 
 const DEFAULT_WIDTH = 320;
 const DEFAULT_HEIGHT = 240;
@@ -70,5 +79,47 @@ simulator.screen.addChild(
     style: { base: { bgColor: '#9e9e9e' } },
   }),
 );
+
+// Stage 5: the section below comes entirely from a hand-written JSON scene
+// via loadScreen() — no `new Button()`/`new Label()`/`addChild()` calls for
+// any of it. Only the click handler (added after loading, since JSON can't
+// carry a function) is wired up in code.
+const fixtureScene: Scene = {
+  version: 1,
+  width: 200,
+  height: 76,
+  layout: { type: 'flex', direction: 'column', rowGap: 8 },
+  children: [
+    { type: 'label', width: 200, height: 16, text: 'Loaded from JSON:' },
+    {
+      type: 'container',
+      width: 200,
+      height: 36,
+      layout: { type: 'flex', columnGap: 8, crossAlign: 'center' },
+      children: [
+        {
+          type: 'button',
+          width: 90,
+          height: 32,
+          text: 'Scene OK',
+          style: { base: {}, states: { pressed: { bgColor: '#00897b' } } },
+        },
+        { type: 'label', width: 90, height: 16, text: 'not clicked' },
+      ],
+    },
+  ],
+};
+
+const fixtureRoot = loadScreen(fixtureScene);
+const [, fixtureRow] = fixtureRoot.children;
+const [fixtureButton, fixtureStatusLabel] = fixtureRow?.children ?? [];
+let fixtureClicks = 0;
+fixtureButton?.addEventListener('clicked', () => {
+  fixtureClicks += 1;
+  if (fixtureStatusLabel instanceof Label) {
+    fixtureStatusLabel.text = `clicked ${fixtureClicks}x`;
+  }
+});
+simulator.screen.addChild(fixtureRoot);
 
 simulator.renderOnce();

@@ -25,6 +25,22 @@ export { hitTest } from './interaction/hitTest';
 export { isPointerDraggable } from './interaction/PointerDraggable';
 export type { PointerDraggable } from './interaction/PointerDraggable';
 
+export { loadScreen } from './scene/loadScreen';
+export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema';
+export type {
+  Scene,
+  SceneButtonNode,
+  SceneCheckboxNode,
+  SceneContainerNode,
+  SceneImageNode,
+  SceneLabelNode,
+  SceneNode,
+  SceneNodeBase,
+  SceneSliderNode,
+  SceneSwitchNode,
+  SceneWidgetType,
+} from './scene/SceneSchema';
+
 export { applyFlexLayout } from './layout/flex';
 export type {
   FlexCrossAlign,

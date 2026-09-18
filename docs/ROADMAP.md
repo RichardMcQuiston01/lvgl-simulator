@@ -54,10 +54,17 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       position — verified end to end via a headless-browser click/drag
       against the playground, not just unit assertions
 
-## Stage 5: Scene import adapter — not started
+## Stage 5: Scene import adapter — done
 
-- [ ] Versioned JSON scene-description schema (documented)
-- [ ] `loadScreen()` entry point
+- [x] Versioned JSON scene-description schema (`Scene`/`SceneNode` in
+      `src/scene/SceneSchema.ts`, `SCENE_SCHEMA_VERSION`), documented
+      independently of any producer in `docs/SCENE_SCHEMA.md`
+- [x] `loadScreen()` entry point — builds the object tree a `Scene`
+      describes and returns its root `Container`; rejects an unsupported
+      `version` or an unknown node `type` with a descriptive error.
+      Verified end to end via a headless-browser click against a
+      hand-written fixture scene rendered in the playground, not just
+      unit assertions
 
 ## Stage 6: Testing & fidelity validation — not started
 
@@ -73,8 +80,10 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
 
 ## Open items
 
-- Final scene-description schema: standalone vs. adapted from
-  `html-to-lvgl`'s internal AST — decide in Stage 5, not before.
+- Decided in Stage 5: the scene-description schema stays standalone (see
+  `docs/SCENE_SCHEMA.md`) rather than adopting `html-to-lvgl`'s internal
+  AST directly. If/when needed, that repo gets a thin adapter mapping its
+  AST to this schema.
 - Whether Stage 6's fidelity harness needs the WASM/real-LVGL path to exist
   first, or can ship its own hand-authored reference screenshots instead.
 - No target dates yet.
