@@ -17,9 +17,14 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npx vite --config e2e/vite.config.ts --port 5175 --strictPort',
+    // Bind explicitly to the IPv4 loopback address: Vite's default "localhost"
+    // host can resolve to the IPv6 loopback first depending on the runner's
+    // DNS order, which the IPv4-literal `url` below would then never reach.
+    command: 'npx vite --config e2e/vite.config.ts --port 5175 --strictPort --host 127.0.0.1',
     url: 'http://127.0.0.1:5175',
     reuseExistingServer: !process.env.CI,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
   projects: [
     {
