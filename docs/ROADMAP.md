@@ -100,9 +100,9 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       published to npm, followed immediately by
       [`v0.1.1`](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator/v/0.1.1)
       fixing a packaging bug `0.1.0` shipped with — see "Open items" below.
-- [ ] Spike integration into `html2lvgl-platform`'s `apps/web` — per
-      `docs/PLAN.md`, this is explicitly a follow-up in that other repo,
-      not this one ("separate PR, separate repo").
+- [ ] Spike integration into a consumer web editor's live-preview app —
+      per `docs/PLAN.md`, this is explicitly a follow-up in that other
+      project, not this one ("separate PR, separate repo").
 
 ## Open items
 
