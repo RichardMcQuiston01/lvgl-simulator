@@ -54,7 +54,7 @@ describe('createSimulator', () => {
     expect(screen).toBeInstanceOf(LvObject);
     expect(screen.width).toBe(320);
     expect(screen.height).toBe(240);
-    expect(screen.backgroundColor).toBe('#ff0000');
+    expect(screen.resolvedStyle.bgColor).toBe('#ff0000');
   });
 
   it('defaults to a white screen background', () => {
@@ -62,7 +62,7 @@ describe('createSimulator', () => {
 
     const { screen } = createSimulator(container, { width: 10, height: 10, devicePixelRatio: 1 });
 
-    expect(screen.backgroundColor).toBe('#ffffff');
+    expect(screen.resolvedStyle.bgColor).toBe('#ffffff');
   });
 
   it('paints the screen once on mount', () => {
@@ -90,7 +90,7 @@ describe('createSimulator', () => {
     fakeContext.clearRect.mockClear();
     fakeContext.fillRect.mockClear();
 
-    screen.backgroundColor = '#123456';
+    screen.style = { base: { bgColor: '#123456' } };
     renderOnce();
 
     expect(fakeContext.clearRect).toHaveBeenCalledWith(0, 0, 10, 10);

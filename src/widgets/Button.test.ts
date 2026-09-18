@@ -7,7 +7,7 @@ describe('Button', () => {
   it('defaults its background to the theme primary color', () => {
     const button = new Button({ width: 80, height: 30 });
 
-    expect(button.backgroundColor).toBe(defaultTheme.primaryColor);
+    expect(button.resolvedStyle.bgColor).toBe(defaultTheme.primaryColor);
   });
 
   it('paints a filled rounded rect and its label centered', () => {
@@ -37,5 +37,22 @@ describe('Button', () => {
     button.render(context);
 
     expect(context.fillStyle).toBe('#00ff00');
+  });
+
+  it('darkens its background when pressed, matching the LVGL default theme', () => {
+    const button = new Button({ width: 80, height: 30, pressed: true });
+
+    expect(button.resolvedStyle.bgColor).toBe(defaultTheme.primaryColorPressed);
+  });
+
+  it('lets a caller override the pressed-state style', () => {
+    const button = new Button({
+      width: 80,
+      height: 30,
+      pressed: true,
+      style: { base: {}, states: { pressed: { bgColor: '#000000' } } },
+    });
+
+    expect(button.resolvedStyle.bgColor).toBe('#000000');
   });
 });

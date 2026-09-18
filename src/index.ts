@@ -1,5 +1,6 @@
 import { createRenderLoop } from './core/RenderLoop';
 import { createDisplayDriver, type ColorFormat, type DisplayDriver } from './display/DisplayDriver';
+import { mergeStyle, paddingAll } from './style/Style';
 import { Container, type ContainerLayout } from './widgets/Container';
 
 export { LvObject } from './core/LvObject';
@@ -10,6 +11,10 @@ export { createDisplayDriver } from './display/DisplayDriver';
 export type { ColorFormat, DisplayDriver, DisplayDriverOptions } from './display/DisplayDriver';
 
 export { defaultTheme } from './theme/defaultTheme';
+
+export { mergeStyle, paddingAll, resolveStyle } from './style/Style';
+export type { LvState, Style, StyleSet } from './style/Style';
+export { withOpacity } from './style/color';
 
 export { applyFlexLayout } from './layout/flex';
 export type {
@@ -43,11 +48,13 @@ export type { ImageWidgetOptions } from './widgets/ImageWidget';
 export interface SimulatorOptions {
   readonly width: number;
   readonly height: number;
+  /** Sugar for the screen's `style.base.bgColor`. */
   readonly backgroundColor?: string;
   readonly colorFormat?: ColorFormat;
   readonly devicePixelRatio?: number;
   /** Flex/grid layout applied to the screen's own direct children. */
   readonly layout?: ContainerLayout;
+  /** Sugar for a uniform `style.base` padding on the screen. */
   readonly padding?: number;
 }
 
@@ -71,8 +78,9 @@ export interface Simulator {
  * Mounts a simulator display inside `container`: a `<canvas>` sized to the
  * given resolution, an object tree rooted at `screen`, and a render loop
  * that repaints the whole tree every frame (see docs/PLAN.md). `screen` is
- * a {@link Container}, so widgets (Stage 2) can be added directly with an
- * optional flex/grid layout; interaction (Stage 4) builds on top of it.
+ * a {@link Container}, so widgets can be added directly with an optional
+ * flex/grid layout and a `StyleSet`; interaction (Stage 4) builds on top
+ * of it.
  */
 export function createSimulator(container: HTMLElement, options: SimulatorOptions): Simulator {
   const {
@@ -86,7 +94,19 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
   } = options;
 
   const displayDriver = createDisplayDriver({ width, height, colorFormat, devicePixelRatio });
-  const screen = new Container({ x: 0, y: 0, width, height, backgroundColor, layout, padding });
+  const screen = new Container({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    layout,
+    style: {
+      base: mergeStyle(
+        { bgColor: backgroundColor },
+        padding !== undefined ? paddingAll(padding) : undefined,
+      ),
+    },
+  });
 
   function renderOnce(): void {
     displayDriver.context.clearRect(0, 0, displayDriver.width, displayDriver.height);

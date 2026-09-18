@@ -1,3 +1,6 @@
+import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style';
+import { withOpacity } from '../style/color';
+
 /**
  * Constructor options for {@link LvObject}.
  */
@@ -6,7 +9,7 @@ export interface LvObjectOptions {
   readonly y?: number;
   readonly width: number;
   readonly height: number;
-  readonly backgroundColor?: string;
+  readonly style?: StyleSet;
   /** Share of a flex container's free main-axis space this child grows into. Mirrors LVGL's `flex_grow`. */
   readonly flexGrow?: number;
   /** 0-based grid column track. Mirrors LVGL's `style_grid_cell_column_pos`. Omit to auto-place. */
@@ -15,26 +18,32 @@ export interface LvObjectOptions {
   readonly gridRow?: number;
   readonly gridColumnSpan?: number;
   readonly gridRowSpan?: number;
+  readonly pressed?: boolean;
+  readonly disabled?: boolean;
+  readonly focused?: boolean;
 }
 
 /**
  * A node in the simulator's object tree, mirroring LVGL's `lv_obj_t`
- * parent/child hierarchy. Stage 1 kept this to position, size, a flat
- * background color, and tree structure; Stage 2 adds the `updateLayout`/
- * `paintSelf` hooks that {@link Container} and the widget subclasses build
- * on. The full cascading style/state system is still a later stage.
+ * parent/child hierarchy. Position, size, and tree structure (Stage 1);
+ * `updateLayout`/`paintSelf` hooks that {@link Container} and the widget
+ * subclasses build on (Stage 2); a `StyleSet` resolved against this
+ * object's active `LvState`s (Stage 3) — see `src/style/Style.ts`.
  */
 export class LvObject {
   x: number;
   y: number;
   width: number;
   height: number;
-  backgroundColor: string | undefined;
+  style: StyleSet;
   flexGrow: number | undefined;
   gridColumn: number | undefined;
   gridRow: number | undefined;
   gridColumnSpan: number | undefined;
   gridRowSpan: number | undefined;
+  pressed: boolean;
+  disabled: boolean;
+  focused: boolean;
 
   private parentObject: LvObject | null = null;
   private readonly childObjects: LvObject[] = [];
@@ -44,12 +53,15 @@ export class LvObject {
     this.y = options.y ?? 0;
     this.width = options.width;
     this.height = options.height;
-    this.backgroundColor = options.backgroundColor;
+    this.style = options.style ?? { base: {} };
     this.flexGrow = options.flexGrow;
     this.gridColumn = options.gridColumn;
     this.gridRow = options.gridRow;
     this.gridColumnSpan = options.gridColumnSpan;
     this.gridRowSpan = options.gridRowSpan;
+    this.pressed = options.pressed ?? false;
+    this.disabled = options.disabled ?? false;
+    this.focused = options.focused ?? false;
   }
 
   get parent(): LvObject | null {
@@ -89,6 +101,31 @@ export class LvObject {
   }
 
   /**
+   * This object's own currently-active LVGL states, used to resolve
+   * `style` (and any other per-part `StyleSet`s a subclass defines).
+   * Subclasses with their own state-like fields (e.g. `Checkbox.checked`)
+   * override this and fold theirs in via `super.getActiveStates()`.
+   */
+  protected getActiveStates(): ReadonlySet<LvState> {
+    const states = new Set<LvState>();
+    if (this.pressed) {
+      states.add('pressed');
+    }
+    if (this.disabled) {
+      states.add('disabled');
+    }
+    if (this.focused) {
+      states.add('focused');
+    }
+    return states;
+  }
+
+  /** `style` resolved against this object's currently active states. */
+  get resolvedStyle(): Style {
+    return resolveStyle(this.style, this.getActiveStates());
+  }
+
+  /**
    * Positions this object's children (relative to its own content origin).
    * The base class does no layout — children keep whatever x/y/width/height
    * they were given (LVGL's default "manual" positioning). {@link Container}
@@ -102,21 +139,33 @@ export class LvObject {
    * widget-specific content instead of/in addition to a flat fill.
    */
   protected paintSelf(context: CanvasRenderingContext2D): void {
-    if (this.backgroundColor) {
+    const style = this.resolvedStyle;
+    if (style.bgColor) {
       const { x, y } = this.getAbsolutePosition();
-      context.fillStyle = this.backgroundColor;
+      context.fillStyle = withOpacity(style.bgColor, style.bgOpa);
       context.fillRect(x, y, this.width, this.height);
     }
   }
 
   /**
-   * Lays out this object's children, paints this object, then recurses
-   * into its children in order (later children paint over earlier ones,
-   * matching LVGL's z-ordering).
+   * Lays out this object's children, paints this object (applying its
+   * resolved `opa`, if any — LVGL's overall per-object opacity multiplier;
+   * not inherited by children in this simulator, unlike real LVGL), then
+   * recurses into its children in order (later children paint over
+   * earlier ones, matching LVGL's z-ordering).
    */
   render(context: CanvasRenderingContext2D): void {
     this.updateLayout();
-    this.paintSelf(context);
+
+    const opa = this.resolvedStyle.opa;
+    if (opa !== undefined && opa < 255) {
+      context.save();
+      context.globalAlpha = Math.max(0, Math.min(255, opa)) / 255;
+      this.paintSelf(context);
+      context.restore();
+    } else {
+      this.paintSelf(context);
+    }
 
     for (const child of this.childObjects) {
       child.render(context);

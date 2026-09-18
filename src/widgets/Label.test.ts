@@ -16,9 +16,9 @@ describe('Label', () => {
   it('defaults to the theme text color, font size, and font family', () => {
     const label = new Label({ width: 10, height: 10, text: 'x' });
 
-    expect(label.textColor).toBe(defaultTheme.textColor);
-    expect(label.fontSize).toBe(defaultTheme.fontSize);
-    expect(label.fontFamily).toBe(defaultTheme.fontFamily);
+    expect(label.resolvedStyle.textColor).toBe(defaultTheme.textColor);
+    expect(label.resolvedStyle.textFontSize).toBe(defaultTheme.fontSize);
+    expect(label.resolvedStyle.textFontFamily).toBe(defaultTheme.fontFamily);
   });
 
   it('respects explicit text styling options', () => {

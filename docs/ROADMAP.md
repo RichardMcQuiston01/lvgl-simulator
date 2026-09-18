@@ -31,10 +31,15 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
 - [x] Label, Button, ImageWidget
 - [x] Checkbox, Switch, Slider
 
-## Stage 3: Style & theme system — not started
+## Stage 3: Style & theme system — done
 
-- [ ] Core style property set (bg/border/radius/padding/font/opacity)
-- [ ] Part/state model (default/pressed/checked/disabled/focused)
+- [x] Core style property set (`Style`: bg/border/radius/padding/font/opacity,
+      matching LVGL's `style_*` attribute names 1:1 for `src/style/Style.ts`)
+- [x] Part/state model: `StyleSet` (base + per-state overrides) resolved via
+      `resolveStyle()` against an object's active `LvState`s
+      (pressed/checked/disabled/focused); widgets with multiple LVGL "parts"
+      (Checkbox's indicator, Switch's/Slider's knob, Slider's indicator)
+      expose separate named `StyleSet` fields, all resolved the same way
 
 ## Stage 4: Input & interaction — not started
 

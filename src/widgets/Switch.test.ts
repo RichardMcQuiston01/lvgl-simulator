@@ -55,4 +55,21 @@ describe('Switch', () => {
     // knob left = width - diameter - inset = 40 - 16 - 2 = 22 => center at 22 + 8 = 30
     expect(context.arc).toHaveBeenCalledWith(30, 10, 8, 0, Math.PI * 2);
   });
+
+  it('lets a caller override the knob color via knobStyle', () => {
+    const context = createFakeCanvasContext();
+    const fillColors: string[] = [];
+    (context.fill as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      fillColors.push(context.fillStyle as string);
+    });
+    const toggle = new Switch({
+      width: 40,
+      height: 20,
+      knobStyle: { base: { bgColor: '#ff00ff' } },
+    });
+
+    toggle.render(context);
+
+    expect(fillColors[1]).toBe('#ff00ff');
+  });
 });

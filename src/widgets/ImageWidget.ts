@@ -1,5 +1,6 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject';
 import { paintRoundedRect } from '../rendering/shapes';
+import { mergeStyle } from '../style/Style';
 import { defaultTheme } from '../theme/defaultTheme';
 
 export interface ImageWidgetOptions extends LvObjectOptions {
@@ -13,16 +14,22 @@ export interface ImageWidgetOptions extends LvObjectOptions {
 
 /**
  * Draws a bitmap, mirroring LVGL's `lv_image`. Renders a neutral
- * placeholder box until a source is available — real asset decoding
- * (matching the converter's font/image pipeline) is out of scope for
- * Stage 2.
+ * placeholder box (`style.base.bgColor`) until a source is available —
+ * real asset decoding (matching the converter's font/image pipeline) is
+ * out of scope for this simulator so far.
  */
 export class ImageWidget extends LvObject {
   private drawable: CanvasImageSource | undefined;
   private readonly onLoadCallback: (() => void) | undefined;
 
   constructor(options: ImageWidgetOptions) {
-    super(options);
+    super({
+      ...options,
+      style: {
+        base: mergeStyle({ bgColor: defaultTheme.disabledColor }, options.style?.base),
+        states: options.style?.states,
+      },
+    });
     this.onLoadCallback = options.onLoad;
 
     if (options.image) {
@@ -49,6 +56,15 @@ export class ImageWidget extends LvObject {
       return;
     }
 
-    paintRoundedRect(context, x, y, this.width, this.height, 0, defaultTheme.disabledColor);
+    const style = this.resolvedStyle;
+    paintRoundedRect(
+      context,
+      x,
+      y,
+      this.width,
+      this.height,
+      style.radius ?? 0,
+      style.bgColor ?? defaultTheme.disabledColor,
+    );
   }
 }
