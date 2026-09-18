@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { LvObject } from '../core/LvObject';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { Container } from './Container';
+import { LvObject } from '../core/LvObject.js';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { Container } from './Container.js';
 
 describe('Container', () => {
   it('leaves children at their manually-set position when no layout is given', () => {

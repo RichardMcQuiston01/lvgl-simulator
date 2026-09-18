@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { Button } from './Button';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { Button } from './Button.js';
 
 describe('Button', () => {
   it('defaults its background to the theme primary color', () => {

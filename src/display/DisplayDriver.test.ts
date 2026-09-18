@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createDisplayDriver } from './DisplayDriver';
+import { createDisplayDriver } from './DisplayDriver.js';
 
 class FakeContext2D {
   fillStyle = '';

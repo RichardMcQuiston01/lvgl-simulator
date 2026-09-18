@@ -1,6 +1,6 @@
-import { LvObject, type LvObjectOptions } from '../core/LvObject';
-import { mergeStyle } from '../style/Style';
-import { defaultTheme } from '../theme/defaultTheme';
+import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
+import { mergeStyle } from '../style/Style.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
 
 export interface LabelOptions extends LvObjectOptions {
   readonly text: string;

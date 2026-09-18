@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { LvObject } from './LvObject';
+import { LvObject } from './LvObject.js';
 
 function createFakeContext(): CanvasRenderingContext2D {
   return {

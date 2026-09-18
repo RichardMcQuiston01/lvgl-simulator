@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { withOpacity } from './color';
+import { withOpacity } from './color.js';
 
 describe('withOpacity', () => {
   it('returns the color unchanged when opa is undefined', () => {

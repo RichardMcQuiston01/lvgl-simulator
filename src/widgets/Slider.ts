@@ -1,8 +1,8 @@
-import { LvObject, type LvObjectOptions } from '../core/LvObject';
-import type { PointerDraggable } from '../interaction/PointerDraggable';
-import { paintCircle, paintCircleStroke, paintRoundedRect } from '../rendering/shapes';
-import { mergeStyle, resolveStyle, type StyleSet } from '../style/Style';
-import { defaultTheme } from '../theme/defaultTheme';
+import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
+import type { PointerDraggable } from '../interaction/PointerDraggable.js';
+import { paintCircle, paintCircleStroke, paintRoundedRect } from '../rendering/shapes.js';
+import { mergeStyle, resolveStyle, type StyleSet } from '../style/Style.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
 
 const MAX_TRACK_HEIGHT = 8;
 

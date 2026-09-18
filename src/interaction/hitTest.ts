@@ -1,4 +1,4 @@
-import type { LvObject } from '../core/LvObject';
+import type { LvObject } from '../core/LvObject.js';
 
 /**
  * Finds the deepest (most specific) object in `root`'s subtree whose

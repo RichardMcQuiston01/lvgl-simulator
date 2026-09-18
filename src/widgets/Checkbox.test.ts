@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { Checkbox } from './Checkbox';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { Checkbox } from './Checkbox.js';
 
 describe('Checkbox', () => {
   it('defaults to unchecked', () => {

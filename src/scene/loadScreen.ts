@@ -1,10 +1,10 @@
-import { Button } from '../widgets/Button';
-import { Checkbox } from '../widgets/Checkbox';
-import { Container } from '../widgets/Container';
-import { ImageWidget } from '../widgets/ImageWidget';
-import { Label } from '../widgets/Label';
-import type { LvObject } from '../core/LvObject';
-import { Slider } from '../widgets/Slider';
+import { Button } from '../widgets/Button.js';
+import { Checkbox } from '../widgets/Checkbox.js';
+import { Container } from '../widgets/Container.js';
+import { ImageWidget } from '../widgets/ImageWidget.js';
+import { Label } from '../widgets/Label.js';
+import type { LvObject } from '../core/LvObject.js';
+import { Slider } from '../widgets/Slider.js';
 import {
   SCENE_SCHEMA_VERSION,
   type Scene,
@@ -16,8 +16,8 @@ import {
   type SceneNode,
   type SceneSliderNode,
   type SceneSwitchNode,
-} from './SceneSchema';
-import { Switch } from '../widgets/Switch';
+} from './SceneSchema.js';
+import { Switch } from '../widgets/Switch.js';
 
 /**
  * Builds the object tree `scene` describes and returns its root — a

@@ -1,4 +1,4 @@
-import type { LvObject } from '../core/LvObject';
+import type { LvObject } from '../core/LvObject.js';
 
 export type FlexDirection = 'row' | 'column';
 export type FlexWrap = 'nowrap' | 'wrap';

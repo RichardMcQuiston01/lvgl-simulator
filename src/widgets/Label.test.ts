@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { Label } from './Label';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { Label } from './Label.js';
 
 describe('Label', () => {
   it('draws its text at the vertical center of its box', () => {

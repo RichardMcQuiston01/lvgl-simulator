@@ -1,4 +1,4 @@
-import type { LvObject } from '../core/LvObject';
+import type { LvObject } from '../core/LvObject.js';
 
 /** An event dispatched by an {@link LvObject}, mirroring LVGL's `lv_event_t`. */
 export interface LvEvent {

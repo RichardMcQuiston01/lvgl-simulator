@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { Button } from '../widgets/Button';
-import { Checkbox } from '../widgets/Checkbox';
-import { Container } from '../widgets/Container';
-import { ImageWidget } from '../widgets/ImageWidget';
-import { Label } from '../widgets/Label';
-import { Slider } from '../widgets/Slider';
-import { Switch } from '../widgets/Switch';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { loadScreen } from './loadScreen';
-import { SCENE_SCHEMA_VERSION, type Scene, type SceneNode } from './SceneSchema';
+import { Button } from '../widgets/Button.js';
+import { Checkbox } from '../widgets/Checkbox.js';
+import { Container } from '../widgets/Container.js';
+import { ImageWidget } from '../widgets/ImageWidget.js';
+import { Label } from '../widgets/Label.js';
+import { Slider } from '../widgets/Slider.js';
+import { Switch } from '../widgets/Switch.js';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { loadScreen } from './loadScreen.js';
+import { SCENE_SCHEMA_VERSION, type Scene, type SceneNode } from './SceneSchema.js';
 
 describe('loadScreen', () => {
   it('throws a descriptive error for an unsupported schema version', () => {

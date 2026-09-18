@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { LvObject } from '../core/LvObject';
-import { hitTest } from './hitTest';
+import { LvObject } from '../core/LvObject.js';
+import { hitTest } from './hitTest.js';
 
 describe('hitTest', () => {
   it('returns the root when the point is within its bounds and it has no children', () => {

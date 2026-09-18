@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createSimulator, Button, Container } from './index';
-import { LvObject } from './core/LvObject';
+import { createSimulator, Button, Container } from './index.js';
+import { LvObject } from './core/LvObject.js';
 
 function pointerEventAt(type: string, x: number, y: number, pointerId = 1): PointerEvent {
   const event = new PointerEvent(type, { pointerId, bubbles: true });

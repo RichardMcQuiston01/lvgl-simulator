@@ -1,7 +1,7 @@
-import { EventEmitter } from '../events/EventEmitter';
-import type { LvEventMap } from '../events/LvEvent';
-import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style';
-import { withOpacity } from '../style/color';
+import { EventEmitter } from '../events/EventEmitter.js';
+import type { LvEventMap } from '../events/LvEvent.js';
+import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style.js';
+import { withOpacity } from '../style/color.js';
 
 /**
  * Constructor options for {@link LvObject}.

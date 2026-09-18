@@ -1,32 +1,36 @@
-import { createRenderLoop } from './core/RenderLoop';
-import { createDisplayDriver, type ColorFormat, type DisplayDriver } from './display/DisplayDriver';
-import { attachInteraction } from './interaction/InteractionController';
-import { mergeStyle, paddingAll } from './style/Style';
-import { Container, type ContainerLayout } from './widgets/Container';
+import { createRenderLoop } from './core/RenderLoop.js';
+import {
+  createDisplayDriver,
+  type ColorFormat,
+  type DisplayDriver,
+} from './display/DisplayDriver.js';
+import { attachInteraction } from './interaction/InteractionController.js';
+import { mergeStyle, paddingAll } from './style/Style.js';
+import { Container, type ContainerLayout } from './widgets/Container.js';
 
-export { LvObject } from './core/LvObject';
-export type { LvObjectOptions } from './core/LvObject';
-export { createRenderLoop } from './core/RenderLoop';
-export type { RenderLoop, RenderLoopScheduler } from './core/RenderLoop';
-export { createDisplayDriver } from './display/DisplayDriver';
-export type { ColorFormat, DisplayDriver, DisplayDriverOptions } from './display/DisplayDriver';
+export { LvObject } from './core/LvObject.js';
+export type { LvObjectOptions } from './core/LvObject.js';
+export { createRenderLoop } from './core/RenderLoop.js';
+export type { RenderLoop, RenderLoopScheduler } from './core/RenderLoop.js';
+export { createDisplayDriver } from './display/DisplayDriver.js';
+export type { ColorFormat, DisplayDriver, DisplayDriverOptions } from './display/DisplayDriver.js';
 
-export { defaultTheme } from './theme/defaultTheme';
+export { defaultTheme } from './theme/defaultTheme.js';
 
-export { mergeStyle, paddingAll, resolveStyle } from './style/Style';
-export type { LvState, Style, StyleSet } from './style/Style';
-export { withOpacity } from './style/color';
+export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
+export type { LvState, Style, StyleSet } from './style/Style.js';
+export { withOpacity } from './style/color.js';
 
-export type { LvEvent, LvEventMap } from './events/LvEvent';
+export type { LvEvent, LvEventMap } from './events/LvEvent.js';
 
-export { attachInteraction } from './interaction/InteractionController';
-export type { InteractionController } from './interaction/InteractionController';
-export { hitTest } from './interaction/hitTest';
-export { isPointerDraggable } from './interaction/PointerDraggable';
-export type { PointerDraggable } from './interaction/PointerDraggable';
+export { attachInteraction } from './interaction/InteractionController.js';
+export type { InteractionController } from './interaction/InteractionController.js';
+export { hitTest } from './interaction/hitTest.js';
+export { isPointerDraggable } from './interaction/PointerDraggable.js';
+export type { PointerDraggable } from './interaction/PointerDraggable.js';
 
-export { loadScreen } from './scene/loadScreen';
-export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema';
+export { loadScreen } from './scene/loadScreen.js';
+export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
   Scene,
   SceneButtonNode,
@@ -39,33 +43,33 @@ export type {
   SceneSliderNode,
   SceneSwitchNode,
   SceneWidgetType,
-} from './scene/SceneSchema';
+} from './scene/SceneSchema.js';
 
-export { applyFlexLayout } from './layout/flex';
+export { applyFlexLayout } from './layout/flex.js';
 export type {
   FlexCrossAlign,
   FlexDirection,
   FlexLayout,
   FlexMainAlign,
   FlexWrap,
-} from './layout/flex';
-export { applyGridLayout } from './layout/grid';
-export type { GridLayout } from './layout/grid';
+} from './layout/flex.js';
+export { applyGridLayout } from './layout/grid.js';
+export type { GridLayout } from './layout/grid.js';
 
-export { Container } from './widgets/Container';
-export type { ContainerLayout, ContainerOptions } from './widgets/Container';
-export { Label } from './widgets/Label';
-export type { LabelOptions } from './widgets/Label';
-export { Button } from './widgets/Button';
-export type { ButtonOptions } from './widgets/Button';
-export { Checkbox } from './widgets/Checkbox';
-export type { CheckboxOptions } from './widgets/Checkbox';
-export { Switch } from './widgets/Switch';
-export type { SwitchOptions } from './widgets/Switch';
-export { Slider } from './widgets/Slider';
-export type { SliderOptions } from './widgets/Slider';
-export { ImageWidget } from './widgets/ImageWidget';
-export type { ImageWidgetOptions } from './widgets/ImageWidget';
+export { Container } from './widgets/Container.js';
+export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
+export { Label } from './widgets/Label.js';
+export type { LabelOptions } from './widgets/Label.js';
+export { Button } from './widgets/Button.js';
+export type { ButtonOptions } from './widgets/Button.js';
+export { Checkbox } from './widgets/Checkbox.js';
+export type { CheckboxOptions } from './widgets/Checkbox.js';
+export { Switch } from './widgets/Switch.js';
+export type { SwitchOptions } from './widgets/Switch.js';
+export { Slider } from './widgets/Slider.js';
+export type { SliderOptions } from './widgets/Slider.js';
+export { ImageWidget } from './widgets/ImageWidget.js';
+export type { ImageWidgetOptions } from './widgets/ImageWidget.js';
 
 /**
  * Options for {@link createSimulator}.

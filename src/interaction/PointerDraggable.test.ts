@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isPointerDraggable } from './PointerDraggable';
+import { isPointerDraggable } from './PointerDraggable.js';
 
 describe('isPointerDraggable', () => {
   it('returns true for an object with a handlePointerPosition method', () => {
