@@ -84,34 +84,39 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       comparison exists yet), and how to update the baseline
       intentionally
 
-## Stage 7: Packaging, docs, platform integration — publish-ready
+## Stage 7: Packaging, docs, platform integration — published
 
 - [x] README complete (prerequisites/install/usage/examples, plus a
-      "Releasing" section for maintainers)
+      "Releasing" section for maintainers) and a deeper
+      [`docs/GETTING_STARTED.md`](./GETTING_STARTED.md) walkthrough
 - [x] npm publish workflow — `.github/workflows/release.yml`, triggered by
       a `vX.Y.Z` tag push: lints/typechecks/tests/builds, verifies the tag
       matches `package.json`'s version, then `npm publish --provenance`.
       Filled in the previously-empty `LICENSE` (Apache License 2.0,
       matching what `package.json`/`README.md` already declared) and
       `package.json`'s `repository`/`homepage`/`bugs`/`keywords`/`author`/
-      `publishConfig` — required for a clean npm listing. Cut the
-      accumulated `CHANGELOG.md` entries as `0.1.0`.
-      **Not done in this repo:** actually pushing the first release tag
-      and provisioning the `NPM_TOKEN` secret — those are one-way,
-      account-owning actions for a human to trigger, not something to
-      do unprompted.
+      `publishConfig` — required for a clean npm listing.
+      [`v0.1.0`](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator/v/0.1.0)
+      published to npm, followed immediately by
+      [`v0.1.1`](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator/v/0.1.1)
+      fixing a packaging bug `0.1.0` shipped with — see "Open items" below.
 - [ ] Spike integration into `html2lvgl-platform`'s `apps/web` — per
       `docs/PLAN.md`, this is explicitly a follow-up in that other repo,
-      not this one ("separate PR, separate repo"), and only possible once
-      `0.1.0` is actually published to npm.
+      not this one ("separate PR, separate repo").
 
 ## Open items
 
-- Stage 7: the repository is publish-ready, but `0.1.0` has not actually
-  been published yet — that needs an `NPM_TOKEN` secret with publish
-  rights on the `@richardmcquiston01` npm scope, and the first
-  `git tag v0.1.0 && git push origin v0.1.0`. See the README's
-  "Releasing" section.
+- Lesson from `0.1.0`: verifying "installs correctly from npm" needs an
+  actual `npm install` + plain `node` import of the published tarball,
+  not just `npm run build` succeeding locally. `0.1.0` built and tested
+  fine (Vite/Vitest's `"Bundler"` module resolution tolerates relative
+  imports missing a file extension), but failed for any consumer using
+  plain Node ESM (`Cannot find module '.../dist/core/RenderLoop'`) —
+  Node's native resolver requires the literal `.js` extension, unlike a
+  bundler. Fixed in `0.1.1` by adding `.js` to every relative
+  import/export in `src/`, verified against a freshly-installed tarball
+  before publishing. Worth keeping an npm-install smoke test in mind for
+  future releases, not just the existing Vitest/Playwright suites.
 - Decided in Stage 5: the scene-description schema stays standalone (see
   `docs/SCENE_SCHEMA.md`) rather than adopting `html-to-lvgl`'s internal
   AST directly. If/when needed, that repo gets a thin adapter mapping its

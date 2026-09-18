@@ -1,8 +1,13 @@
 # LVGL Simulator
 
+[![npm version](https://img.shields.io/npm/v/@richardmcquiston01/lvgl-simulator.svg)](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator)
+[![CI](https://github.com/RichardMcQuiston01/lvgl-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/RichardMcQuiston01/lvgl-simulator/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
+
 ## Overview
 
-TypeScript LVGL simulator for running in the browser. Designed to be as package for incorporation into other repositories.
+TypeScript LVGL simulator for running in the browser, designed to be used as
+a package for incorporation into other repositories.
 
 Renders LVGL-style UIs to an HTML5 `<canvas>` by re-implementing widget,
 layout, and style behavior in pure TypeScript (no WASM/Emscripten build of
@@ -10,9 +15,11 @@ LVGL itself). Intended for future consumption by
 [`html2lvgl-platform`](https://github.com/RichardMcQuiston01/html2lvgl-platform)'s
 web editor as a fast, low-fidelity-tradeoff live preview.
 
-See [`docs/PLAN.md`](./docs/PLAN.md) for the architecture rationale and the
-multi-agent, multi-stage development plan, and
-[`docs/ROADMAP.md`](./docs/ROADMAP.md) for current stage status.
+See [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md) for a full
+walkthrough (widgets, styling, layout, events, scenes, framework
+integration, troubleshooting), [`docs/PLAN.md`](./docs/PLAN.md) for the
+architecture rationale and the multi-agent, multi-stage development plan,
+and [`docs/ROADMAP.md`](./docs/ROADMAP.md) for current stage status.
 
 ## Getting Started
 
@@ -125,6 +132,10 @@ disabled button, a live slider-value readout, and a section loaded
 entirely from a hand-written JSON scene — `npm run dev`, then visit the
 printed URL (resolution configurable via `?width=`/`?height=` query
 params). See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for what's next.
+
+For the full widget/styling/layout/events reference, a step-by-step
+tutorial, framework integration snippets, and troubleshooting, see
+[`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md).
 
 ## Releasing
 
