@@ -72,4 +72,15 @@ describe('Switch', () => {
 
     expect(fillColors[1]).toBe('#ff00ff');
   });
+
+  it('toggles checked and fires valueChanged when clicked', () => {
+    const toggle = new Switch({ width: 40, height: 20, checked: false });
+    const valueChanged = vi.fn();
+    toggle.addEventListener('valueChanged', valueChanged);
+
+    toggle.dispatchEvent('clicked');
+
+    expect(toggle.checked).toBe(true);
+    expect(valueChanged).toHaveBeenCalledWith({ target: toggle });
+  });
 });

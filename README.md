@@ -58,11 +58,18 @@ const simulator = createSimulator(document.getElementById('app')!, {
   layout: { type: 'flex', direction: 'column', rowGap: 16 },
 });
 
-simulator.screen.addChild(new Label({ width: 200, height: 20, text: 'Widget gallery' }));
-simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Press me' }));
-simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Checked', checked: true }));
-simulator.screen.addChild(new Switch({ width: 44, height: 24, checked: true }));
-simulator.screen.addChild(new Slider({ width: 200, height: 20, value: 60 }));
+const counterLabel = new Label({ width: 200, height: 20, text: 'Clicks: 0' });
+const button = new Button({ width: 120, height: 36, text: 'Click me' });
+let clicks = 0;
+button.addEventListener('clicked', () => {
+  counterLabel.text = `Clicks: ${++clicks}`;
+});
+
+simulator.screen.addChild(button);
+simulator.screen.addChild(counterLabel);
+simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Toggle me' }));
+simulator.screen.addChild(new Switch({ width: 44, height: 24 }));
+simulator.screen.addChild(new Slider({ width: 200, height: 20, value: 60 })); // drag it — it's live
 
 // Every widget's paint properties are a StyleSet (a base plus per-state
 // overrides), mirroring LVGL's own part/state model — override any of it:
@@ -76,13 +83,16 @@ simulator.screen.addChild(
   }),
 );
 
-simulator.start(); // repaints `simulator.screen` on every animation frame
+// Pointer input is wired up automatically: clicking toggles
+// Checkbox/Switch (firing `valueChanged`), and dragging a Slider updates
+// its value — canvas listeners are attached the moment createSimulator()
+// runs, no separate setup required.
 ```
 
-The `playground/` app runs this exact gallery — `npm run dev`, then visit
-the printed URL (resolution configurable via `?width=`/`?height=` query
-params). It will grow further as interaction lands — see
-[`docs/ROADMAP.md`](./docs/ROADMAP.md).
+The `playground/` app runs a fuller version of this gallery, including a
+disabled button and a live slider-value readout — `npm run dev`, then
+visit the printed URL (resolution configurable via `?width=`/`?height=`
+query params). See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for what's next.
 
 ## Buy Me a Coffee
 

@@ -1,5 +1,6 @@
 import { createRenderLoop } from './core/RenderLoop';
 import { createDisplayDriver, type ColorFormat, type DisplayDriver } from './display/DisplayDriver';
+import { attachInteraction } from './interaction/InteractionController';
 import { mergeStyle, paddingAll } from './style/Style';
 import { Container, type ContainerLayout } from './widgets/Container';
 
@@ -15,6 +16,14 @@ export { defaultTheme } from './theme/defaultTheme';
 export { mergeStyle, paddingAll, resolveStyle } from './style/Style';
 export type { LvState, Style, StyleSet } from './style/Style';
 export { withOpacity } from './style/color';
+
+export type { LvEvent, LvEventMap } from './events/LvEvent';
+
+export { attachInteraction } from './interaction/InteractionController';
+export type { InteractionController } from './interaction/InteractionController';
+export { hitTest } from './interaction/hitTest';
+export { isPointerDraggable } from './interaction/PointerDraggable';
+export type { PointerDraggable } from './interaction/PointerDraggable';
 
 export { applyFlexLayout } from './layout/flex';
 export type {
@@ -72,15 +81,17 @@ export interface Simulator {
   stop(): void;
   /** Repaints the current tree once, without starting the render loop. */
   renderOnce(): void;
+  /** Stops the render loop and detaches pointer input handling. Call when unmounting. */
+  destroy(): void;
 }
 
 /**
  * Mounts a simulator display inside `container`: a `<canvas>` sized to the
- * given resolution, an object tree rooted at `screen`, and a render loop
- * that repaints the whole tree every frame (see docs/PLAN.md). `screen` is
- * a {@link Container}, so widgets can be added directly with an optional
- * flex/grid layout and a `StyleSet`; interaction (Stage 4) builds on top
- * of it.
+ * given resolution, an object tree rooted at `screen`, a render loop that
+ * repaints the whole tree every frame, and pointer input wired to `screen`
+ * (see docs/PLAN.md — `attachInteraction` drives pressed/released/clicked/
+ * valueChanged). `screen` is a {@link Container}, so widgets can be added
+ * directly with an optional flex/grid layout and a `StyleSet`.
  */
 export function createSimulator(container: HTMLElement, options: SimulatorOptions): Simulator {
   const {
@@ -114,6 +125,7 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
   }
 
   const loop = createRenderLoop(renderOnce);
+  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce);
 
   container.appendChild(displayDriver.canvas);
   renderOnce();
@@ -125,5 +137,9 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     start: () => loop.start(),
     stop: () => loop.stop(),
     renderOnce,
+    destroy: () => {
+      loop.stop();
+      interaction.dispose();
+    },
   };
 }

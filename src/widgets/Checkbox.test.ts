@@ -99,4 +99,20 @@ describe('Checkbox', () => {
 
     expect(context.strokeStyle).toBe(defaultTheme.borderColor);
   });
+
+  it('toggles checked and fires valueChanged when clicked', () => {
+    const checkbox = new Checkbox({ width: 100, height: 20, checked: false });
+    const valueChanged = vi.fn();
+    checkbox.addEventListener('valueChanged', valueChanged);
+
+    checkbox.dispatchEvent('clicked');
+
+    expect(checkbox.checked).toBe(true);
+    expect(valueChanged).toHaveBeenCalledWith({ target: checkbox });
+
+    checkbox.dispatchEvent('clicked');
+
+    expect(checkbox.checked).toBe(false);
+    expect(valueChanged).toHaveBeenCalledTimes(2);
+  });
 });

@@ -41,10 +41,18 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       (Checkbox's indicator, Switch's/Slider's knob, Slider's indicator)
       expose separate named `StyleSet` fields, all resolved the same way
 
-## Stage 4: Input & interaction — not started
+## Stage 4: Input & interaction — done
 
-- [ ] Pointer/touch hit-testing
-- [ ] LVGL-style event model (CLICKED, VALUE_CHANGED, PRESSED/RELEASED)
+- [x] Pointer/touch hit-testing (`hitTest`: deepest/topmost object under a
+      point, reverse z-order, disabled objects excluded by the controller)
+- [x] LVGL-style event model (`EventEmitter`, `LvEvent`/`LvEventMap`:
+      `pressed`/`released`/`clicked`/`valueChanged`) dispatched by
+      `attachInteraction`, wired into `createSimulator` by default
+- [x] State transitions driven by input: `Checkbox`/`Switch` toggle
+      `checked` (+ `valueChanged`) on click; `Slider` implements
+      `PointerDraggable` to update `value` (+ `valueChanged`) from drag
+      position — verified end to end via a headless-browser click/drag
+      against the playground, not just unit assertions
 
 ## Stage 5: Scene import adapter — not started
 
