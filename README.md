@@ -23,6 +23,14 @@ multi-agent, multi-stage development plan, and
 
 ### Installation
 
+To use the published package in your own project:
+
+```bash
+npm install @richardmcquiston01/lvgl-simulator
+```
+
+To work on this repository itself:
+
 ```bash
 git clone https://github.com/RichardMcQuiston01/lvgl-simulator.git
 cd lvgl-simulator
@@ -118,6 +126,22 @@ entirely from a hand-written JSON scene — `npm run dev`, then visit the
 printed URL (resolution configurable via `?width=`/`?height=` query
 params). See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for what's next.
 
+## Releasing
+
+Publishing to npm is tag-triggered (`.github/workflows/release.yml`):
+
+1. Bump `version` in `package.json` (following semver) and add a matching
+   entry at the top of [`CHANGELOG.md`](./CHANGELOG.md), above `Unreleased`.
+2. Commit, merge to `main`, then tag the merge commit and push the tag:
+   ```bash
+   git tag v<version>
+   git push origin v<version>
+   ```
+3. CI lints/typechecks/tests/builds, verifies the tag matches
+   `package.json`'s version, then runs `npm publish --provenance`. This
+   requires an `NPM_TOKEN` repository secret with publish rights on the
+   `@richardmcquiston01` npm scope.
+
 ## Buy Me a Coffee
 
 If this app, code, or repository has helped you or someone you know, please consider donating. I appreciate any help to offset the costs of development and/or AI Credits.
@@ -128,7 +152,7 @@ If this app, code, or repository has helped you or someone you know, please cons
 
 ## License
 
-Apache 2
+[Apache License 2.0](./LICENSE)
 
 ## Copyright
 

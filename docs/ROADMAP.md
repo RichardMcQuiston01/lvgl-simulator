@@ -84,14 +84,34 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       comparison exists yet), and how to update the baseline
       intentionally
 
-## Stage 7: Packaging, docs, platform integration — not started
+## Stage 7: Packaging, docs, platform integration — publish-ready
 
-- [ ] README complete (prerequisites/install/usage/examples)
-- [ ] npm publish workflow
-- [ ] Spike integration into `html2lvgl-platform`'s `apps/web`
+- [x] README complete (prerequisites/install/usage/examples, plus a
+      "Releasing" section for maintainers)
+- [x] npm publish workflow — `.github/workflows/release.yml`, triggered by
+      a `vX.Y.Z` tag push: lints/typechecks/tests/builds, verifies the tag
+      matches `package.json`'s version, then `npm publish --provenance`.
+      Filled in the previously-empty `LICENSE` (Apache License 2.0,
+      matching what `package.json`/`README.md` already declared) and
+      `package.json`'s `repository`/`homepage`/`bugs`/`keywords`/`author`/
+      `publishConfig` — required for a clean npm listing. Cut the
+      accumulated `CHANGELOG.md` entries as `0.1.0`.
+      **Not done in this repo:** actually pushing the first release tag
+      and provisioning the `NPM_TOKEN` secret — those are one-way,
+      account-owning actions for a human to trigger, not something to
+      do unprompted.
+- [ ] Spike integration into `html2lvgl-platform`'s `apps/web` — per
+      `docs/PLAN.md`, this is explicitly a follow-up in that other repo,
+      not this one ("separate PR, separate repo"), and only possible once
+      `0.1.0` is actually published to npm.
 
 ## Open items
 
+- Stage 7: the repository is publish-ready, but `0.1.0` has not actually
+  been published yet — that needs an `NPM_TOKEN` secret with publish
+  rights on the `@richardmcquiston01` npm scope, and the first
+  `git tag v0.1.0 && git push origin v0.1.0`. See the README's
+  "Releasing" section.
 - Decided in Stage 5: the scene-description schema stays standalone (see
   `docs/SCENE_SCHEMA.md`) rather than adopting `html-to-lvgl`'s internal
   AST directly. If/when needed, that repo gets a thin adapter mapping its

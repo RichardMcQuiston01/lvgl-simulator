@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.1.0 - 2026-09-18
+
+- Stage 7 packaging & docs: filled in `LICENSE` (Apache License 2.0, matching
+  the license already declared in `package.json`/`README.md`), added
+  `repository`/`homepage`/`bugs`/`keywords`/`author`/`publishConfig` to
+  `package.json`, and added a tag-triggered release workflow
+  (`.github/workflows/release.yml`) that lints/typechecks/tests/builds and
+  publishes to npm with provenance on a `vX.Y.Z` tag push. Cut this
+  changelog's accumulated `Unreleased` entries (Stages 0–6) as the `0.1.0`
+  release.
 - Stage 6 testing & fidelity validation: extended the Vitest layout suite
   (`src/layout/flex.test.ts`/`grid.test.ts`) with `space_around`/
   `space_evenly` main-axis distribution, per-line cross-axis sizing and
