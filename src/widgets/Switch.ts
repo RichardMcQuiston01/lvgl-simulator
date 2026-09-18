@@ -33,6 +33,14 @@ export class Switch extends LvObject {
       base: mergeStyle({ bgColor: defaultTheme.backgroundColor }, options.knobStyle?.base),
       states: options.knobStyle?.states,
     };
+
+    // Toggling on click is the switch's own reaction to input, mirroring
+    // LVGL's lv_switch — the interaction controller only knows about
+    // generic pressed/released/clicked, not what a click means per widget.
+    this.addEventListener('clicked', () => {
+      this.checked = !this.checked;
+      this.dispatchEvent('valueChanged');
+    });
   }
 
   protected override getActiveStates(): ReadonlySet<LvState> {

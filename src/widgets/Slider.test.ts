@@ -84,4 +84,44 @@ describe('Slider', () => {
     expect(fillColors[1]).toBe('#ff00ff');
     expect(fillColors[2]).toBe('#00ffff');
   });
+
+  describe('handlePointerPosition', () => {
+    it('sets value proportionally to the local x position and fires valueChanged', () => {
+      const slider = new Slider({ width: 200, height: 20, min: 0, max: 100 });
+      const valueChanged = vi.fn();
+      slider.addEventListener('valueChanged', valueChanged);
+
+      slider.handlePointerPosition(100, 0);
+
+      expect(slider.value).toBe(50);
+      expect(valueChanged).toHaveBeenCalledWith({ target: slider });
+    });
+
+    it('clamps to min/max for positions outside the track', () => {
+      const slider = new Slider({ width: 200, height: 20, min: 0, max: 100 });
+
+      slider.handlePointerPosition(-50, 0);
+      expect(slider.value).toBe(0);
+
+      slider.handlePointerPosition(500, 0);
+      expect(slider.value).toBe(100);
+    });
+
+    it('does not fire valueChanged when the computed value is unchanged', () => {
+      const slider = new Slider({ width: 200, height: 20, min: 0, max: 100, value: 0 });
+      const valueChanged = vi.fn();
+      slider.addEventListener('valueChanged', valueChanged);
+
+      slider.handlePointerPosition(-50, 0); // clamps to 0, same as current value
+
+      expect(valueChanged).not.toHaveBeenCalled();
+    });
+
+    it('treats a zero-width track as always at the minimum', () => {
+      const slider = new Slider({ width: 0, height: 20, min: 0, max: 100 });
+
+      expect(() => slider.handlePointerPosition(10, 0)).not.toThrow();
+      expect(slider.value).toBe(0);
+    });
+  });
 });

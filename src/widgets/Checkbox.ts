@@ -41,6 +41,14 @@ export class Checkbox extends LvObject {
         ...options.indicatorStyle?.states,
       },
     };
+
+    // Toggling on click is the checkbox's own reaction to input, mirroring
+    // LVGL's lv_checkbox — the interaction controller only knows about
+    // generic pressed/released/clicked, not what a click means per widget.
+    this.addEventListener('clicked', () => {
+      this.checked = !this.checked;
+      this.dispatchEvent('valueChanged');
+    });
   }
 
   protected override getActiveStates(): ReadonlySet<LvState> {

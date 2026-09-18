@@ -1,3 +1,5 @@
+import { EventEmitter } from '../events/EventEmitter';
+import type { LvEventMap } from '../events/LvEvent';
 import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style';
 import { withOpacity } from '../style/color';
 
@@ -47,6 +49,7 @@ export class LvObject {
 
   private parentObject: LvObject | null = null;
   private readonly childObjects: LvObject[] = [];
+  private readonly eventEmitter = new EventEmitter<LvEventMap>();
 
   constructor(options: LvObjectOptions) {
     this.x = options.x ?? 0;
@@ -87,6 +90,36 @@ export class LvObject {
     }
     this.childObjects.splice(index, 1);
     child.parentObject = null;
+  }
+
+  /**
+   * Subscribes `listener` to `type`, mirroring `lv_obj_add_event_cb`.
+   * See {@link LvEventMap} for the event types this simulator dispatches.
+   */
+  addEventListener<K extends keyof LvEventMap>(
+    type: K,
+    listener: (event: LvEventMap[K]) => void,
+  ): void {
+    this.eventEmitter.on(type, listener);
+  }
+
+  /** Unsubscribes `listener` from `type`. No-op if it was never added. */
+  removeEventListener<K extends keyof LvEventMap>(
+    type: K,
+    listener: (event: LvEventMap[K]) => void,
+  ): void {
+    this.eventEmitter.off(type, listener);
+  }
+
+  /**
+   * Fires `type` on this object with `{ target: this }`, mirroring LVGL
+   * dispatching an event to an object's registered callbacks. Called by
+   * the interaction controller (`src/interaction/`) for pointer-driven
+   * events, and by widgets reacting to their own input (e.g. `Checkbox`
+   * toggling on `clicked`).
+   */
+  dispatchEvent<K extends keyof LvEventMap>(type: K): void {
+    this.eventEmitter.emit(type, { target: this });
   }
 
   /** This object's position in the display's coordinate space. */

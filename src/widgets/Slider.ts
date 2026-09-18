@@ -1,4 +1,5 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject';
+import type { PointerDraggable } from '../interaction/PointerDraggable';
 import { paintCircle, paintCircleStroke, paintRoundedRect } from '../rendering/shapes';
 import { mergeStyle, resolveStyle, type StyleSet } from '../style/Style';
 import { defaultTheme } from '../theme/defaultTheme';
@@ -16,7 +17,7 @@ export interface SliderOptions extends LvObjectOptions {
 }
 
 /** A track with a filled indicator and a draggable knob, mirroring LVGL's `lv_slider`. */
-export class Slider extends LvObject {
+export class Slider extends LvObject implements PointerDraggable {
   min: number;
   max: number;
   value: number;
@@ -60,6 +61,22 @@ export class Slider extends LvObject {
       return 0;
     }
     return Math.min(1, Math.max(0, (this.value - this.min) / span));
+  }
+
+  /**
+   * Sets `value` from a pointer's horizontal position along the track (see
+   * {@link PointerDraggable}), dispatching `valueChanged` if it changed.
+   * The interaction controller calls this on press and on every move while
+   * dragging, mirroring LVGL's `lv_slider` drag behavior.
+   */
+  handlePointerPosition(localX: number, _localY?: number): void {
+    const ratio = this.width === 0 ? 0 : Math.min(1, Math.max(0, localX / this.width));
+    const nextValue = this.min + ratio * (this.max - this.min);
+    if (nextValue === this.value) {
+      return;
+    }
+    this.value = nextValue;
+    this.dispatchEvent('valueChanged');
   }
 
   protected override paintSelf(context: CanvasRenderingContext2D): void {

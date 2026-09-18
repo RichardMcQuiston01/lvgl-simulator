@@ -181,4 +181,38 @@ describe('LvObject', () => {
     expect(context.save).not.toHaveBeenCalled();
     expect(context.restore).not.toHaveBeenCalled();
   });
+
+  it('dispatchEvent() calls listeners subscribed via addEventListener with { target: this }', () => {
+    const object = new LvObject({ width: 10, height: 10 });
+    const listener = vi.fn();
+
+    object.addEventListener('clicked', listener);
+    object.dispatchEvent('clicked');
+
+    expect(listener).toHaveBeenCalledWith({ target: object });
+  });
+
+  it('removeEventListener() unsubscribes a listener', () => {
+    const object = new LvObject({ width: 10, height: 10 });
+    const listener = vi.fn();
+
+    object.addEventListener('clicked', listener);
+    object.removeEventListener('clicked', listener);
+    object.dispatchEvent('clicked');
+
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('only calls listeners subscribed to the dispatched event type', () => {
+    const object = new LvObject({ width: 10, height: 10 });
+    const clicked = vi.fn();
+    const pressed = vi.fn();
+
+    object.addEventListener('clicked', clicked);
+    object.addEventListener('pressed', pressed);
+    object.dispatchEvent('clicked');
+
+    expect(clicked).toHaveBeenCalledTimes(1);
+    expect(pressed).not.toHaveBeenCalled();
+  });
 });

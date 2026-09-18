@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Stage 4 input & interaction: `hitTest()` (`src/interaction/hitTest.ts`,
+  deepest/topmost object under a point), `attachInteraction()`
+  (`src/interaction/InteractionController.ts`, pointer/touch → hit-test →
+  pressed/released/clicked, plus continuous drag forwarding to any object
+  implementing `PointerDraggable`), and an `LvEvent`/`LvEventMap`
+  (`pressed`/`released`/`clicked`/`valueChanged`) dispatched through a new
+  `EventEmitter`. `LvObject` gained `addEventListener`/`removeEventListener`/
+  `dispatchEvent`. `createSimulator()` now wires `attachInteraction` onto
+  its canvas by default and exposes `destroy()` to detach it.
+  `Checkbox`/`Switch` toggle `checked` (dispatching `valueChanged`) on
+  `clicked`; `Slider` implements `PointerDraggable` to set `value` from
+  drag position. Verified end to end with a real headless-browser
+  click/drag against the playground (button click counter, switch
+  toggle, slider drag), not just unit assertions.
 - Stage 3 style & theme system: `Style`/`StyleSet`/`LvState`/`resolveStyle`
   (`src/style/Style.ts`) — a flat, LVGL-`style_*`-mappable property bag
   plus per-state overrides (pressed/checked/disabled/focused), resolved

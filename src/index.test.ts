@@ -2,6 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSimulator, Button, Container } from './index';
 import { LvObject } from './core/LvObject';
 
+function pointerEventAt(type: string, x: number, y: number, pointerId = 1): PointerEvent {
+  const event = new PointerEvent(type, { pointerId, bubbles: true });
+  Object.defineProperty(event, 'offsetX', { value: x, configurable: true });
+  Object.defineProperty(event, 'offsetY', { value: y, configurable: true });
+  return event;
+}
+
 class FakeContext2D {
   fillStyle = '';
   strokeStyle = '';
@@ -136,5 +143,38 @@ describe('createSimulator', () => {
     expect(second.x).toBe(65); // 5 (padding) + 50 (first) + 10 (gap)
     expect(fakeContext.fillText).toHaveBeenCalledWith('A', expect.any(Number), expect.any(Number));
     expect(fakeContext.fillText).toHaveBeenCalledWith('B', expect.any(Number), expect.any(Number));
+  });
+
+  it('wires real pointer input on the canvas to the screen tree end to end', () => {
+    const container = document.createElement('div');
+    const { canvas, screen } = createSimulator(container, { width: 100, height: 100 });
+    const button = new Button({ x: 10, y: 10, width: 30, height: 20, text: 'Go' });
+    const clicked = vi.fn();
+    button.addEventListener('clicked', clicked);
+    screen.addChild(button);
+
+    canvas.dispatchEvent(pointerEventAt('pointerdown', 20, 20));
+    expect(button.pressed).toBe(true);
+
+    canvas.dispatchEvent(pointerEventAt('pointerup', 20, 20));
+
+    expect(button.pressed).toBe(false);
+    expect(clicked).toHaveBeenCalledWith({ target: button });
+  });
+
+  it('destroy() stops the render loop and detaches pointer input without throwing', () => {
+    const container = document.createElement('div');
+    const simulator = createSimulator(container, { width: 100, height: 100 });
+    const button = new Button({ x: 10, y: 10, width: 30, height: 20, text: 'Go' });
+    simulator.screen.addChild(button);
+
+    expect(() => simulator.destroy()).not.toThrow();
+
+    const clicked = vi.fn();
+    button.addEventListener('clicked', clicked);
+    simulator.canvas.dispatchEvent(pointerEventAt('pointerdown', 20, 20));
+    simulator.canvas.dispatchEvent(pointerEventAt('pointerup', 20, 20));
+
+    expect(clicked).not.toHaveBeenCalled();
   });
 });
