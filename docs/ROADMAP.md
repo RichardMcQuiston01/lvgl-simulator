@@ -22,11 +22,14 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
 - [x] Renders a static single-container screen at a given resolution with
       correct DPI scaling
 
-## Stage 2: Widget library — not started
+## Stage 2: Widget library — done
 
-- [ ] Container (flex + grid layout)
-- [ ] Label, Button, Image
-- [ ] Checkbox/Switch, Slider
+- [x] Container (flex + grid layout, matching LVGL's `flex_flow`/
+      `flex_main_place`/`flex_cross_place`/`pad_row`/`pad_column` and
+      explicit grid track arrays — verified against `html-to-lvgl`'s
+      actual output vocabulary)
+- [x] Label, Button, ImageWidget
+- [x] Checkbox, Switch, Slider
 
 ## Stage 3: Style & theme system — not started
 

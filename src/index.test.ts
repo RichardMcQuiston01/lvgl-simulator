@@ -1,12 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createSimulator } from './index';
+import { createSimulator, Button, Container } from './index';
 import { LvObject } from './core/LvObject';
 
 class FakeContext2D {
   fillStyle = '';
+  strokeStyle = '';
+  lineWidth = 0;
+  font = '';
+  textAlign = '';
+  textBaseline = '';
   fillRect = vi.fn();
   clearRect = vi.fn();
   scale = vi.fn();
+  beginPath = vi.fn();
+  closePath = vi.fn();
+  moveTo = vi.fn();
+  arcTo = vi.fn();
+  fill = vi.fn();
+  stroke = vi.fn();
+  fillText = vi.fn();
 }
 
 let fakeContext: FakeContext2D;
@@ -101,5 +113,28 @@ describe('createSimulator', () => {
     expect(() => createSimulator(container, { width: 10, height: 10 })).toThrow(
       /2D rendering context/,
     );
+  });
+
+  it('renders a screen with a flex-laid-out widget tree end to end', () => {
+    const container = document.createElement('div');
+
+    const { screen, renderOnce } = createSimulator(container, {
+      width: 200,
+      height: 60,
+      layout: { type: 'flex', columnGap: 10 },
+      padding: 5,
+    });
+    const first = new Button({ width: 50, height: 30, text: 'A' });
+    const second = new Button({ width: 50, height: 30, text: 'B' });
+    screen.addChild(first);
+    screen.addChild(second);
+
+    renderOnce();
+
+    expect(screen).toBeInstanceOf(Container);
+    expect(first.x).toBe(5);
+    expect(second.x).toBe(65); // 5 (padding) + 50 (first) + 10 (gap)
+    expect(fakeContext.fillText).toHaveBeenCalledWith('A', expect.any(Number), expect.any(Number));
+    expect(fakeContext.fillText).toHaveBeenCalledWith('B', expect.any(Number), expect.any(Number));
   });
 });

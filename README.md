@@ -42,21 +42,35 @@ npm run format       # Prettier check
 ### Examples
 
 ```ts
-import { createSimulator } from '@richardmcquiston01/lvgl-simulator';
+import {
+  Button,
+  Checkbox,
+  createSimulator,
+  Label,
+  Slider,
+  Switch,
+} from '@richardmcquiston01/lvgl-simulator';
 
 const simulator = createSimulator(document.getElementById('app')!, {
   width: 320,
   height: 240,
-  backgroundColor: '#ffffff',
+  padding: 16,
+  layout: { type: 'flex', direction: 'column', rowGap: 16 },
 });
+
+simulator.screen.addChild(new Label({ width: 200, height: 20, text: 'Stage 2 widget gallery' }));
+simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Press me' }));
+simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Checked', checked: true }));
+simulator.screen.addChild(new Switch({ width: 44, height: 24, checked: true }));
+simulator.screen.addChild(new Slider({ width: 200, height: 20, value: 60 }));
 
 simulator.start(); // repaints `simulator.screen` on every animation frame
 ```
 
-The `playground/` app is the current example/manual test bed: it mounts a
-`createSimulator()` canvas at a configurable resolution
-(`?width=480&height=320` query params). It will grow into a fuller demo as
-widgets and interaction land — see [`docs/ROADMAP.md`](./docs/ROADMAP.md).
+The `playground/` app runs this exact gallery — `npm run dev`, then visit
+the printed URL (resolution configurable via `?width=`/`?height=` query
+params). It will grow further as interaction lands — see
+[`docs/ROADMAP.md`](./docs/ROADMAP.md).
 
 ## Buy Me a Coffee
 
