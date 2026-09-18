@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Stage 6 testing & fidelity validation: extended the Vitest layout suite
+  (`src/layout/flex.test.ts`/`grid.test.ts`) with `space_around`/
+  `space_evenly` main-axis distribution, per-line cross-axis sizing and
+  alignment once flex wraps, cross-axis gaps between wrapped lines, and
+  grid row-span sizing (169 tests total). Added Playwright as a real
+  devDependency (`@playwright/test`) with a dedicated fixture
+  (`e2e/fixtures/`) rendering every Stage 2 widget in multiple states and
+  a snapshot regression test (`e2e/widgets.spec.ts`) comparing it against
+  a committed baseline PNG — wired into CI (`npm run test:e2e`), which
+  now blocks the build on a visual diff. Documented exactly what that
+  baseline covers, and what it doesn't (no WASM/real-LVGL comparison
+  exists yet), in `docs/FIDELITY_BASELINE.md`.
 - Stage 5 scene import adapter: a versioned JSON scene-description schema
   (`Scene`/`SceneNode` in `src/scene/SceneSchema.ts`, `SCENE_SCHEMA_VERSION`),
   documented independently of any producer in `docs/SCENE_SCHEMA.md`, and

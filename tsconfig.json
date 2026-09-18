@@ -17,5 +17,12 @@
       "@lvgl-simulator": ["./src/index.ts"]
     }
   },
-  "include": ["src", "playground", "vitest.config.ts", "vite.config.ts"]
+  "include": [
+    "src",
+    "playground",
+    "e2e",
+    "vitest.config.ts",
+    "vite.config.ts",
+    "playwright.config.ts"
+  ]
 }

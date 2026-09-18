@@ -35,9 +35,15 @@ npm install
 npm run dev        # launch the Vite playground at http://localhost:5173
 npm run build       # type-check and emit the library to dist/
 npm test            # run the Vitest suite
+npm run test:e2e     # run the Playwright visual-regression suite
 npm run lint         # ESLint
 npm run format       # Prettier check
 ```
+
+`test:e2e` compares a canvas render of the Stage 2 widget set against a
+committed baseline screenshot — see
+[`docs/FIDELITY_BASELINE.md`](./docs/FIDELITY_BASELINE.md) for what it
+covers and how to update the baseline after an intentional visual change.
 
 ### Examples
 
