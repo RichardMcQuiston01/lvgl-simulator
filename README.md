@@ -89,10 +89,28 @@ simulator.screen.addChild(
 // runs, no separate setup required.
 ```
 
+A whole subtree can also come from plain JSON via `loadScreen()` — see
+[`docs/SCENE_SCHEMA.md`](./docs/SCENE_SCHEMA.md) for the full format:
+
+```ts
+import { loadScreen, type Scene } from '@richardmcquiston01/lvgl-simulator';
+
+const scene: Scene = {
+  version: 1,
+  width: 200,
+  height: 40,
+  layout: { type: 'flex', columnGap: 8 },
+  children: [{ type: 'button', width: 90, height: 32, text: 'OK' }],
+};
+
+simulator.screen.addChild(loadScreen(scene)); // no manual widget construction
+```
+
 The `playground/` app runs a fuller version of this gallery, including a
-disabled button and a live slider-value readout — `npm run dev`, then
-visit the printed URL (resolution configurable via `?width=`/`?height=`
-query params). See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for what's next.
+disabled button, a live slider-value readout, and a section loaded
+entirely from a hand-written JSON scene — `npm run dev`, then visit the
+printed URL (resolution configurable via `?width=`/`?height=` query
+params). See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for what's next.
 
 ## Buy Me a Coffee
 

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Stage 5 scene import adapter: a versioned JSON scene-description schema
+  (`Scene`/`SceneNode` in `src/scene/SceneSchema.ts`, `SCENE_SCHEMA_VERSION`),
+  documented independently of any producer in `docs/SCENE_SCHEMA.md`, and
+  `loadScreen()` (`src/scene/loadScreen.ts`), which builds the object tree
+  a `Scene` describes and returns its root `Container` — rejecting an
+  unsupported `version` or unknown node `type` with a descriptive error.
+  Every node field maps 1:1 onto some widget's constructor options; a
+  node's `style`/`layout` fields are used exactly as their TypeScript
+  counterparts (`StyleSet`, `FlexLayout`/`GridLayout`), since both are
+  already plain, JSON-safe data. Verified end to end with a real
+  headless-browser click against a hand-written fixture scene rendered in
+  the playground, not just unit assertions.
 - Stage 4 input & interaction: `hitTest()` (`src/interaction/hitTest.ts`,
   deepest/topmost object under a point), `attachInteraction()`
   (`src/interaction/InteractionController.ts`, pointer/touch → hit-test →
