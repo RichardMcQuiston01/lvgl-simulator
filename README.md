@@ -41,6 +41,18 @@ npm run format       # Prettier check
 
 ### Examples
 
+```ts
+import { createSimulator } from '@richardmcquiston01/lvgl-simulator';
+
+const simulator = createSimulator(document.getElementById('app')!, {
+  width: 320,
+  height: 240,
+  backgroundColor: '#ffffff',
+});
+
+simulator.start(); // repaints `simulator.screen` on every animation frame
+```
+
 The `playground/` app is the current example/manual test bed: it mounts a
 `createSimulator()` canvas at a configurable resolution
 (`?width=480&height=320` query params). It will grow into a fuller demo as

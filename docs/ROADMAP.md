@@ -12,12 +12,15 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       `?width=`/`?height=` query params)
 - [x] CI workflow: install, lint, typecheck, test, build
 
-## Stage 1: Core rendering engine — not started
+## Stage 1: Core rendering engine — done
 
-- [ ] Object-tree model
-- [ ] Display driver abstraction (resolution, color format, DPI)
-- [ ] Render loop + repaint strategy
-- [ ] Renders a static single-container screen
+- [x] Object-tree model (`LvObject`: parent/child, absolute position)
+- [x] Display driver abstraction (`createDisplayDriver`: resolution, color
+      format, devicePixelRatio-scaled backing store)
+- [x] Render loop + repaint strategy (`createRenderLoop`: full repaint every
+      animation frame)
+- [x] Renders a static single-container screen at a given resolution with
+      correct DPI scaling
 
 ## Stage 2: Widget library — not started
 
