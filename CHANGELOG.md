@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.1.2 - 2026-09-18
+
+- No code changes. Removed all references to a private consumer
+  repository from `README.md`, `docs/PLAN.md`, and `docs/ROADMAP.md` —
+  the README is rendered verbatim on the public npm package page, which
+  had leaked the private repo's name and URL there. See
+  `docs/PLAN.md`/`docs/ROADMAP.md` for the same architecture rationale
+  and integration plan, now described generically.
+
 ## 0.1.1 - 2026-09-18
 
 - Fix: the published `0.1.0` package failed to load under plain Node.js

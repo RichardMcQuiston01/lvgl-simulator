@@ -1,6 +1,6 @@
 {
   "name": "@richardmcquiston01/lvgl-simulator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TypeScript LVGL simulator that renders LVGL-style UIs to an HTML5 canvas.",
   "license": "Apache-2.0",
   "author": "Richard McQuiston",
