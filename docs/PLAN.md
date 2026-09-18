@@ -29,20 +29,25 @@ Non-goal for v1: matching LVGL's C renderer pixel-for-pixel. The target is
 pass (Stage 6) can narrow the gap and measure it quantitatively, the same
 way the converter engine (`html-to-lvgl`) tracks a fidelity percentage.
 
-## Intended integration (future work, not this repo's job yet)
+## Intended integration
 
-- Published standalone to npm (mirrors how `html-to-lvgl` stays a separate,
-  independently-versioned repo rather than living inside the
-  `html2lvgl-platform` monorepo — see that repo's `docs/PLAN.md`).
-- Consumed by `apps/web` (Next.js) in `html2lvgl-platform` as a normal
-  dependency, to drive the GUI editor's live-preview pane.
-- Input contract: a JSON scene description that either matches, or is
-  trivially derived from, whatever AST `html-to-lvgl` already produces
-  internally — avoiding a second source of truth for "what is this UI."
-  The exact schema is a Stage 5 deliverable, not decided here.
+- **Done:** published standalone to npm as
+  [`@richardmcquiston01/lvgl-simulator`](https://www.npmjs.com/package/@richardmcquiston01/lvgl-simulator)
+  (mirrors how `html-to-lvgl` stays a separate, independently-versioned
+  repo rather than living inside the `html2lvgl-platform` monorepo — see
+  that repo's `docs/PLAN.md`).
+- **Done:** input contract — a versioned JSON scene description
+  (`docs/SCENE_SCHEMA.md`), standalone rather than adopting
+  `html-to-lvgl`'s internal AST directly (see Stage 5 below and
+  `docs/ROADMAP.md`'s "Open items" for why). If `html-to-lvgl`'s output
+  needs to feed this library, that repo gets a thin adapter mapping its
+  AST to this schema, keeping the two repos decoupled.
+- **Future work, not this repo's job:** consumed by `apps/web` (Next.js)
+  in `html2lvgl-platform` as a normal dependency, to drive the GUI
+  editor's live-preview pane — a separate PR against that repo, once it
+  adds this package as a dependency.
 - This repo has no dependency on `html2lvgl-platform` or `html-to-lvgl`
-  and must build/test/run standalone; integration happens later, as a
-  separate PR against `html2lvgl-platform`.
+  and must build/test/run standalone; that remains true after publishing.
 
 ## Conventions (matching the sibling repos)
 
