@@ -16,6 +16,11 @@ coverage/
 # Logs
 *.log
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+
 # Env files
 .env*
 !.env.example

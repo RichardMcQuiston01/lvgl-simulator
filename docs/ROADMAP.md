@@ -66,11 +66,23 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       hand-written fixture scene rendered in the playground, not just
       unit assertions
 
-## Stage 6: Testing & fidelity validation — not started
+## Stage 6: Testing & fidelity validation — done
 
-- [ ] Vitest unit coverage (layout math, style resolution)
-- [ ] Playwright canvas snapshot regression tests
-- [ ] Fidelity baseline report for the Stage 2 widget set
+- [x] Vitest unit coverage (layout math, style resolution) — extended
+      `src/layout/flex.test.ts`/`grid.test.ts` with `space_around`/
+      `space_evenly` main-axis distribution, per-line cross-axis sizing
+      and alignment when wrapped, cross-axis gaps between wrapped lines,
+      and row-span track sizing (169 tests total, up from 163)
+- [x] Playwright canvas snapshot regression tests — `e2e/widgets.spec.ts`
+      screenshots a dedicated fixture (`e2e/fixtures/`) covering every
+      Stage 2 widget in multiple states, compared against a committed
+      baseline PNG with a small diff-pixel tolerance; wired into CI via
+      `npm run test:e2e`, which blocks the build on a diff
+- [x] Fidelity baseline report for the Stage 2 widget set
+      (`docs/FIDELITY_BASELINE.md`) — documents exactly what the
+      snapshot test covers, what it doesn't (no WASM/real-LVGL
+      comparison exists yet), and how to update the baseline
+      intentionally
 
 ## Stage 7: Packaging, docs, platform integration — not started
 
@@ -84,6 +96,9 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
   `docs/SCENE_SCHEMA.md`) rather than adopting `html-to-lvgl`'s internal
   AST directly. If/when needed, that repo gets a thin adapter mapping its
   AST to this schema.
-- Whether Stage 6's fidelity harness needs the WASM/real-LVGL path to exist
-  first, or can ship its own hand-authored reference screenshots instead.
+- Decided in Stage 6: the fidelity baseline compares this simulator's
+  rendering against itself (regression detection), not against a
+  WASM/real-LVGL reference, since no such path exists in this repo yet —
+  see `docs/FIDELITY_BASELINE.md`. A true fidelity-vs-real-LVGL harness
+  remains a future addition once that reference path exists.
 - No target dates yet.

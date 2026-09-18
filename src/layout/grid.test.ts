@@ -53,6 +53,14 @@ describe('applyGridLayout', () => {
     expect(a.width).toBe(40 + 10 + 60);
   });
 
+  it('spans multiple row tracks, including the gap between them', () => {
+    const a = cell({ gridRowSpan: 2 });
+
+    applyGridLayout([a], 0, 0, { type: 'grid', columns: [40], rows: [20, 30], rowGap: 5 });
+
+    expect(a.height).toBe(20 + 5 + 30);
+  });
+
   it('offsets later tracks by the gap', () => {
     const a = cell();
     const b = cell({ gridColumn: 1 });
