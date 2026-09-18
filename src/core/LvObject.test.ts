@@ -5,6 +5,9 @@ function createFakeContext(): CanvasRenderingContext2D {
   return {
     fillStyle: '',
     fillRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    globalAlpha: 1,
   } as unknown as CanvasRenderingContext2D;
 }
 
@@ -53,7 +56,13 @@ describe('LvObject', () => {
 
   it('fills its background at its absolute position', () => {
     const context = createFakeContext();
-    const root = new LvObject({ x: 10, y: 20, width: 100, height: 50, backgroundColor: '#abcdef' });
+    const root = new LvObject({
+      x: 10,
+      y: 20,
+      width: 100,
+      height: 50,
+      style: { base: { bgColor: '#abcdef' } },
+    });
 
     root.render(context);
 
@@ -77,9 +86,9 @@ describe('LvObject', () => {
       calls.push(context.fillStyle as string);
     });
 
-    const root = new LvObject({ width: 100, height: 100, backgroundColor: 'root' });
-    const first = new LvObject({ width: 10, height: 10, backgroundColor: 'first' });
-    const second = new LvObject({ width: 10, height: 10, backgroundColor: 'second' });
+    const root = new LvObject({ width: 100, height: 100, style: { base: { bgColor: 'root' } } });
+    const first = new LvObject({ width: 10, height: 10, style: { base: { bgColor: 'first' } } });
+    const second = new LvObject({ width: 10, height: 10, style: { base: { bgColor: 'second' } } });
     root.addChild(first);
     root.addChild(second);
 
@@ -126,5 +135,50 @@ describe('LvObject', () => {
     expect(child.gridRow).toBe(2);
     expect(child.gridColumnSpan).toBe(3);
     expect(child.gridRowSpan).toBe(4);
+  });
+
+  it('defaults pressed/disabled/focused to false', () => {
+    const object = new LvObject({ width: 10, height: 10 });
+
+    expect(object.pressed).toBe(false);
+    expect(object.disabled).toBe(false);
+    expect(object.focused).toBe(false);
+  });
+
+  it('resolves its style against its own active states', () => {
+    const object = new LvObject({
+      width: 10,
+      height: 10,
+      pressed: true,
+      style: { base: { bgColor: '#111111' }, states: { pressed: { bgColor: '#222222' } } },
+    });
+
+    expect(object.resolvedStyle.bgColor).toBe('#222222');
+  });
+
+  it('applies its resolved opacity via globalAlpha only around its own paint', () => {
+    const context = createFakeContext();
+    const root = new LvObject({
+      width: 10,
+      height: 10,
+      style: { base: { bgColor: '#fff', opa: 128 } },
+    });
+    const child = new LvObject({ width: 1, height: 1 });
+    root.addChild(child);
+
+    root.render(context);
+
+    expect(context.save).toHaveBeenCalledTimes(1);
+    expect(context.restore).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the globalAlpha save/restore when fully opaque', () => {
+    const context = createFakeContext();
+    const root = new LvObject({ width: 10, height: 10 });
+
+    root.render(context);
+
+    expect(context.save).not.toHaveBeenCalled();
+    expect(context.restore).not.toHaveBeenCalled();
   });
 });

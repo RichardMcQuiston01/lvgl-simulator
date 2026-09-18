@@ -1,10 +1,8 @@
 /**
  * Approximation of LVGL's built-in default (light) theme — enough for
- * widgets to be "recognizable" against it (Stage 2's bar), not a
- * pixel-accurate port. Stage 3 replaces this flat constant table with the
- * full cascading style/part/state system; widgets should keep reading
- * colors from here rather than hardcoding hex values so that swap is
- * mechanical.
+ * widgets to be "recognizable" against it, not a pixel-accurate port.
+ * Widgets use these as the default values in the `StyleSet`s they build
+ * (see `src/style/Style.ts`) rather than hardcoding hex values inline.
  */
 export const defaultTheme = {
   /** LVGL's default theme primary palette (LV_PALETTE_BLUE). */

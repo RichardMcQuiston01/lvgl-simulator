@@ -69,4 +69,39 @@ describe('Container', () => {
     expect(a.x).toBe(10);
     expect(a.y).toBe(10);
   });
+
+  it('supports per-side padding via style.base', () => {
+    const context = createFakeCanvasContext();
+    const container = new Container({
+      width: 100,
+      height: 100,
+      style: { base: { padTop: 1, padRight: 2, padBottom: 3, padLeft: 4 } },
+      layout: { type: 'flex' },
+    });
+    const a = new LvObject({ width: 10, height: 10 });
+    container.addChild(a);
+
+    container.render(context);
+
+    expect(a.x).toBe(4);
+    expect(a.y).toBe(1);
+  });
+
+  it('prefers explicit per-side style padding over the padding convenience option', () => {
+    const context = createFakeCanvasContext();
+    const container = new Container({
+      width: 100,
+      height: 100,
+      padding: 20,
+      style: { base: { padTop: 1, padRight: 1, padBottom: 1, padLeft: 1 } },
+      layout: { type: 'flex' },
+    });
+    const a = new LvObject({ width: 10, height: 10 });
+    container.addChild(a);
+
+    container.render(context);
+
+    expect(a.x).toBe(1);
+    expect(a.y).toBe(1);
+  });
 });

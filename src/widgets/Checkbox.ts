@@ -1,5 +1,6 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject';
 import { paintCheckmark, paintRoundedRect, paintRoundedRectStroke } from '../rendering/shapes';
+import { mergeStyle, resolveStyle, type LvState, type StyleSet } from '../style/Style';
 import { defaultTheme } from '../theme/defaultTheme';
 
 const INDICATOR_SIZE = 20;
@@ -9,33 +10,63 @@ const LABEL_GAP = 8;
 export interface CheckboxOptions extends LvObjectOptions {
   readonly text?: string;
   readonly checked?: boolean;
+  /** Style for the box itself — LVGL's `LV_PART_INDICATOR`. The object's own `style` covers the label text (`LV_PART_MAIN`). */
+  readonly indicatorStyle?: StyleSet;
 }
 
 /** A square indicator with an optional trailing label, mirroring LVGL's `lv_checkbox`. */
 export class Checkbox extends LvObject {
   text: string | undefined;
   checked: boolean;
+  /** Style for the box — LVGL's `LV_PART_INDICATOR`. */
+  indicatorStyle: StyleSet;
 
   constructor(options: CheckboxOptions) {
-    super(options);
+    super({
+      ...options,
+      style: {
+        base: mergeStyle({ textColor: defaultTheme.textColor }, options.style?.base),
+        states: options.style?.states,
+      },
+    });
     this.text = options.text;
     this.checked = options.checked ?? false;
+    this.indicatorStyle = {
+      base: mergeStyle(
+        { borderColor: defaultTheme.borderColor, borderWidth: 2, radius: INDICATOR_RADIUS },
+        options.indicatorStyle?.base,
+      ),
+      states: {
+        checked: { bgColor: defaultTheme.primaryColor },
+        ...options.indicatorStyle?.states,
+      },
+    };
+  }
+
+  protected override getActiveStates(): ReadonlySet<LvState> {
+    const states = new Set(super.getActiveStates());
+    if (this.checked) {
+      states.add('checked');
+    }
+    return states;
   }
 
   protected override paintSelf(context: CanvasRenderingContext2D): void {
+    const style = this.resolvedStyle;
+    const indicator = resolveStyle(this.indicatorStyle, this.getActiveStates());
     const { x, y } = this.getAbsolutePosition();
     const size = Math.min(INDICATOR_SIZE, this.height);
     const indicatorY = y + (this.height - size) / 2;
 
-    if (this.checked) {
+    if (this.checked && indicator.bgColor) {
       paintRoundedRect(
         context,
         x,
         indicatorY,
         size,
         size,
-        INDICATOR_RADIUS,
-        defaultTheme.primaryColor,
+        indicator.radius ?? 0,
+        indicator.bgColor,
       );
       paintCheckmark(context, x, indicatorY, size, defaultTheme.textColorOnPrimary);
     } else {
@@ -45,14 +76,14 @@ export class Checkbox extends LvObject {
         indicatorY,
         size,
         size,
-        INDICATOR_RADIUS,
-        defaultTheme.borderColor,
-        2,
+        indicator.radius ?? 0,
+        indicator.borderColor ?? defaultTheme.borderColor,
+        indicator.borderWidth ?? 1,
       );
     }
 
     if (this.text) {
-      context.fillStyle = defaultTheme.textColor;
+      context.fillStyle = style.textColor ?? defaultTheme.textColor;
       context.font = `${defaultTheme.fontSize}px ${defaultTheme.fontFamily}`;
       context.textAlign = 'left';
       context.textBaseline = 'middle';

@@ -1,24 +1,47 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject';
 import { paintRoundedRect } from '../rendering/shapes';
+import { mergeStyle } from '../style/Style';
 import { defaultTheme } from '../theme/defaultTheme';
 
 export interface ButtonOptions extends LvObjectOptions {
   readonly text?: string;
+  /** Sugar for `style.base.bgColor`. */
+  readonly backgroundColor?: string;
+  /** Sugar for `style.base.textColor`. */
   readonly textColor?: string;
 }
 
 /** A rounded, filled push button, mirroring LVGL's `lv_button`. */
 export class Button extends LvObject {
   text: string | undefined;
-  textColor: string;
 
   constructor(options: ButtonOptions) {
-    super({ ...options, backgroundColor: options.backgroundColor ?? defaultTheme.primaryColor });
+    super({
+      ...options,
+      style: {
+        base: mergeStyle(
+          {
+            bgColor: defaultTheme.primaryColor,
+            textColor: defaultTheme.textColorOnPrimary,
+            radius: defaultTheme.radius,
+          },
+          options.style?.base,
+          { bgColor: options.backgroundColor, textColor: options.textColor },
+        ),
+        states: {
+          // Pressed buttons darken, matching LVGL's default theme. A
+          // caller-supplied `style.states.pressed` replaces this default
+          // outright (a shallow, per-state override — not a deep merge).
+          pressed: { bgColor: defaultTheme.primaryColorPressed },
+          ...options.style?.states,
+        },
+      },
+    });
     this.text = options.text;
-    this.textColor = options.textColor ?? defaultTheme.textColorOnPrimary;
   }
 
   protected override paintSelf(context: CanvasRenderingContext2D): void {
+    const style = this.resolvedStyle;
     const { x, y } = this.getAbsolutePosition();
     paintRoundedRect(
       context,
@@ -26,12 +49,12 @@ export class Button extends LvObject {
       y,
       this.width,
       this.height,
-      defaultTheme.radius,
-      this.backgroundColor ?? defaultTheme.primaryColor,
+      style.radius ?? defaultTheme.radius,
+      style.bgColor ?? defaultTheme.primaryColor,
     );
 
     if (this.text) {
-      context.fillStyle = this.textColor;
+      context.fillStyle = style.textColor ?? defaultTheme.textColorOnPrimary;
       context.font = `${defaultTheme.fontSize}px ${defaultTheme.fontFamily}`;
       context.textAlign = 'center';
       context.textBaseline = 'middle';

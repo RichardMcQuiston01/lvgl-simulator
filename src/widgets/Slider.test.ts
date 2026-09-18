@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
+import { defaultTheme } from '../theme/defaultTheme';
 import { Slider } from './Slider';
 
 describe('Slider', () => {
@@ -48,5 +49,39 @@ describe('Slider', () => {
     slider.render(context);
 
     expect(context.arc).toHaveBeenCalledWith(100, 10, 10, 0, Math.PI * 2);
+  });
+
+  it('draws the track, then the filled indicator, in their theme colors', () => {
+    const context = createFakeCanvasContext();
+    const fillColors: string[] = [];
+    (context.fill as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      fillColors.push(context.fillStyle as string);
+    });
+    const slider = new Slider({ width: 200, height: 20, value: 50 });
+
+    slider.render(context);
+
+    expect(fillColors[0]).toBe(defaultTheme.borderColor);
+    expect(fillColors[1]).toBe(defaultTheme.primaryColor);
+  });
+
+  it('lets a caller override the indicator and knob colors', () => {
+    const context = createFakeCanvasContext();
+    const fillColors: string[] = [];
+    (context.fill as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      fillColors.push(context.fillStyle as string);
+    });
+    const slider = new Slider({
+      width: 200,
+      height: 20,
+      value: 50,
+      indicatorStyle: { base: { bgColor: '#ff00ff' } },
+      knobStyle: { base: { bgColor: '#00ffff' } },
+    });
+
+    slider.render(context);
+
+    expect(fillColors[1]).toBe('#ff00ff');
+    expect(fillColors[2]).toBe('#00ffff');
   });
 });

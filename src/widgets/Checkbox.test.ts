@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
 import { defaultTheme } from '../theme/defaultTheme';
 import { Checkbox } from './Checkbox';
@@ -66,5 +66,37 @@ describe('Checkbox', () => {
 
     // The checkmark (stroked last) uses the on-primary color for contrast.
     expect(context.strokeStyle).toBe(defaultTheme.textColorOnPrimary);
+  });
+
+  it('lets a caller override the checked indicator color via indicatorStyle', () => {
+    const context = createFakeCanvasContext();
+    const fillColors: string[] = [];
+    (context.fill as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      fillColors.push(context.fillStyle as string);
+    });
+    const checkbox = new Checkbox({
+      width: 100,
+      height: 20,
+      checked: true,
+      indicatorStyle: { base: {}, states: { checked: { bgColor: '#ff00ff' } } },
+    });
+
+    checkbox.render(context);
+
+    expect(fillColors[0]).toBe('#ff00ff');
+  });
+
+  it('does not apply a checked-state indicatorStyle override while unchecked', () => {
+    const context = createFakeCanvasContext();
+    const checkbox = new Checkbox({
+      width: 100,
+      height: 20,
+      checked: false,
+      indicatorStyle: { base: {}, states: { checked: { borderColor: '#ff00ff' } } },
+    });
+
+    checkbox.render(context);
+
+    expect(context.strokeStyle).toBe(defaultTheme.borderColor);
   });
 });

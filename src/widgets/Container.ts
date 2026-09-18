@@ -1,12 +1,17 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject';
 import { applyFlexLayout, type FlexLayout } from '../layout/flex';
 import { applyGridLayout, type GridLayout } from '../layout/grid';
+import { paddingAll } from '../style/Style';
 
 export type ContainerLayout = FlexLayout | GridLayout;
 
 export interface ContainerOptions extends LvObjectOptions {
   readonly layout?: ContainerLayout;
-  /** Uniform inset applied to all sides of the content area before layout runs. */
+  /**
+   * Convenience for a uniform `style.base` padding on all four sides
+   * (mirrors LVGL's `style_pad_all`). Ignored if `style.base` already sets
+   * any `pad*` field — pass those directly for per-side control.
+   */
   readonly padding?: number;
 }
 
@@ -18,12 +23,22 @@ export interface ContainerOptions extends LvObjectOptions {
  */
 export class Container extends LvObject {
   layout: ContainerLayout | undefined;
-  padding: number;
 
   constructor(options: ContainerOptions) {
-    super(options);
+    const hasExplicitPadding =
+      options.style?.base.padTop !== undefined ||
+      options.style?.base.padRight !== undefined ||
+      options.style?.base.padBottom !== undefined ||
+      options.style?.base.padLeft !== undefined;
+
+    super({
+      ...options,
+      style:
+        options.padding !== undefined && !hasExplicitPadding
+          ? { ...options.style, base: { ...options.style?.base, ...paddingAll(options.padding) } }
+          : options.style,
+    });
     this.layout = options.layout;
-    this.padding = options.padding ?? 0;
   }
 
   protected override updateLayout(): void {
@@ -31,8 +46,14 @@ export class Container extends LvObject {
       return;
     }
 
-    const contentWidth = Math.max(0, this.width - this.padding * 2);
-    const contentHeight = Math.max(0, this.height - this.padding * 2);
+    const style = this.resolvedStyle;
+    const padTop = style.padTop ?? 0;
+    const padRight = style.padRight ?? 0;
+    const padBottom = style.padBottom ?? 0;
+    const padLeft = style.padLeft ?? 0;
+
+    const contentWidth = Math.max(0, this.width - padLeft - padRight);
+    const contentHeight = Math.max(0, this.height - padTop - padBottom);
 
     if (this.layout.type === 'flex') {
       applyFlexLayout(this.children, contentWidth, contentHeight, this.layout);
@@ -41,8 +62,8 @@ export class Container extends LvObject {
     }
 
     for (const child of this.children) {
-      child.x += this.padding;
-      child.y += this.padding;
+      child.x += padLeft;
+      child.y += padTop;
     }
   }
 }

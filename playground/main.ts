@@ -29,11 +29,23 @@ const simulator = createSimulator(container, {
   layout: { type: 'flex', direction: 'column', rowGap: 16, crossAlign: 'start' },
 });
 
-simulator.screen.addChild(new Label({ width: 200, height: 20, text: 'Stage 2 widget gallery' }));
-simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Press me' }));
+simulator.screen.addChild(
+  new Label({ width: 200, height: 20, text: 'Stage 3 style & theme system' }),
+);
+simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Default' }));
+simulator.screen.addChild(new Button({ width: 120, height: 36, text: 'Pressed', pressed: true }));
 simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Checked', checked: true }));
 simulator.screen.addChild(new Checkbox({ width: 160, height: 20, text: 'Unchecked' }));
 simulator.screen.addChild(new Switch({ width: 44, height: 24, checked: true }));
 simulator.screen.addChild(new Slider({ width: 200, height: 20, value: 60 }));
+simulator.screen.addChild(
+  new Button({
+    width: 160,
+    height: 36,
+    text: 'Custom pressed color',
+    pressed: true,
+    style: { base: {}, states: { pressed: { bgColor: '#8e24aa' } } },
+  }),
+);
 
 simulator.renderOnce();
