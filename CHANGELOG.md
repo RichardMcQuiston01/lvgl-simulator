@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.1.1 - 2026-09-18
+
+- Fix: the published `0.1.0` package failed to load under plain Node.js
+  ESM (`Cannot find module '.../dist/core/RenderLoop'`) — this library's
+  relative imports omitted file extensions, which Node's native ESM
+  resolver requires (bundlers like Vite/Vitest tolerate it, which is why
+  this wasn't caught by the existing test suite). Added `.js` extensions
+  to every relative import/export specifier across `src/` — the standard
+  pattern for a TypeScript package that ships as native ESM — verified by
+  installing the built tarball fresh and importing it with plain
+  `node --input-type=module`.
+
 ## 0.1.0 - 2026-09-18
 
 - Stage 7 packaging & docs: filled in `LICENSE` (Apache License 2.0, matching

@@ -1,7 +1,7 @@
-import { LvObject, type LvObjectOptions } from '../core/LvObject';
-import { paintRoundedRect } from '../rendering/shapes';
-import { mergeStyle } from '../style/Style';
-import { defaultTheme } from '../theme/defaultTheme';
+import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
+import { paintRoundedRect } from '../rendering/shapes.js';
+import { mergeStyle } from '../style/Style.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
 
 export interface ButtonOptions extends LvObjectOptions {
   readonly text?: string;

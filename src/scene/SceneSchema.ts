@@ -1,5 +1,5 @@
-import type { ContainerLayout } from '../widgets/Container';
-import type { StyleSet } from '../style/Style';
+import type { ContainerLayout } from '../widgets/Container.js';
+import type { StyleSet } from '../style/Style.js';
 
 /**
  * Current version of the scene-description schema. `loadScreen()` rejects

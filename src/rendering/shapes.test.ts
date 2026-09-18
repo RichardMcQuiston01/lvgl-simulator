@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
 import {
   paintCheckmark,
   paintCircle,
   paintCircleStroke,
   paintRoundedRect,
   paintRoundedRectStroke,
-} from './shapes';
+} from './shapes.js';
 
 describe('paintRoundedRect', () => {
   it('traces a path and fills it with the given color', () => {

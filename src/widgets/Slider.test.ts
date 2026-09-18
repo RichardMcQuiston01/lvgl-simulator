@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { Slider } from './Slider';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { Slider } from './Slider.js';
 
 describe('Slider', () => {
   it('defaults to a 0-100 range starting at the minimum', () => {

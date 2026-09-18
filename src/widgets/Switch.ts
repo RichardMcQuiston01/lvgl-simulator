@@ -1,7 +1,7 @@
-import { LvObject, type LvObjectOptions } from '../core/LvObject';
-import { paintCircle, paintRoundedRect } from '../rendering/shapes';
-import { mergeStyle, resolveStyle, type LvState, type StyleSet } from '../style/Style';
-import { defaultTheme } from '../theme/defaultTheme';
+import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
+import { paintCircle, paintRoundedRect } from '../rendering/shapes.js';
+import { mergeStyle, resolveStyle, type LvState, type StyleSet } from '../style/Style.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
 
 const KNOB_INSET = 2;
 

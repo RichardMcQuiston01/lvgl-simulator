@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { EventEmitter } from './EventEmitter';
+import { EventEmitter } from './EventEmitter.js';
 
 interface TestEventMap {
   ping: { readonly value: number };

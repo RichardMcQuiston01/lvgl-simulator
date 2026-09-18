@@ -1,4 +1,4 @@
-import type { LvObject } from '../core/LvObject';
+import type { LvObject } from '../core/LvObject.js';
 
 export interface GridLayout {
   readonly type: 'grid';

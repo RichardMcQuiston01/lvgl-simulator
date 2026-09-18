@@ -1,6 +1,6 @@
-import type { LvObject } from '../core/LvObject';
-import { hitTest } from './hitTest';
-import { isPointerDraggable } from './PointerDraggable';
+import type { LvObject } from '../core/LvObject.js';
+import { hitTest } from './hitTest.js';
+import { isPointerDraggable } from './PointerDraggable.js';
 
 export interface InteractionController {
   /** Stops listening for pointer input on the canvas. */

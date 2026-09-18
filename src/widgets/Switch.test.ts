@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { Switch } from './Switch';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { Switch } from './Switch.js';
 
 describe('Switch', () => {
   it('defaults to unchecked', () => {

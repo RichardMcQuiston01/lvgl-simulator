@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { LvObject } from '../core/LvObject';
-import { createFakeCanvas } from '../testing/fakeCanvas';
-import { attachInteraction } from './InteractionController';
-import type { PointerDraggable } from './PointerDraggable';
+import { LvObject } from '../core/LvObject.js';
+import { createFakeCanvas } from '../testing/fakeCanvas.js';
+import { attachInteraction } from './InteractionController.js';
+import type { PointerDraggable } from './PointerDraggable.js';
 
 function pointerEvent(overrides: Partial<PointerEvent> = {}): Partial<PointerEvent> {
   return { pointerId: 1, offsetX: 0, offsetY: 0, ...overrides };

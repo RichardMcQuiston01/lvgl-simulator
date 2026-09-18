@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { LvObject } from '../core/LvObject';
-import { applyGridLayout } from './grid';
+import { LvObject } from '../core/LvObject.js';
+import { applyGridLayout } from './grid.js';
 
 function cell(
   options: {

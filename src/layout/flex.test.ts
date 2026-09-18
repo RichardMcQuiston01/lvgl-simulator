@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { LvObject } from '../core/LvObject';
-import { applyFlexLayout } from './flex';
+import { LvObject } from '../core/LvObject.js';
+import { applyFlexLayout } from './flex.js';
 
 function box(width: number, height: number, flexGrow?: number): LvObject {
   return new LvObject({ width, height, flexGrow });

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createRenderLoop, type RenderLoopScheduler } from './RenderLoop';
+import { createRenderLoop, type RenderLoopScheduler } from './RenderLoop.js';
 
 function createFakeScheduler(): RenderLoopScheduler & { readonly pendingCount: number } {
   let nextHandle = 1;

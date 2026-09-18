@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createFakeCanvasContext } from '../testing/fakeCanvasContext';
-import { defaultTheme } from '../theme/defaultTheme';
-import { ImageWidget } from './ImageWidget';
+import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
+import { ImageWidget } from './ImageWidget.js';
 
 /** A deterministic stand-in for HTMLImageElement: setting `src` fires `load` synchronously. */
 class FakeImageElement {

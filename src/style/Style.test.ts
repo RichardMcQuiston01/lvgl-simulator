@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeStyle, paddingAll, resolveStyle, type StyleSet } from './Style';
+import { mergeStyle, paddingAll, resolveStyle, type StyleSet } from './Style.js';
 
 describe('resolveStyle', () => {
   it('returns the base style when no states are active', () => {

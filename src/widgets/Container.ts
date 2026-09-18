@@ -1,7 +1,7 @@
-import { LvObject, type LvObjectOptions } from '../core/LvObject';
-import { applyFlexLayout, type FlexLayout } from '../layout/flex';
-import { applyGridLayout, type GridLayout } from '../layout/grid';
-import { paddingAll } from '../style/Style';
+import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
+import { applyFlexLayout, type FlexLayout } from '../layout/flex.js';
+import { applyGridLayout, type GridLayout } from '../layout/grid.js';
+import { paddingAll } from '../style/Style.js';
 
 export type ContainerLayout = FlexLayout | GridLayout;
 
