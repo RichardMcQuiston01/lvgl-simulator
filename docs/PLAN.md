@@ -16,13 +16,13 @@ approach: compiling LVGL's actual C source to WebAssembly via Emscripten for
 pixel-perfect fidelity. Both approaches are expected to coexist long-term;
 this repo intentionally takes the other tradeoff:
 
-| | This simulator (Canvas + TS) | WASM (Emscripten + real LVGL C) |
-|---|---|---|
-| Fidelity | Approximate — re-implemented layout/paint rules | Pixel-perfect — native engine |
-| Bundle size | Small (no compiled binary) | +1–2 MB `.wasm` |
-| Toolchain | `tsc`/`vite` only | Emscripten build pipeline |
-| Iteration speed | Fast — plain TS, hot reload | Slower — native rebuild step |
-| Best for | Live editor preview while a user is composing a UI | Final fidelity check / hardware-accurate preview |
+|                 | This simulator (Canvas + TS)                       | WASM (Emscripten + real LVGL C)                  |
+| --------------- | -------------------------------------------------- | ------------------------------------------------ |
+| Fidelity        | Approximate — re-implemented layout/paint rules    | Pixel-perfect — native engine                    |
+| Bundle size     | Small (no compiled binary)                         | +1–2 MB `.wasm`                                  |
+| Toolchain       | `tsc`/`vite` only                                  | Emscripten build pipeline                        |
+| Iteration speed | Fast — plain TS, hot reload                        | Slower — native rebuild step                     |
+| Best for        | Live editor preview while a user is composing a UI | Final fidelity check / hardware-accurate preview |
 
 Non-goal for v1: matching LVGL's C renderer pixel-for-pixel. The target is
 "close enough, fast enough" for an in-editor live preview; a later fidelity
@@ -64,7 +64,9 @@ run concurrently once Stage 1's interfaces are stable; everything else is
 sequential. See `docs/ROADMAP.md` for status tracking.
 
 ### Stage 0 — Scaffolding
+
 **Agent role:** Scaffold Agent
+
 - `package.json` (`type: module`, `exports` map, no runtime deps yet),
   `tsconfig.json` (strict, ES2022, matches `html2lvgl-platform`'s
   `tsconfig.base.json` shape), ESLint + Prettier config, Vitest.
@@ -75,7 +77,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   playground rendering an empty canvas at a configurable resolution.
 
 ### Stage 1 — Core rendering engine
+
 **Agent role:** Rendering Engine Agent · depends on Stage 0
+
 - Object-tree model (parent/child, mirrors `lv_obj_t` hierarchy), a
   display driver abstraction (width/height/color format, matching LVGL's
   `lv_disp_drv_t` concept), a render loop (`requestAnimationFrame`), and a
@@ -84,7 +88,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   background color) at a given resolution with correct DPI scaling.
 
 ### Stage 2 — Widget library
+
 **Agent role:** Widget Agent · depends on Stage 1
+
 - Widgets prioritized by what `html-to-lvgl` actually emits today, not by
   LVGL's full widget catalog: container (flex + grid layout), label,
   button, image, checkbox/switch, slider.
@@ -93,7 +99,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   semantics for the common cases (row/column, wrap, gap, align).
 
 ### Stage 3 — Style & theme system
+
 **Agent role:** Styling Agent · depends on Stage 1, parallel with Stage 2
+
 - Style properties mirroring LVGL's core set (`bg_color`, `border_*`,
   `radius`, `padding_*`, `text_font`, `text_color`, opacity) with LVGL's
   part/state model (default/pressed/checked/disabled/focused).
@@ -101,7 +109,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   AST importer (Stage 5) can map 1:1 without a lossy translation layer.
 
 ### Stage 4 — Input & interaction
+
 **Agent role:** Interaction Agent · depends on Stage 2, Stage 3
+
 - Pointer/touch → canvas hit-testing against the object tree; an event
   model mirroring LVGL events (`CLICKED`, `VALUE_CHANGED`,
   `PRESSED`/`RELEASED`); state transitions driven by input.
@@ -109,7 +119,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   fires a `CLICKED` event observable by the host application.
 
 ### Stage 5 — Scene import adapter
+
 **Agent role:** Integration Agent · depends on Stage 2, Stage 3
+
 - Define and version a JSON scene-description schema; document it
   independently of any specific producer. If/when compared against
   `html-to-lvgl`'s internal AST, add a thin adapter rather than adopting
@@ -119,7 +131,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   scene with no manual wiring.
 
 ### Stage 6 — Testing & fidelity validation
+
 **Agent role:** QA Agent · test-harness work can start alongside Stage 2–4
+
 - Vitest for layout/style-resolution unit tests; Playwright-driven canvas
   snapshot tests for visual regression; an optional fidelity harness that
   renders the same fixture through this simulator and through the WASM/real
@@ -128,7 +142,9 @@ sequential. See `docs/ROADMAP.md` for status tracking.
   fidelity baseline exists for the Stage 2 widget set.
 
 ### Stage 7 — Packaging, docs, and platform integration
+
 **Agent role:** Release/Docs Agent · depends on all prior stages
+
 - Finish `README.md` (prerequisites, installation, usage, examples),
   `CHANGELOG.md` entries per release, an npm publish workflow (tag/branch
   triggered, matching `html-to-lvgl`'s release pattern).

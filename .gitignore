@@ -1,0 +1,21 @@
+# Editor directories and files
+.idea/
+.vscode/
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Node
+node_modules
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# Env files
+.env*
+!.env.example

@@ -3,47 +3,60 @@
 Ordered by dependency, not by date. Mirrors the stage numbering in
 `docs/PLAN.md`; update the status line as each stage completes.
 
-## Stage 0: Scaffolding — not started
-- [ ] `package.json` / `tsconfig.json` (strict, ES2022)
-- [ ] ESLint + Prettier config
-- [ ] Vitest set up
-- [ ] `playground/` Vite app (empty canvas)
-- [ ] CI workflow: install, lint, typecheck, test, build
+## Stage 0: Scaffolding — done
 
-## Stage 1: Core rendering engine — not started
-- [ ] Object-tree model
-- [ ] Display driver abstraction (resolution, color format, DPI)
-- [ ] Render loop + repaint strategy
-- [ ] Renders a static single-container screen
+- [x] `package.json` / `tsconfig.json` (strict, ES2022)
+- [x] ESLint + Prettier config
+- [x] Vitest set up
+- [x] `playground/` Vite app (empty canvas, resolution configurable via
+      `?width=`/`?height=` query params)
+- [x] CI workflow: install, lint, typecheck, test, build
+
+## Stage 1: Core rendering engine — done
+
+- [x] Object-tree model (`LvObject`: parent/child, absolute position)
+- [x] Display driver abstraction (`createDisplayDriver`: resolution, color
+      format, devicePixelRatio-scaled backing store)
+- [x] Render loop + repaint strategy (`createRenderLoop`: full repaint every
+      animation frame)
+- [x] Renders a static single-container screen at a given resolution with
+      correct DPI scaling
 
 ## Stage 2: Widget library — not started
+
 - [ ] Container (flex + grid layout)
 - [ ] Label, Button, Image
 - [ ] Checkbox/Switch, Slider
 
 ## Stage 3: Style & theme system — not started
+
 - [ ] Core style property set (bg/border/radius/padding/font/opacity)
 - [ ] Part/state model (default/pressed/checked/disabled/focused)
 
 ## Stage 4: Input & interaction — not started
+
 - [ ] Pointer/touch hit-testing
 - [ ] LVGL-style event model (CLICKED, VALUE_CHANGED, PRESSED/RELEASED)
 
 ## Stage 5: Scene import adapter — not started
+
 - [ ] Versioned JSON scene-description schema (documented)
 - [ ] `loadScreen()` entry point
 
 ## Stage 6: Testing & fidelity validation — not started
+
 - [ ] Vitest unit coverage (layout math, style resolution)
 - [ ] Playwright canvas snapshot regression tests
 - [ ] Fidelity baseline report for the Stage 2 widget set
 
 ## Stage 7: Packaging, docs, platform integration — not started
+
 - [ ] README complete (prerequisites/install/usage/examples)
 - [ ] npm publish workflow
 - [ ] Spike integration into `html2lvgl-platform`'s `apps/web`
 
 ## Open items
+
 - Final scene-description schema: standalone vs. adapted from
   `html-to-lvgl`'s internal AST — decide in Stage 5, not before.
 - Whether Stage 6's fidelity harness needs the WASM/real-LVGL path to exist

@@ -2,7 +2,7 @@
 
 ## Overview
 
-TypeScript LVGL simulator for running in the browser.  Designed to be as package for incorporation into other repositories.
+TypeScript LVGL simulator for running in the browser. Designed to be as package for incorporation into other repositories.
 
 Renders LVGL-style UIs to an HTML5 `<canvas>` by re-implementing widget,
 layout, and style behavior in pure TypeScript (no WASM/Emscripten build of
@@ -18,11 +18,45 @@ multi-agent, multi-stage development plan, and
 
 ### Prerequisites
 
+- [Node.js](https://nodejs.org) >= 22
+- npm (ships with Node)
+
 ### Installation
+
+```bash
+git clone https://github.com/RichardMcQuiston01/lvgl-simulator.git
+cd lvgl-simulator
+npm install
+```
 
 ### Usage
 
+```bash
+npm run dev        # launch the Vite playground at http://localhost:5173
+npm run build       # type-check and emit the library to dist/
+npm test            # run the Vitest suite
+npm run lint         # ESLint
+npm run format       # Prettier check
+```
+
 ### Examples
+
+```ts
+import { createSimulator } from '@richardmcquiston01/lvgl-simulator';
+
+const simulator = createSimulator(document.getElementById('app')!, {
+  width: 320,
+  height: 240,
+  backgroundColor: '#ffffff',
+});
+
+simulator.start(); // repaints `simulator.screen` on every animation frame
+```
+
+The `playground/` app is the current example/manual test bed: it mounts a
+`createSimulator()` canvas at a configurable resolution
+(`?width=480&height=320` query params). It will grow into a fuller demo as
+widgets and interaction land — see [`docs/ROADMAP.md`](./docs/ROADMAP.md).
 
 ## Buy Me a Coffee
 
@@ -38,4 +72,4 @@ Apache 2
 
 ## Copyright
 
-(c)2026 Richard McQuiston.  All rights reserved.
+(c)2026 Richard McQuiston. All rights reserved.
