@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.1.3 - 2026-09-23
+
+- No code changes. README cleanup: regenerated `donate.svg` (it was
+  missing entirely, so the Stripe QR image in Buy Me a Coffee was
+  broken), added a Live Demo link under the title, removed the
+  Releasing section, and collapsed Getting Started down to a link to
+  `docs/GETTING_STARTED.md` (dropping the now-redundant link to it from
+  Overview).
+
 ## 0.1.2 - 2026-09-18
 
 - No code changes. Removed all references to a private consumer
