@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-09-24
+
 - Added `createNavigator()` (`src/navigation/Navigator.ts`) for multi-view
   UIs: mounts one view under a screen at a time and keeps a back-stack for
   a "Back" button, with an optional `maxDepth` guard. No changes needed to
