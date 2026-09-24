@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added `createNavigator()` (`src/navigation/Navigator.ts`) for multi-view
+  UIs: mounts one view under a screen at a time and keeps a back-stack for
+  a "Back" button, with an optional `maxDepth` guard. No changes needed to
+  `createSimulator`, the render loop, or `attachInteraction`. Documented in
+  `docs/GETTING_STARTED.md`; demonstrated in `playground/` with a
+  Home → Settings → Advanced three-view flow.
+
 ## 0.1.3 - 2026-09-23
 
 - No code changes. README cleanup: regenerated `donate.svg` (it was

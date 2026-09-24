@@ -104,6 +104,30 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       per `docs/PLAN.md`, this is explicitly a follow-up in that other
       project, not this one ("separate PR, separate repo").
 
+## Post-v1: Multi-view navigation — done
+
+- [x] `createNavigator()` (`src/navigation/Navigator.ts`): mounts one view
+      (any `LvObject`) under a screen at a time and keeps a back-stack, so
+      a "Back" button can return to whatever was showing before —
+      mirroring LVGL's `lv_screen_load()` plus the navigation history LVGL
+      itself doesn't track. `push()`/`pop()`/`current`/`depth`/`canPop`,
+      plus an optional `maxDepth` that caps how many `push()`es are
+      allowed above the initial view. Needs no changes to
+      `createSimulator`, the render loop, or `attachInteraction` — it only
+      swaps the screen's single child, and those already traverse
+      whatever's currently mounted there. 7 unit tests
+      (`src/navigation/Navigator.test.ts`).
+- [x] `playground/` rewritten around three views (Home → Settings →
+      Advanced, `maxDepth: 2`) demonstrating it end to end — a Settings
+      button pushes forward, Back buttons pop back — verified in a
+      headless browser, not just unit assertions.
+- [x] Documented in `docs/GETTING_STARTED.md`'s new "Navigation" section.
+- [ ] Not yet published to npm — still sitting on `main` past `0.1.3`. The
+      [live demo](https://lvgl-simulator-demo.vercel.app/) (a separate
+      repo, `lvgl-simulator-demo`) depends on the published package, so it
+      won't show this until a new version ships and that repo bumps its
+      dependency.
+
 ## Open items
 
 - Lesson from `0.1.0`: verifying "installs correctly from npm" needs an
