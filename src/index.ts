@@ -29,6 +29,9 @@ export { hitTest } from './interaction/hitTest.js';
 export { isPointerDraggable } from './interaction/PointerDraggable.js';
 export type { PointerDraggable } from './interaction/PointerDraggable.js';
 
+export { createNavigator } from './navigation/Navigator.js';
+export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
+
 export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
