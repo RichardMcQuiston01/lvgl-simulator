@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.1 - 2026-10-20
+
+- No code changes. Added a `funding` entry to `package.json` (so `npm fund`
+  and the npm package page show the donate link) and rewrote `README.md`
+  with install, a quick start, a features overview, and development
+  commands.
+
 ## 0.2.0 - 2026-09-24
 
 - Added `createNavigator()` (`src/navigation/Navigator.ts`) for multi-view
