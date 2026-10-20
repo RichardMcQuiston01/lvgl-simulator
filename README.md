@@ -23,6 +23,7 @@ runtime dependencies.
   `focused`, and `disabled` overrides.
 - **Interaction:** pointer and touch input with `pressed`, `released`,
   `clicked`, and `valueChanged` events.
+- **Navigation:** multi-view UIs with a back-stack via `createNavigator()`.
 - **JSON scenes:** build a UI from a versioned JSON schema via `loadScreen()`.
 - **Sharp rendering:** HiDPI-aware canvas; coordinates are always logical pixels.
 

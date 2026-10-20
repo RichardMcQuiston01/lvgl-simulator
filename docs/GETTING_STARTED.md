@@ -16,6 +16,7 @@ writing code, or jump to a section below as reference while you build.
 - [Layout](#layout)
 - [Events & interaction](#events--interaction)
 - [Scenes (JSON UIs)](#scenes-json-uis)
+- [Navigation (multi-view UIs)](#navigation-multi-view-uis)
 - [Framework integration](#framework-integration)
 - [Troubleshooting](#troubleshooting)
 - [Where to go next](#where-to-go-next)
@@ -345,6 +346,56 @@ simulator.screen.addChild(loadScreen(scene));
 version this build supports (naming both), so a producer built against a
 stale/newer schema fails loudly rather than misrendering silently. Scene
 import is currently one-way — there's no `Container` → `Scene` serializer.
+
+## Navigation (multi-view UIs)
+
+`createSimulator()` gives you one `screen`, but a real UI is usually more
+than one page — a home screen with a button that opens a Settings screen,
+say. `createNavigator()` (`src/navigation/Navigator.ts`) manages that: it
+mounts one "view" (any `LvObject`, typically a `Container` built the same
+way you'd build `screen`'s contents) under a screen at a time, and keeps a
+back-stack so a "Back" button can return to whatever was showing before —
+mirroring LVGL's `lv_screen_load()` plus the navigation history LVGL itself
+doesn't track:
+
+```ts
+import {
+  Container,
+  createNavigator,
+  createSimulator,
+  Button,
+} from '@richardmcquiston01/lvgl-simulator';
+
+const simulator = createSimulator(document.getElementById('app')!, { width: 320, height: 240 });
+
+const home = new Container({ width: 320, height: 240, padding: 16 });
+const settings = new Container({ width: 320, height: 240, padding: 16 });
+
+const openSettings = new Button({ width: 120, height: 32, text: 'Settings' });
+const back = new Button({ width: 120, height: 32, text: 'Back' });
+home.addChild(openSettings);
+settings.addChild(back);
+
+const navigator = createNavigator(simulator.screen, home, simulator.renderOnce);
+openSettings.addEventListener('clicked', () => navigator.push(settings));
+back.addEventListener('clicked', () => navigator.pop());
+```
+
+`createNavigator(screen, initialView, render, options?)` takes over
+`screen`'s children — it mounts `initialView` immediately, clearing
+anything already there. `push(view)` swaps in a new view and remembers the
+current one; `pop()` (a no-op if there's nothing to return to) restores it.
+`render` is called after every swap, so pass `simulator.renderOnce` (or any
+function that repaints) to keep the canvas in sync automatically — you
+don't need to call it yourself after navigating. `current`, `depth`
+(`0` at the initial view), and `canPop` reflect the navigator's state at
+any point. An optional `maxDepth` caps how many `push()`es are allowed
+above the initial view — `push()` throws once reached, which is useful for
+bounding how deep an embedded-style UI's navigation can go.
+
+Since `push`/`pop` only ever swap `screen`'s single child, this needs no
+changes to `createSimulator`, the render loop, or pointer interaction —
+hit-testing and rendering already walk whatever's currently mounted there.
 
 ## Framework integration
 

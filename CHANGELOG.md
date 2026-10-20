@@ -2,12 +2,21 @@
 
 ## Unreleased
 
-## 0.1.4 - 2026-10-20
+## 0.2.1 - 2026-10-20
 
 - No code changes. Added a `funding` entry to `package.json` (so `npm fund`
   and the npm package page show the donate link) and rewrote `README.md`
-  with install, a quick start, a widget/feature overview, and development
+  with install, a quick start, a features overview, and development
   commands.
+
+## 0.2.0 - 2026-09-24
+
+- Added `createNavigator()` (`src/navigation/Navigator.ts`) for multi-view
+  UIs: mounts one view under a screen at a time and keeps a back-stack for
+  a "Back" button, with an optional `maxDepth` guard. No changes needed to
+  `createSimulator`, the render loop, or `attachInteraction`. Documented in
+  `docs/GETTING_STARTED.md`; demonstrated in `playground/` with a
+  Home → Settings → Advanced three-view flow.
 
 ## 0.1.3 - 2026-09-23
 
