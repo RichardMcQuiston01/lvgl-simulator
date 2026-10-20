@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.1.4 - 2026-10-20
+
+- No code changes. Added a `funding` entry to `package.json` (so `npm fund`
+  and the npm package page show the donate link) and rewrote `README.md`
+  with install, a quick start, a widget/feature overview, and development
+  commands.
+
 ## 0.1.3 - 2026-09-23
 
 - No code changes. README cleanup: regenerated `donate.svg` (it was
