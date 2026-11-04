@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- Donations now point at Ko-fi instead of PayPal: the README badge, the
+  `package.json` funding link and a new `.github/FUNDING.yml`. The PayPal QR
+  image is removed.
+
 ## 0.2.1 - 2026-10-20
 
 - No code changes. Added a `funding` entry to `package.json` (so `npm fund`
