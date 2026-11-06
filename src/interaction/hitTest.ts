@@ -1,4 +1,5 @@
 import type { LvObject } from '../core/LvObject.js';
+import { inverseTransformPoint, resolveTransform } from '../rendering/transform.js';
 
 /**
  * Finds the deepest (most specific) object in `root`'s subtree whose
@@ -13,6 +14,13 @@ import type { LvObject } from '../core/LvObject.js';
 export function hitTest(root: LvObject, x: number, y: number): LvObject | null {
   if (root.hidden) {
     return null;
+  }
+  // A transformed object (and its subtree) is hit-tested in its own
+  // untransformed space: map the pointer back through the inverse transform.
+  const transform = resolveTransform(root.resolvedStyle);
+  if (transform) {
+    const origin = root.getAbsolutePosition();
+    ({ x, y } = inverseTransformPoint(transform, origin.x, origin.y, x, y));
   }
   // A scrolling container clips its children, so content scrolled out of
   // its bounds can't be hit.

@@ -53,6 +53,13 @@ diffs" means in practice.
   anti-aliasing noise rather than a real change, re-run once before
   investigating further, per the guidance in `playwright.config.ts`.
 
+## Baseline history
+
+- Widget expansion W0: a plain `Container` now paints its `radius` and
+  `borderWidth`/`borderColor` (previously ignored), so the fixture's "Box"
+  gained its blue rounded border. The baseline PNG was regenerated for this
+  intentional change.
+
 ## Updating the baseline
 
 When a change intentionally alters a Stage 2 widget's default appearance,

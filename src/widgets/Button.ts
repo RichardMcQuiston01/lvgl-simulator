@@ -1,5 +1,5 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
-import { paintRoundedRect } from '../rendering/shapes.js';
+import { paintBackgroundAndBorder } from '../rendering/box.js';
 import { mergeStyle } from '../style/Style.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
 
@@ -43,15 +43,11 @@ export class Button extends LvObject {
   protected override paintSelf(context: CanvasRenderingContext2D): void {
     const style = this.resolvedStyle;
     const { x, y } = this.getAbsolutePosition();
-    paintRoundedRect(
-      context,
-      x,
-      y,
-      this.width,
-      this.height,
-      style.radius ?? defaultTheme.radius,
-      style.bgColor ?? defaultTheme.primaryColor,
-    );
+    paintBackgroundAndBorder(context, x, y, this.width, this.height, {
+      ...style,
+      radius: style.radius ?? defaultTheme.radius,
+      bgColor: style.bgColor ?? defaultTheme.primaryColor,
+    });
 
     if (this.text) {
       context.fillStyle = style.textColor ?? defaultTheme.textColorOnPrimary;

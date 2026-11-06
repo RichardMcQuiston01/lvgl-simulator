@@ -36,7 +36,8 @@ export function paintRoundedRectStroke(
   context.stroke();
 }
 
-function traceRoundedRect(
+/** Begins a rounded-rectangle path (no fill/stroke); also used for clipping. */
+export function traceRoundedRect(
   context: CanvasRenderingContext2D,
   x: number,
   y: number,

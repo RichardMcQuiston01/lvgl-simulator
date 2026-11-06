@@ -7,6 +7,12 @@
  */
 export type LvState = 'checked' | 'focused' | 'pressed' | 'disabled';
 
+/** Horizontal text alignment, mirroring `lv_text_align_t`. `'auto'` behaves as `'left'`. */
+export type TextAlign = 'auto' | 'left' | 'center' | 'right';
+
+/** Background gradient direction, mirroring `lv_grad_dir_t`. */
+export type GradientDirection = 'none' | 'ver' | 'hor';
+
 /**
  * A flat bag of paint properties, mirroring LVGL's core `lv_style_t`
  * property set closely enough that a future AST importer (Stage 5) can
@@ -18,6 +24,14 @@ export type LvState = 'checked' | 'focused' | 'pressed' | 'disabled';
  * `textColor`/`textFontFamily`/`textFontSize` ↔ `style_text_color`/
  * `style_text_font` (LVGL bundles family+size into one font pointer; we
  * keep them separate since Canvas needs both), `opa` ↔ `style_opa`.
+ *
+ * Also mirrored 1:1 from LVGL: `borderOpa`, `textAlign`, `bgGradColor`/
+ * `bgGradDir`, `shadow*` (`width`, `offsetX`, `offsetY`, `spread`, `color`,
+ * `opa`), `outline*` (`width`, `color`, `opa`, `pad`), `line*`/`arc*`
+ * (`width`, `color`, `opa`, `rounded`; read by the `Line`/`Arc` widgets),
+ * `transformRotation` (0.1° units), `transformScaleX`/`transformScaleY`
+ * (256 = 100%), `transformPivotX`/`transformPivotY` (px from the object's
+ * top-left, default 0), and `clipCorner`.
  *
  * All colors are `#rrggbb` hex strings; `bgOpa`/`opa` are 0–255, matching
  * LVGL's `LV_OPA_*` scale (not CSS's 0–1).
@@ -36,6 +50,34 @@ export interface Style {
   readonly textFontFamily?: string;
   readonly textFontSize?: number;
   readonly opa?: number;
+  readonly borderOpa?: number;
+  readonly textAlign?: TextAlign;
+  readonly bgGradColor?: string;
+  readonly bgGradDir?: GradientDirection;
+  readonly shadowWidth?: number;
+  readonly shadowOffsetX?: number;
+  readonly shadowOffsetY?: number;
+  readonly shadowSpread?: number;
+  readonly shadowColor?: string;
+  readonly shadowOpa?: number;
+  readonly outlineWidth?: number;
+  readonly outlineColor?: string;
+  readonly outlineOpa?: number;
+  readonly outlinePad?: number;
+  readonly lineWidth?: number;
+  readonly lineColor?: string;
+  readonly lineOpa?: number;
+  readonly lineRounded?: boolean;
+  readonly arcWidth?: number;
+  readonly arcColor?: string;
+  readonly arcOpa?: number;
+  readonly arcRounded?: boolean;
+  readonly transformRotation?: number;
+  readonly transformScaleX?: number;
+  readonly transformScaleY?: number;
+  readonly transformPivotX?: number;
+  readonly transformPivotY?: number;
+  readonly clipCorner?: boolean;
 }
 
 /**

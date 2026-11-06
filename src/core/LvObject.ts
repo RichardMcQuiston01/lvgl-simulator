@@ -2,7 +2,10 @@ import { EventEmitter } from '../events/EventEmitter.js';
 import type { LvEventDetailArgs, LvEventMap } from '../events/LvEvent.js';
 import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style.js';
 import { withOpacity } from '../style/color.js';
-import { paintRoundedRect } from '../rendering/shapes.js';
+import { paintBackgroundAndBorder, paintOutline, paintShadow } from '../rendering/box.js';
+import { paintRoundedRect, traceRoundedRect } from '../rendering/shapes.js';
+import { applyTransform, resolveTransform } from '../rendering/transform.js';
+import { defaultTheme } from '../theme/defaultTheme.js';
 import {
   computeScrollRange,
   type ScrollDirection,
@@ -299,12 +302,8 @@ export class LvObject {
    * widget-specific content instead of/in addition to a flat fill.
    */
   protected paintSelf(context: CanvasRenderingContext2D): void {
-    const style = this.resolvedStyle;
-    if (style.bgColor) {
-      const { x, y } = this.getAbsolutePosition();
-      context.fillStyle = withOpacity(style.bgColor, style.bgOpa);
-      context.fillRect(x, y, this.width, this.height);
-    }
+    const { x, y } = this.getAbsolutePosition();
+    paintBackgroundAndBorder(context, x, y, this.width, this.height, this.resolvedStyle);
   }
 
   /**
@@ -320,30 +319,87 @@ export class LvObject {
     }
     this.updateLayout();
 
-    const opa = this.resolvedStyle.opa;
-    if (opa !== undefined && opa < 255) {
+    const style = this.resolvedStyle;
+    const { x, y } = this.getAbsolutePosition();
+    const transform = resolveTransform(style);
+    if (transform) {
+      // Rotation/scale apply to this object and its whole subtree.
       context.save();
-      context.globalAlpha = Math.max(0, Math.min(255, opa)) / 255;
-      this.paintSelf(context);
-      context.restore();
-    } else {
-      this.paintSelf(context);
+      applyTransform(context, transform, x, y);
     }
 
-    const clipsChildren = this.isScrollable;
-    if (clipsChildren) {
-      const { x, y } = this.getAbsolutePosition();
+    const opa = style.opa;
+    const fades = opa !== undefined && opa < 255;
+    if (fades) {
       context.save();
-      context.beginPath();
-      context.rect(x, y, this.width, this.height);
+      context.globalAlpha = Math.max(0, Math.min(255, opa)) / 255;
+    }
+    paintShadow(context, x, y, this.width, this.height, style);
+    this.paintSelf(context);
+    this.paintOutlineFor(context, style, x, y);
+    if (fades) {
+      context.restore();
+    }
+
+    const clipsScroll = this.isScrollable;
+    const clipsCorners = style.clipCorner === true && (style.radius ?? 0) > 0;
+    const clips = clipsScroll || clipsCorners;
+    if (clips) {
+      context.save();
+      if (clipsCorners) {
+        traceRoundedRect(context, x, y, this.width, this.height, style.radius ?? 0);
+      } else {
+        context.beginPath();
+        context.rect(x, y, this.width, this.height);
+      }
       context.clip();
     }
     for (const child of this.childObjects) {
       child.render(context);
     }
-    if (clipsChildren) {
+    if (clips) {
       context.restore();
+    }
+    if (clipsScroll) {
       this.paintScrollbars(context);
+    }
+
+    if (transform) {
+      context.restore();
+    }
+  }
+
+  /** Draws the style's outline, or the theme's focus outline when focused and no outline is set. */
+  private paintOutlineFor(
+    context: CanvasRenderingContext2D,
+    style: Style,
+    x: number,
+    y: number,
+  ): void {
+    if (style.outlineWidth !== undefined) {
+      paintOutline(
+        context,
+        x,
+        y,
+        this.width,
+        this.height,
+        style,
+        style.outlineWidth,
+        style.outlineColor ?? defaultTheme.focusOutlineColor,
+        style.outlinePad ?? 0,
+      );
+    } else if (this.focused) {
+      paintOutline(
+        context,
+        x,
+        y,
+        this.width,
+        this.height,
+        style,
+        defaultTheme.focusOutlineWidth,
+        defaultTheme.focusOutlineColor,
+        defaultTheme.focusOutlinePad,
+      );
     }
   }
 
