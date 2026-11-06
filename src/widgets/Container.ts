@@ -41,6 +41,24 @@ export class Container extends LvObject {
     this.layout = options.layout;
   }
 
+  override get scrollContentInsets(): {
+    readonly left: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+  } {
+    if (!this.layout) {
+      return super.scrollContentInsets;
+    }
+    const style = this.resolvedStyle;
+    return {
+      left: style.padLeft ?? 0,
+      top: style.padTop ?? 0,
+      right: style.padRight ?? 0,
+      bottom: style.padBottom ?? 0,
+    };
+  }
+
   protected override updateLayout(): void {
     if (!this.layout) {
       return;

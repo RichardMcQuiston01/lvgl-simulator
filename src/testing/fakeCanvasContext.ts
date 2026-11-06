@@ -30,5 +30,9 @@ export function createFakeCanvasContext(): CanvasRenderingContext2D {
     stroke: vi.fn(),
     fillText: vi.fn(),
     drawImage: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    rect: vi.fn(),
+    clip: vi.fn(),
   } as unknown as CanvasRenderingContext2D;
 }

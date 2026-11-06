@@ -14,6 +14,11 @@ export function hitTest(root: LvObject, x: number, y: number): LvObject | null {
   if (root.hidden) {
     return null;
   }
+  // A scrolling container clips its children, so content scrolled out of
+  // its bounds can't be hit.
+  if (root.isScrollable && !containsPoint(root, x, y)) {
+    return null;
+  }
   for (let i = root.children.length - 1; i >= 0; i -= 1) {
     const child = root.children[i];
     if (!child) {

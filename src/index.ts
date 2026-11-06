@@ -54,6 +54,14 @@ export type { EasingFunction, EasingName } from './animation/easing.js';
 export { createNavigator } from './navigation/Navigator.js';
 export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
 
+export { applyScrollSnap, computeScrollRange, findScrollTarget } from './scroll/scrollMath.js';
+export type {
+  ScrollDirection,
+  ScrollRange,
+  ScrollSnap,
+  ScrollbarMode,
+} from './scroll/scrollMath.js';
+
 export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
@@ -173,7 +181,7 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
 
   const animations = createAnimationEngine({ onFrame: renderOnce });
   const loop = createRenderLoop(renderOnce);
-  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce);
+  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce, { animations });
 
   container.appendChild(displayDriver.canvas);
   renderOnce();

@@ -1,5 +1,7 @@
 import type { LvObject } from '../core/LvObject.js';
 import type { LvGestureDirection } from '../events/LvEvent.js';
+import type { AnimationEngine, AnimationHandle } from '../animation/Animation.js';
+import { applyScrollSnap, findScrollTarget } from '../scroll/scrollMath.js';
 import { hitTest } from './hitTest.js';
 import { isPointerDraggable } from './PointerDraggable.js';
 
@@ -13,6 +15,13 @@ export interface InteractionOptions {
   readonly scrollLimit?: number;
   /** Minimum travel (px) on the dominant axis for a release to count as a swipe. Default 50. */
   readonly gestureLimit?: number;
+  /**
+   * Animation engine used for scroll throws and snap settling. Without it,
+   * a released scroll stops where it is (still honoring snap, instantly).
+   */
+  readonly animations?: AnimationEngine;
+  /** How far a scroll throw coasts, as a multiple of release velocity in ms. Default 250. */
+  readonly scrollThrowMs?: number;
 }
 
 export interface InteractionController {
@@ -45,6 +54,7 @@ export function attachInteraction(
   const longPressRepeatTimeMs = options.longPressRepeatTimeMs ?? 100;
   const scrollLimit = options.scrollLimit ?? 10;
   const gestureLimit = options.gestureLimit ?? 50;
+  const scrollThrowMs = options.scrollThrowMs ?? 250;
 
   let activeObject: LvObject | null = null;
   let activePointerId: number | null = null;
@@ -52,6 +62,13 @@ export function attachInteraction(
   let startY = 0;
   let longPressTimer: ReturnType<typeof setTimeout> | null = null;
   let longPressRepeatTimer: ReturnType<typeof setInterval> | null = null;
+  let scrollTarget: LvObject | null = null;
+  let scrollThrow: AnimationHandle | null = null;
+  let lastX = 0;
+  let lastY = 0;
+  let lastTime = 0;
+  let velocityX = 0;
+  let velocityY = 0;
 
   function clearLongPress(): void {
     if (longPressTimer !== null) {
@@ -74,6 +91,44 @@ export function attachInteraction(
         render();
       }, longPressRepeatTimeMs);
     }, longPressTimeMs);
+  }
+
+  function endScroll(target: LvObject): void {
+    target.scrolling = false;
+    target.dispatchEvent('scrollEnd');
+    render();
+  }
+
+  /** Coasts `target` with the release velocity, then settles on its snap point. */
+  function releaseScroll(target: LvObject): void {
+    const landing = applyScrollSnap(
+      target,
+      target.scrollX + velocityX * scrollThrowMs,
+      target.scrollY + velocityY * scrollThrowMs,
+    );
+    const startX = target.scrollX;
+    const startY = target.scrollY;
+    const distance = Math.hypot(landing.x - startX, landing.y - startY);
+    if (!options.animations || distance < 0.5) {
+      target.scrollTo(landing.x, landing.y);
+      endScroll(target);
+      return;
+    }
+    scrollThrow = options.animations.start({
+      from: 0,
+      to: 1,
+      durationMs: Math.min(800, Math.max(150, distance * 3)),
+      easing: 'easeOut',
+      onUpdate: (progress) =>
+        target.scrollTo(
+          startX + (landing.x - startX) * progress,
+          startY + (landing.y - startY) * progress,
+        ),
+      onComplete: () => {
+        scrollThrow = null;
+        endScroll(target);
+      },
+    });
   }
 
   function detectGesture(deltaX: number, deltaY: number): LvGestureDirection | null {
@@ -105,6 +160,16 @@ export function attachInteraction(
 
     startX = event.offsetX;
     startY = event.offsetY;
+    lastX = startX;
+    lastY = startY;
+    lastTime = event.timeStamp ?? 0;
+    velocityX = 0;
+    velocityY = 0;
+    scrollTarget = null;
+    if (scrollThrow) {
+      scrollThrow.cancel();
+      scrollThrow = null;
+    }
 
     hit.pressed = true;
     hit.dispatchEvent('pressed');
@@ -122,10 +187,38 @@ export function attachInteraction(
     if (!activeObject || event.pointerId !== activePointerId) {
       return;
     }
-    if (Math.hypot(event.offsetX - startX, event.offsetY - startY) > scrollLimit) {
+    const traveled = Math.hypot(event.offsetX - startX, event.offsetY - startY);
+    if (traveled > scrollLimit) {
       clearLongPress();
     }
+
     if (!isPointerDraggable(activeObject)) {
+      if (!scrollTarget && traveled > scrollLimit) {
+        // The scroll offset moves opposite to the pointer.
+        const dx = startX - event.offsetX;
+        const dy = startY - event.offsetY;
+        const vertical = Math.abs(dy) >= Math.abs(dx);
+        const candidate = findScrollTarget(activeObject, vertical ? 0 : dx, vertical ? dy : 0);
+        if (candidate) {
+          scrollTarget = candidate;
+          activeObject.pressed = false;
+          activeObject.dispatchEvent('pressLost');
+          candidate.scrolling = true;
+          candidate.dispatchEvent('scrollBegin');
+        }
+      }
+      if (scrollTarget) {
+        const elapsed = Math.max(1, (event.timeStamp ?? lastTime + 16) - lastTime);
+        const moveX = lastX - event.offsetX;
+        const moveY = lastY - event.offsetY;
+        velocityX = 0.7 * velocityX + 0.3 * (moveX / elapsed);
+        velocityY = 0.7 * velocityY + 0.3 * (moveY / elapsed);
+        scrollTarget.scrollBy(moveX, moveY);
+        lastX = event.offsetX;
+        lastY = event.offsetY;
+        lastTime = event.timeStamp ?? lastTime + 16;
+        render();
+      }
       return;
     }
 
@@ -144,6 +237,15 @@ export function attachInteraction(
     activeObject = null;
     activePointerId = null;
     clearLongPress();
+
+    if (scrollTarget) {
+      const finishedTarget = scrollTarget;
+      scrollTarget = null;
+      releasedObject.pressed = false;
+      releaseScroll(finishedTarget);
+      render();
+      return;
+    }
 
     releasedObject.pressed = false;
     releasedObject.dispatchEvent('released');
@@ -171,9 +273,35 @@ export function attachInteraction(
     activePointerId = null;
     clearLongPress();
 
+    if (scrollTarget) {
+      const finishedTarget = scrollTarget;
+      scrollTarget = null;
+      releasedObject.pressed = false;
+      releaseScroll(finishedTarget);
+      return;
+    }
+
     releasedObject.pressed = false;
     releasedObject.dispatchEvent('released');
 
+    render();
+  }
+
+  function onWheel(event: WheelEvent): void {
+    const scale = event.deltaMode === 1 ? 16 : 1;
+    const dx = event.deltaX * scale;
+    const dy = event.deltaY * scale;
+    const hit = hitTest(screen, event.offsetX, event.offsetY);
+    if (!hit) {
+      return;
+    }
+    const vertical = Math.abs(dy) >= Math.abs(dx);
+    const target = findScrollTarget(hit, vertical ? 0 : dx, vertical ? dy : 0);
+    if (!target) {
+      return;
+    }
+    event.preventDefault?.();
+    target.scrollBy(vertical ? 0 : dx, vertical ? dy : 0);
     render();
   }
 
@@ -181,6 +309,7 @@ export function attachInteraction(
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('pointercancel', onPointerCancel);
+  canvas.addEventListener('wheel', onWheel, { passive: false });
 
   return {
     dispose(): void {
@@ -189,6 +318,7 @@ export function attachInteraction(
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointercancel', onPointerCancel);
+      canvas.removeEventListener('wheel', onWheel);
     },
   };
 }

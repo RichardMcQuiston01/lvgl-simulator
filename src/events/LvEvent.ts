@@ -25,7 +25,8 @@ export interface LvGestureEvent extends LvEvent {
  * object it was pressed on, and `valueChanged` when a widget's own value
  * changes (e.g. a `Checkbox`/`Switch` toggling, a `Slider` being dragged).
  *
- * Also: `longPressed` (held past the long-press time) and
+ * Also: `pressLost` (the pointer
+ * started scrolling, so the press is abandoned); `longPressed` (held past the long-press time) and
  * `longPressedRepeat` (every repeat interval after that); `scrollBegin`/
  * `scroll`/`scrollEnd` around a scroll gesture; `gesture` for a swipe;
  * `key` for keyboard/encoder input on a focused object; and `focused`/
@@ -36,6 +37,7 @@ export interface LvEventMap {
   released: LvEvent;
   clicked: LvEvent;
   valueChanged: LvEvent;
+  pressLost: LvEvent;
   longPressed: LvEvent;
   longPressedRepeat: LvEvent;
   scrollBegin: LvEvent;
