@@ -4,6 +4,8 @@
 
 - No code changes. `package-lock.json` root `funding` URL still pointed at Stripe; now points at Ko-fi.
 
+- CI: pin workflow runners to `ubuntu-24.04`; `ubuntu-latest` now resolves to 26.04, which Playwright 1.56.1 cannot install Chromium on.
+
 ## 0.2.2 - 2026-11-03
 
 - No code changes. Donations now point at Ko-fi instead of PayPal: the README badge, the `package.json` `funding` link and a new `.github/FUNDING.yml`. The PayPal QR image is removed.
