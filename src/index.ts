@@ -1,3 +1,4 @@
+import { createAnimationEngine, type AnimationEngine } from './animation/Animation.js';
 import { createRenderLoop } from './core/RenderLoop.js';
 import {
   createDisplayDriver,
@@ -37,6 +38,18 @@ export type {
 export { hitTest } from './interaction/hitTest.js';
 export { isPointerDraggable } from './interaction/PointerDraggable.js';
 export type { PointerDraggable } from './interaction/PointerDraggable.js';
+
+export { createAnimationEngine, evaluateAnimation, startTimeline } from './animation/Animation.js';
+export type {
+  AnimationEngine,
+  AnimationEngineOptions,
+  AnimationFrameScheduler,
+  AnimationHandle,
+  AnimationOptions,
+  TimelineEntry,
+} from './animation/Animation.js';
+export { cubicBezier, easings } from './animation/easing.js';
+export type { EasingFunction, EasingName } from './animation/easing.js';
 
 export { createNavigator } from './navigation/Navigator.js';
 export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
@@ -107,6 +120,8 @@ export interface Simulator {
   readonly displayDriver: DisplayDriver;
   /** Root of the object tree, analogous to LVGL's `lv_scr_act()`. */
   readonly screen: Container;
+  /** Animation engine (`lv_anim`); repaints the canvas on every frame while any animation runs. */
+  readonly animations: AnimationEngine;
   /** Starts the render loop (full repaint on every animation frame). */
   start(): void;
   /** Stops the render loop. */
@@ -156,6 +171,7 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     screen.render(displayDriver.context);
   }
 
+  const animations = createAnimationEngine({ onFrame: renderOnce });
   const loop = createRenderLoop(renderOnce);
   const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce);
 
@@ -166,11 +182,13 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     canvas: displayDriver.canvas,
     displayDriver,
     screen,
+    animations,
     start: () => loop.start(),
     stop: () => loop.stop(),
     renderOnce,
     destroy: () => {
       loop.stop();
+      animations.cancelAll();
       interaction.dispose();
     },
   };
