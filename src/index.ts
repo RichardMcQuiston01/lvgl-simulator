@@ -55,6 +55,11 @@ export type { EasingFunction, EasingName } from './animation/easing.js';
 export { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
 export type { FocusGroupMode, FocusGroupOptions, KeyboardController } from './focus/FocusGroup.js';
 
+export { createTextMeasurer, fontString, textMeasurer } from './text/measureText.js';
+export type { TextMeasurer } from './text/measureText.js';
+export { TextEditState } from './text/TextEditState.js';
+export type { TextEditStateOptions } from './text/TextEditState.js';
+
 export { createNavigator } from './navigation/Navigator.js';
 export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
 
