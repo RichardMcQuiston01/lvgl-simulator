@@ -1,6 +1,7 @@
 import type { LvObject } from '../core/LvObject.js';
 import type { LvGestureDirection } from '../events/LvEvent.js';
 import type { AnimationEngine, AnimationHandle } from '../animation/Animation.js';
+import type { FocusGroup } from '../focus/FocusGroup.js';
 import { applyScrollSnap, findScrollTarget } from '../scroll/scrollMath.js';
 import { hitTest } from './hitTest.js';
 import { isPointerDraggable } from './PointerDraggable.js';
@@ -20,6 +21,8 @@ export interface InteractionOptions {
    * a released scroll stops where it is (still honoring snap, instantly).
    */
   readonly animations?: AnimationEngine;
+  /** Pressing an object that belongs to this group focuses it (LVGL's pointer-to-group behavior). */
+  readonly focusGroup?: FocusGroup;
   /** How far a scroll throw coasts, as a multiple of release velocity in ms. Default 250. */
   readonly scrollThrowMs?: number;
 }
@@ -171,6 +174,7 @@ export function attachInteraction(
       scrollThrow = null;
     }
 
+    options.focusGroup?.focus(hit);
     hit.pressed = true;
     hit.dispatchEvent('pressed');
     startLongPress(hit);

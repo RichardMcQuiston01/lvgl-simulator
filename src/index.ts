@@ -5,6 +5,7 @@ import {
   type ColorFormat,
   type DisplayDriver,
 } from './display/DisplayDriver.js';
+import { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
 import { attachInteraction } from './interaction/InteractionController.js';
 import { mergeStyle, paddingAll } from './style/Style.js';
 import { Container, type ContainerLayout } from './widgets/Container.js';
@@ -50,6 +51,9 @@ export type {
 } from './animation/Animation.js';
 export { cubicBezier, easings } from './animation/easing.js';
 export type { EasingFunction, EasingName } from './animation/easing.js';
+
+export { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
+export type { FocusGroupMode, FocusGroupOptions, KeyboardController } from './focus/FocusGroup.js';
 
 export { createNavigator } from './navigation/Navigator.js';
 export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
@@ -130,6 +134,12 @@ export interface Simulator {
   readonly screen: Container;
   /** Animation engine (`lv_anim`); repaints the canvas on every frame while any animation runs. */
   readonly animations: AnimationEngine;
+  /**
+   * Keyboard/encoder focus group (`lv_group_t`). Add the objects keys
+   * should reach; Tab/Shift+Tab move focus, and pressing an object in the
+   * group focuses it. The canvas is focusable so it receives key events.
+   */
+  readonly focusGroup: FocusGroup;
   /** Starts the render loop (full repaint on every animation frame). */
   start(): void;
   /** Stops the render loop. */
@@ -181,7 +191,13 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
 
   const animations = createAnimationEngine({ onFrame: renderOnce });
   const loop = createRenderLoop(renderOnce);
-  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce, { animations });
+  const focusGroup = new FocusGroup();
+  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce, {
+    animations,
+    focusGroup,
+  });
+  displayDriver.canvas.tabIndex = 0;
+  const keyboard = attachKeyboard(displayDriver.canvas, focusGroup, renderOnce);
 
   container.appendChild(displayDriver.canvas);
   renderOnce();
@@ -191,6 +207,7 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     displayDriver,
     screen,
     animations,
+    focusGroup,
     start: () => loop.start(),
     stop: () => loop.stop(),
     renderOnce,
@@ -198,6 +215,7 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
       loop.stop();
       animations.cancelAll();
       interaction.dispose();
+      keyboard.dispose();
     },
   };
 }

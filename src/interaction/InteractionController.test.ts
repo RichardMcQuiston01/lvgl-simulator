@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { LvObject } from '../core/LvObject.js';
+import { FocusGroup } from '../focus/FocusGroup.js';
 import { createFakeCanvas } from '../testing/fakeCanvas.js';
 import { attachInteraction } from './InteractionController.js';
 import type { PointerDraggable } from './PointerDraggable.js';
@@ -281,5 +282,25 @@ describe('long press and gestures', () => {
     canvas.dispatch('pointerdown', pointerEvent({ offsetX: 5, offsetY: 5 }));
     canvas.dispatch('pointerup', pointerEvent({ offsetX: 20, offsetY: 5 }));
     expect(clicked).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('focus group integration', () => {
+  it('focuses a pressed object that belongs to the group', () => {
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 100, height: 100 });
+    const first = new LvObject({ x: 0, y: 0, width: 20, height: 20 });
+    const second = new LvObject({ x: 50, y: 50, width: 20, height: 20 });
+    screen.addChild(first);
+    screen.addChild(second);
+    const group = new FocusGroup();
+    group.add(first);
+    group.add(second);
+
+    attachInteraction(canvas, screen, vi.fn(), { focusGroup: group });
+    canvas.dispatch('pointerdown', pointerEvent({ offsetX: 55, offsetY: 55 }));
+
+    expect(group.focusedItem).toBe(second);
+    expect(second.focused).toBe(true);
   });
 });
