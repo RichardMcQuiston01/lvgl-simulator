@@ -3,7 +3,7 @@
 ## Unreleased
 
 - No code changes. `package-lock.json` root `funding` URL still pointed at Stripe; now points at Ko-fi.
-
+- Docs: ROADMAP gains a phased plan (W0-W6) for the remaining LVGL widgets.
 - CI: pin workflow runners to `ubuntu-24.04`; `ubuntu-latest` now resolves to 26.04, which Playwright 1.56.1 cannot install Chromium on.
 
 ## 0.2.2 - 2026-11-03

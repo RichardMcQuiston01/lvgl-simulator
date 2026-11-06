@@ -128,6 +128,86 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       won't show this until a new version ships and that repo bumps its
       dependency.
 
+## Widget expansion (LVGL 9 parity) — planned
+
+Goal: cover every LVGL widget a UI editor can emit. Shipped: `Container`
+(`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`.
+Each widget below ships with: class in `src/widgets/`, unit tests, a `Scene`
+node type in `SceneSchema.ts`/`loadScreen()`, a case in the Playwright
+fixture, and a `GETTING_STARTED.md` entry. Each phase is released as a minor
+version, with a CHANGELOG entry.
+
+### Phase W0: Foundations (blocks later phases)
+
+- [ ] Scrolling: scrollable containers, scrollbar part, drag + wheel,
+      momentum, snap (`scroll_*` styles/flags)
+- [ ] Object flags: `hidden`, `clickable`, `scrollable`, `floating`, `ignore_layout`
+- [ ] Style gaps: gradients, shadow, outline, `text_align`, `line_*`, `arc_*`
+      props, transforms (rotate/scale), `clip_corner`
+- [ ] Animation engine (`lv_anim`: timeline, easing, repeat) + render-loop hook
+- [ ] Focus groups: keyboard/encoder navigation, `focused` state, `key`/
+      `focused`/`defocused` events
+- [ ] New events: `longPressed`, `longPressedRepeat`, `scroll`, `gesture`,
+      `valueChanged` for all value widgets
+- [ ] Reusable text-input caret/selection and a text-measure cache
+
+### Phase W1: Simple display and value widgets
+
+- [ ] `Bar` — value/range, start value, symmetrical, vertical
+- [ ] `Arc` — value/range, rotation, bg/fg angles, knob, drag input
+- [ ] `Spinner` — arc + spin animation
+- [ ] `LED` — brightness, color, glow
+- [ ] `Line` — point array, `y_invert`
+- [ ] `Scale` — linear/round, ticks, labels, sections (needed by gauges)
+- [ ] `ImageButton` — per-state images, tiled middle
+
+### Phase W2: Text and input widgets
+
+- [ ] `Textarea` — caret, selection, placeholder, password mode, one-line
+- [ ] `Keyboard` — layouts (lower/upper/special/number), target textarea
+- [ ] `Spinbox` — digits, step, range, increment/decrement
+- [ ] `Span` — multi-style rich text spans, wrapping modes
+- [ ] `ArcLabel` — text along an arc (LVGL 9.3+)
+
+### Phase W3: Selection and list widgets (need W0 scrolling)
+
+- [ ] `Dropdown` — popup list, direction, symbol, selected highlight
+- [ ] `Roller` — infinite mode, visible rows, snap/momentum
+- [ ] `ButtonMatrix` — button map, control flags (checkable, hidden, disabled)
+- [ ] `List` — scrollable list of text/buttons
+- [ ] `Checkbox` radio grouping (`checked` exclusivity)
+
+### Phase W4: Container and navigation widgets
+
+- [ ] `Tabview` — tab bar position, swipe, content pages
+- [ ] `Tileview` — grid of tiles, swipe directions
+- [ ] `Msgbox` — title, text, close button, footer buttons, modal backdrop
+- [ ] `Win` — header, title, buttons, content
+- [ ] `Menu` — sidebar/main pages, back button, separators, sections
+
+### Phase W5: Data widgets
+
+- [ ] `Table` — rows/columns, cell ctrl flags, column widths, merging
+- [ ] `Chart` — line, bar, scatter; series, axes, ticks, cursors, zoom
+- [ ] `Calendar` — month view, highlighted dates, header (arrow/dropdown)
+- [ ] `Canvas` — draw API (rect, line, arc, text, image) over an offscreen buffer
+
+### Phase W6: Media and extras (optional, size-gated)
+
+- [ ] `AnimImg` — frame sequence
+- [ ] `GIF` — decode via `ImageDecoder`/`createImageBitmap`
+- [ ] `QRCode` / `Barcode` — pure-TS encoders, lazy-loaded
+- [ ] `Lottie` — evaluate whether to wrap `lottie-web` as an optional peer dep
+
+### Cross-cutting, every phase
+
+- [ ] Add widgets to `SceneSchema` and bump the schema version when a node
+      shape changes (additive changes stay compatible)
+- [ ] Extend the Playwright fixture + baseline PNG; keep `FIDELITY_BASELINE.md` current
+- [ ] Tree-shakeable exports; check bundle-size budget per phase
+- [ ] Playground page showcasing each new widget
+- [ ] npm-install smoke test in CI before each release
+
 ## Open items
 
 - Lesson from `0.1.0`: verifying "installs correctly from npm" needs an
