@@ -21,7 +21,13 @@ export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
 export type { LvState, Style, StyleSet } from './style/Style.js';
 export { withOpacity } from './style/color.js';
 
-export type { LvEvent, LvEventMap } from './events/LvEvent.js';
+export type {
+  LvEvent,
+  LvEventMap,
+  LvGestureDirection,
+  LvGestureEvent,
+  LvKeyEvent,
+} from './events/LvEvent.js';
 
 export { attachInteraction } from './interaction/InteractionController.js';
 export type { InteractionController } from './interaction/InteractionController.js';

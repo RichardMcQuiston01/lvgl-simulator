@@ -55,13 +55,14 @@ export class Container extends LvObject {
     const contentWidth = Math.max(0, this.width - padLeft - padRight);
     const contentHeight = Math.max(0, this.height - padTop - padBottom);
 
+    const laidOutChildren = this.children.filter((child) => child.participatesInLayout);
     if (this.layout.type === 'flex') {
-      applyFlexLayout(this.children, contentWidth, contentHeight, this.layout);
+      applyFlexLayout(laidOutChildren, contentWidth, contentHeight, this.layout);
     } else {
-      applyGridLayout(this.children, contentWidth, contentHeight, this.layout);
+      applyGridLayout(laidOutChildren, contentWidth, contentHeight, this.layout);
     }
 
-    for (const child of this.children) {
+    for (const child of laidOutChildren) {
       child.x += padLeft;
       child.y += padTop;
     }

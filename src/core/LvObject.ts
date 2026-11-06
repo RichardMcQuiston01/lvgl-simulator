@@ -1,5 +1,5 @@
 import { EventEmitter } from '../events/EventEmitter.js';
-import type { LvEventMap } from '../events/LvEvent.js';
+import type { LvEventDetailArgs, LvEventMap } from '../events/LvEvent.js';
 import { resolveStyle, type LvState, type Style, type StyleSet } from '../style/Style.js';
 import { withOpacity } from '../style/color.js';
 
@@ -23,6 +23,18 @@ export interface LvObjectOptions {
   readonly pressed?: boolean;
   readonly disabled?: boolean;
   readonly focused?: boolean;
+  /** Hides this object and its subtree: not painted, not laid out, not hit-testable. Mirrors `LV_OBJ_FLAG_HIDDEN`. */
+  readonly hidden?: boolean;
+  /** Whether pointer input can target this object (default `true`). Mirrors `LV_OBJ_FLAG_CLICKABLE`. */
+  readonly clickable?: boolean;
+  /** Whether this object scrolls when its content overflows (default `true`). Mirrors `LV_OBJ_FLAG_SCROLLABLE`. */
+  readonly scrollable?: boolean;
+  /** Keeps this object out of its parent's flex/grid layout and positioned by its own x/y. Mirrors `LV_OBJ_FLAG_FLOATING`. */
+  readonly floating?: boolean;
+  /** Excludes this object from its parent's flex/grid layout. Mirrors `LV_OBJ_FLAG_IGNORE_LAYOUT`. */
+  readonly ignoreLayout?: boolean;
+  /** Whether a focus group's Enter key puts this object into edit mode (encoder-style). Mirrors `lv_obj_class` `editable`. */
+  readonly editable?: boolean;
 }
 
 /**
@@ -46,6 +58,12 @@ export class LvObject {
   pressed: boolean;
   disabled: boolean;
   focused: boolean;
+  hidden: boolean;
+  clickable: boolean;
+  scrollable: boolean;
+  floating: boolean;
+  ignoreLayout: boolean;
+  editable: boolean;
 
   private parentObject: LvObject | null = null;
   private readonly childObjects: LvObject[] = [];
@@ -65,6 +83,17 @@ export class LvObject {
     this.pressed = options.pressed ?? false;
     this.disabled = options.disabled ?? false;
     this.focused = options.focused ?? false;
+    this.hidden = options.hidden ?? false;
+    this.clickable = options.clickable ?? true;
+    this.scrollable = options.scrollable ?? true;
+    this.floating = options.floating ?? false;
+    this.ignoreLayout = options.ignoreLayout ?? false;
+    this.editable = options.editable ?? false;
+  }
+
+  /** Whether the parent's flex/grid layout positions this object. */
+  get participatesInLayout(): boolean {
+    return !this.hidden && !this.floating && !this.ignoreLayout;
   }
 
   get parent(): LvObject | null {
@@ -118,8 +147,8 @@ export class LvObject {
    * events, and by widgets reacting to their own input (e.g. `Checkbox`
    * toggling on `clicked`).
    */
-  dispatchEvent<K extends keyof LvEventMap>(type: K): void {
-    this.eventEmitter.emit(type, { target: this });
+  dispatchEvent<K extends keyof LvEventMap>(type: K, ...detail: LvEventDetailArgs<K>): void {
+    this.eventEmitter.emit(type, { ...detail[0], target: this } as unknown as LvEventMap[K]);
   }
 
   /** This object's position in the display's coordinate space. */
@@ -188,6 +217,9 @@ export class LvObject {
    * earlier ones, matching LVGL's z-ordering).
    */
   render(context: CanvasRenderingContext2D): void {
+    if (this.hidden) {
+      return;
+    }
     this.updateLayout();
 
     const opa = this.resolvedStyle.opa;
