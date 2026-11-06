@@ -210,3 +210,76 @@ describe('attachInteraction', () => {
     expect(button.pressed).toBe(false);
   });
 });
+
+describe('long press and gestures', () => {
+  function setup(): { canvas: ReturnType<typeof createFakeCanvas>; target: LvObject } {
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 200, height: 200 });
+    const target = new LvObject({ x: 0, y: 0, width: 200, height: 200 });
+    screen.addChild(target);
+    attachInteraction(canvas, screen, vi.fn());
+    return { canvas, target };
+  }
+
+  it('fires longPressed after the hold time and repeats until release', () => {
+    vi.useFakeTimers();
+    const { canvas, target } = setup();
+    const longPressed = vi.fn();
+    const repeated = vi.fn();
+    target.addEventListener('longPressed', longPressed);
+    target.addEventListener('longPressedRepeat', repeated);
+
+    canvas.dispatch('pointerdown', pointerEvent({ offsetX: 5, offsetY: 5 }));
+    vi.advanceTimersByTime(399);
+    expect(longPressed).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(longPressed).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(300);
+    expect(repeated).toHaveBeenCalledTimes(3);
+
+    canvas.dispatch('pointerup', pointerEvent({ offsetX: 5, offsetY: 5 }));
+    vi.advanceTimersByTime(1000);
+    expect(repeated).toHaveBeenCalledTimes(3);
+    vi.useRealTimers();
+  });
+
+  it('cancels a pending long press when the pointer travels past the scroll limit', () => {
+    vi.useFakeTimers();
+    const { canvas, target } = setup();
+    const longPressed = vi.fn();
+    target.addEventListener('longPressed', longPressed);
+
+    canvas.dispatch('pointerdown', pointerEvent({ offsetX: 5, offsetY: 5 }));
+    canvas.dispatch('pointermove', pointerEvent({ offsetX: 40, offsetY: 5 }));
+    vi.advanceTimersByTime(1000);
+    expect(longPressed).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it.each([
+    [{ x: 100, y: 10 }, { x: 20, y: 10 }, 'left'],
+    [{ x: 20, y: 10 }, { x: 100, y: 10 }, 'right'],
+    [{ x: 50, y: 120 }, { x: 50, y: 20 }, 'top'],
+    [{ x: 50, y: 20 }, { x: 50, y: 120 }, 'bottom'],
+  ] as const)('fires gesture %j -> %j as %s instead of clicked', (from, to, direction) => {
+    const { canvas, target } = setup();
+    const gesture = vi.fn();
+    const clicked = vi.fn();
+    target.addEventListener('gesture', gesture);
+    target.addEventListener('clicked', clicked);
+
+    canvas.dispatch('pointerdown', pointerEvent({ offsetX: from.x, offsetY: from.y }));
+    canvas.dispatch('pointerup', pointerEvent({ offsetX: to.x, offsetY: to.y }));
+    expect(gesture).toHaveBeenCalledWith({ direction, target });
+    expect(clicked).not.toHaveBeenCalled();
+  });
+
+  it('still clicks when travel is under the gesture limit', () => {
+    const { canvas, target } = setup();
+    const clicked = vi.fn();
+    target.addEventListener('clicked', clicked);
+    canvas.dispatch('pointerdown', pointerEvent({ offsetX: 5, offsetY: 5 }));
+    canvas.dispatch('pointerup', pointerEvent({ offsetX: 20, offsetY: 5 }));
+    expect(clicked).toHaveBeenCalledTimes(1);
+  });
+});

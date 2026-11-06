@@ -30,7 +30,10 @@ export type {
 } from './events/LvEvent.js';
 
 export { attachInteraction } from './interaction/InteractionController.js';
-export type { InteractionController } from './interaction/InteractionController.js';
+export type {
+  InteractionController,
+  InteractionOptions,
+} from './interaction/InteractionController.js';
 export { hitTest } from './interaction/hitTest.js';
 export { isPointerDraggable } from './interaction/PointerDraggable.js';
 export type { PointerDraggable } from './interaction/PointerDraggable.js';
