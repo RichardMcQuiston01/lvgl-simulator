@@ -9,6 +9,10 @@ import type { LvObject } from '../core/LvObject.js';
  */
 export type FocusGroupMode = 'keypad' | 'encoder';
 
+/** Keys the focus group never consumes, so the browser keeps them: modifiers, lock keys and F1–F24. */
+const UNHANDLED_KEYS =
+  /^(Shift|Control|Alt|AltGraph|Meta|OS|CapsLock|NumLock|ScrollLock|Fn|FnLock|F\d{1,2})$/;
+
 export interface FocusGroupOptions {
   readonly mode?: FocusGroupMode;
   /** Whether focus wraps past the first/last object (default `true`). Mirrors `lv_group_set_wrap`. */
@@ -66,7 +70,7 @@ export class FocusGroup {
       return;
     }
     if (this.focusedObject === object) {
-      const next = this.findFocusable(index, 1, false);
+      const next = this.findFocusable(index, 1, false) ?? this.findFocusable(index, -1, false);
       this.members.splice(index, 1);
       object.focused = false;
       this.focusedObject = null;
@@ -123,9 +127,6 @@ export class FocusGroup {
       return false;
     }
 
-    if (key === 'Enter') {
-      return this.handleEnter(focused);
-    }
     if (key === 'Escape' && this.editing) {
       this.editing = false;
       return true;
@@ -137,6 +138,20 @@ export class FocusGroup {
       if (key === 'ArrowLeft' || key === 'ArrowUp') {
         return this.focusPrev();
       }
+    }
+
+    // Past this point the key acts on the focused object, which may have
+    // been disabled or hidden since it took focus; pointer input rejects such
+    // objects, so keyboard input does too (navigation above still works).
+    if (!this.isFocusable(focused)) {
+      return false;
+    }
+    if (key === 'Enter') {
+      return this.handleEnter(focused);
+    }
+    // Bare modifiers and function keys belong to the browser (reload, devtools).
+    if (UNHANDLED_KEYS.test(key)) {
+      return false;
     }
 
     focused.dispatchEvent('key', { key });

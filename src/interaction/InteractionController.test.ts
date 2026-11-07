@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { LvObject } from '../core/LvObject.js';
+import { createAnimationEngine } from '../animation/Animation.js';
 import { FocusGroup } from '../focus/FocusGroup.js';
 import { createFakeCanvas } from '../testing/fakeCanvas.js';
 import { attachInteraction } from './InteractionController.js';
@@ -302,5 +303,54 @@ describe('focus group integration', () => {
 
     expect(group.focusedItem).toBe(second);
     expect(second.focused).toBe(true);
+  });
+});
+
+describe('review fixes', () => {
+  it('does not leak a long-press timer when a second pointer goes down', () => {
+    vi.useFakeTimers();
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 200, height: 200 });
+    const target = new LvObject({ width: 200, height: 200 });
+    screen.addChild(target);
+    attachInteraction(canvas, screen, vi.fn());
+    const longPressed = vi.fn();
+    target.addEventListener('longPressed', longPressed);
+
+    canvas.dispatch('pointerdown', pointerEvent({ pointerId: 1, offsetX: 5, offsetY: 5 }));
+    vi.advanceTimersByTime(200);
+    canvas.dispatch('pointerdown', pointerEvent({ pointerId: 2, offsetX: 6, offsetY: 6 }));
+    canvas.dispatch('pointerup', pointerEvent({ pointerId: 2, offsetX: 6, offsetY: 6 }));
+    vi.advanceTimersByTime(2000);
+
+    expect(longPressed).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('ends the scroll of an interrupted throw', () => {
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 100, height: 100 });
+    const list = new LvObject({ width: 100, height: 100 });
+    for (let i = 0; i < 5; i += 1) {
+      list.addChild(new LvObject({ y: i * 40, width: 100, height: 40 }));
+    }
+    screen.addChild(list);
+    const time = { now: 0 };
+    const engine = createAnimationEngine({ now: () => time.now, scheduler: null });
+    attachInteraction(canvas, screen, vi.fn(), { animations: engine });
+    const scrollEnd = vi.fn();
+    list.addEventListener('scrollEnd', scrollEnd);
+
+    canvas.dispatch('pointerdown', { pointerId: 1, offsetX: 50, offsetY: 90, timeStamp: 0 });
+    canvas.dispatch('pointermove', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 10 });
+    canvas.dispatch('pointerup', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 10 });
+    expect(list.scrolling).toBe(true);
+    expect(scrollEnd).not.toHaveBeenCalled();
+
+    // A tap during the throw cancels it.
+    canvas.dispatch('pointerdown', { pointerId: 1, offsetX: 50, offsetY: 50, timeStamp: 20 });
+    expect(list.scrolling).toBe(false);
+    expect(scrollEnd).toHaveBeenCalledTimes(1);
+    expect(engine.activeCount).toBe(0);
   });
 });

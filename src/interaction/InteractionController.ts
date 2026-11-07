@@ -67,6 +67,7 @@ export function attachInteraction(
   let longPressRepeatTimer: ReturnType<typeof setInterval> | null = null;
   let scrollTarget: LvObject | null = null;
   let scrollThrow: AnimationHandle | null = null;
+  let scrollThrowTarget: LvObject | null = null;
   let lastX = 0;
   let lastY = 0;
   let lastTime = 0;
@@ -85,6 +86,7 @@ export function attachInteraction(
   }
 
   function startLongPress(target: LvObject): void {
+    clearLongPress();
     longPressTimer = setTimeout(() => {
       longPressTimer = null;
       target.dispatchEvent('longPressed');
@@ -117,6 +119,7 @@ export function attachInteraction(
       endScroll(target);
       return;
     }
+    scrollThrowTarget = target;
     scrollThrow = options.animations.start({
       from: 0,
       to: 1,
@@ -129,6 +132,7 @@ export function attachInteraction(
         ),
       onComplete: () => {
         scrollThrow = null;
+        scrollThrowTarget = null;
         endScroll(target);
       },
     });
@@ -172,6 +176,11 @@ export function attachInteraction(
     if (scrollThrow) {
       scrollThrow.cancel();
       scrollThrow = null;
+      // cancel() skips onComplete, so close out the interrupted throw here.
+      if (scrollThrowTarget) {
+        endScroll(scrollThrowTarget);
+        scrollThrowTarget = null;
+      }
     }
 
     options.focusGroup?.focus(hit);

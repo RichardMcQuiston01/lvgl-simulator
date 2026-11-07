@@ -2,7 +2,7 @@ import { withOpacity } from '../style/color.js';
 import type { Style } from '../style/Style.js';
 import { paintRoundedRectStroke, traceRoundedRect } from './shapes.js';
 
-/** How far off-canvas the shadow caster is drawn, so only its shadow shows. */
+/** How far off-canvas (device pixels) the shadow caster is drawn, so only its shadow shows. */
 const SHADOW_CASTER_OFFSET = 100_000;
 
 /**
@@ -25,14 +25,29 @@ export function paintShadow(
   }
   const spread = style.shadowSpread ?? 0;
 
+  // Canvas shadow offsets and blur are in device pixels and ignore the
+  // current transform (e.g. the display driver's devicePixelRatio scale),
+  // while shapes follow it. Shift the caster off-screen in device space and
+  // map the offset and blur through the same matrix.
+  const matrix = context.getTransform();
+  const offsetX = style.shadowOffsetX ?? 0;
+  const offsetY = style.shadowOffsetY ?? 0;
   context.save();
+  context.setTransform(
+    matrix.a,
+    matrix.b,
+    matrix.c,
+    matrix.d,
+    matrix.e - SHADOW_CASTER_OFFSET,
+    matrix.f,
+  );
   context.shadowColor = withOpacity(style.shadowColor ?? '#000000', style.shadowOpa ?? 255);
-  context.shadowBlur = blur;
-  context.shadowOffsetX = (style.shadowOffsetX ?? 0) + SHADOW_CASTER_OFFSET;
-  context.shadowOffsetY = style.shadowOffsetY ?? 0;
+  context.shadowBlur = blur * Math.hypot(matrix.a, matrix.b);
+  context.shadowOffsetX = SHADOW_CASTER_OFFSET + matrix.a * offsetX + matrix.c * offsetY;
+  context.shadowOffsetY = matrix.b * offsetX + matrix.d * offsetY;
   traceRoundedRect(
     context,
-    x - spread - SHADOW_CASTER_OFFSET,
+    x - spread,
     y - spread,
     width + spread * 2,
     height + spread * 2,

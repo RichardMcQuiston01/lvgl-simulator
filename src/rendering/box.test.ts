@@ -10,6 +10,8 @@ function contextWithExtras(): CanvasRenderingContext2D {
   context.translate = vi.fn();
   context.rotate = vi.fn();
   context.createLinearGradient = vi.fn(() => ({ addColorStop: vi.fn() }));
+  context.getTransform = vi.fn(() => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }));
+  context.setTransform = vi.fn();
   return context as unknown as CanvasRenderingContext2D;
 }
 
@@ -74,6 +76,34 @@ describe('paintShadow', () => {
     expect(context.fill).toHaveBeenCalledTimes(1);
     expect(context.save).toHaveBeenCalled();
     expect(context.restore).toHaveBeenCalled();
+  });
+});
+
+describe('paintShadow on a scaled context', () => {
+  it('maps the offset and blur through the transform and shifts the caster in device space', () => {
+    const context = contextWithExtras();
+    (context.getTransform as ReturnType<typeof vi.fn>).mockReturnValue({
+      a: 2,
+      b: 0,
+      c: 0,
+      d: 2,
+      e: 0,
+      f: 0,
+    });
+    paintShadow(context, 10, 10, 20, 20, { shadowWidth: 8, shadowOffsetX: 3, shadowOffsetY: 4 });
+
+    expect(context.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, -100_000, 0);
+    expect(context.shadowBlur).toBe(16);
+    expect(context.shadowOffsetX).toBe(100_000 + 6);
+    expect(context.shadowOffsetY).toBe(8);
+  });
+
+  it('leaves an identity transform at the logical offset and blur', () => {
+    const context = contextWithExtras();
+    paintShadow(context, 10, 10, 20, 20, { shadowWidth: 8, shadowOffsetX: 3, shadowOffsetY: 4 });
+    expect(context.shadowBlur).toBe(8);
+    expect(context.shadowOffsetX).toBe(100_003);
+    expect(context.shadowOffsetY).toBe(4);
   });
 });
 

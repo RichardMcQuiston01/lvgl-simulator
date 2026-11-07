@@ -117,6 +117,50 @@ describe('FocusGroup', () => {
   });
 });
 
+describe('FocusGroup review fixes', () => {
+  it('falls back to the previous neighbour when the last focused object is removed', () => {
+    const [a, b, c] = makeObjects(3) as [LvObject, LvObject, LvObject];
+    const group = new FocusGroup();
+    [a, b, c].forEach((o) => group.add(o));
+    group.focus(c);
+    group.remove(c);
+    expect(group.focusedItem).toBe(b);
+    expect(b.focused).toBe(true);
+  });
+
+  it('ignores Enter and keys on a focused object that became disabled, but still navigates', () => {
+    const [a, b] = makeObjects(2) as [LvObject, LvObject];
+    const group = new FocusGroup();
+    group.add(a);
+    group.add(b);
+    const clicked = vi.fn();
+    const keys = vi.fn();
+    a.addEventListener('clicked', clicked);
+    a.addEventListener('key', keys);
+    a.disabled = true;
+
+    expect(group.handleKey('Enter')).toBe(false);
+    expect(group.handleKey('x')).toBe(false);
+    expect(clicked).not.toHaveBeenCalled();
+    expect(keys).not.toHaveBeenCalled();
+    expect(group.handleKey('Tab')).toBe(true);
+    expect(group.focusedItem).toBe(b);
+  });
+
+  it.each(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'F5', 'F12'])(
+    'does not consume %s',
+    (key) => {
+      const [a] = makeObjects(1) as [LvObject];
+      const group = new FocusGroup();
+      group.add(a);
+      const keys = vi.fn();
+      a.addEventListener('key', keys);
+      expect(group.handleKey(key)).toBe(false);
+      expect(keys).not.toHaveBeenCalled();
+    },
+  );
+});
+
 describe('attachKeyboard', () => {
   function fakeTarget(): {
     target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'>;

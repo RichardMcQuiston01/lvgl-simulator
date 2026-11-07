@@ -138,7 +138,12 @@ export class TextEditState {
    */
   handleKey(
     key: string,
-    modifiers: { readonly shiftKey?: boolean; readonly ctrlKey?: boolean } = {},
+    modifiers: {
+      readonly shiftKey?: boolean;
+      readonly ctrlKey?: boolean;
+      readonly metaKey?: boolean;
+      readonly altKey?: boolean;
+    } = {},
   ): boolean {
     const extend = modifiers.shiftKey ?? false;
     switch (key) {
@@ -167,7 +172,8 @@ export class TextEditState {
         this.insert('\n');
         return true;
       case 'a':
-        if (modifiers.ctrlKey) {
+      case 'A':
+        if (modifiers.ctrlKey || modifiers.metaKey) {
           this.selectAll();
           return true;
         }
@@ -175,7 +181,10 @@ export class TextEditState {
       default:
         break;
     }
-    if ([...key].length === 1) {
+    // Ctrl/Cmd shortcuts (copy, paste, ...) must not type their letter. Ctrl+Alt
+    // is how Windows reports AltGr, which does type printable characters.
+    const isShortcut = (modifiers.ctrlKey || modifiers.metaKey) && !modifiers.altKey;
+    if (!isShortcut && [...key].length === 1) {
       this.insert(key);
       return true;
     }

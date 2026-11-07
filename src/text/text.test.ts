@@ -112,6 +112,24 @@ describe('TextEditState', () => {
     expect(state.handleKey('Shift')).toBe(false);
   });
 
+  it('does not type the letter of Ctrl/Cmd shortcuts, but does for AltGr', () => {
+    const state = new TextEditState({ text: 'abc' });
+    expect(state.handleKey('c', { ctrlKey: true })).toBe(false);
+    expect(state.handleKey('v', { metaKey: true })).toBe(false);
+    expect(state.text).toBe('abc');
+    state.handleKey('@', { ctrlKey: true, altKey: true });
+    expect(state.text).toBe('abc@');
+  });
+
+  it('selects all for uppercase A and Cmd+A', () => {
+    const state = new TextEditState({ text: 'xyz' });
+    expect(state.handleKey('A', { ctrlKey: true, shiftKey: true })).toBe(true);
+    expect(state.selectedText).toBe('xyz');
+    state.setCaret(0);
+    expect(state.handleKey('a', { metaKey: true })).toBe(true);
+    expect(state.selectedText).toBe('xyz');
+  });
+
   it('clamps the caret when text is replaced', () => {
     const state = new TextEditState({ text: 'long text' });
     state.setText('hi');
