@@ -3,7 +3,16 @@
 ## Unreleased
 
 - No code changes. `package-lock.json` root `funding` URL still pointed at Stripe; now points at Ko-fi.
-
+- Widget expansion W0 (foundations, no new widgets yet):
+  - Object flags `hidden`, `clickable`, `scrollable`, `floating`, `ignoreLayout`.
+  - Scrolling: clipping, scrollbars, drag/wheel, throw, chaining, snap, `scrollTo`/`scrollBy`/`scrollToView`.
+  - Events: `longPressed`, `longPressedRepeat`, `gesture`, `pressLost`, `scrollBegin`/`scroll`/`scrollEnd`, `key`, `focused`/`defocused`.
+  - `FocusGroup` (keypad/encoder) and `simulator.focusGroup`; focused objects draw a theme outline.
+  - `lv_anim`-style animation engine (`simulator.animations`, easings, repeat, playback, timelines).
+  - New style properties: gradients, shadow, outline, `borderOpa`, `textAlign`, transforms, `clipCorner`, plus `line*`/`arc*` for upcoming widgets.
+  - `textMeasurer` cache and `TextEditState` caret/selection model.
+  - Behavior change: a plain `Container` now paints `radius` and borders; the visual baseline was regenerated.
+- Docs: ROADMAP gains a phased plan (W0-W6) for the remaining LVGL widgets.
 - CI: pin workflow runners to `ubuntu-24.04`; `ubuntu-latest` now resolves to 26.04, which Playwright 1.56.1 cannot install Chromium on.
 
 ## 0.2.2 - 2026-11-03

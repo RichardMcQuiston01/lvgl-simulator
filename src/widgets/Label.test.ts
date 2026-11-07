@@ -38,3 +38,24 @@ describe('Label', () => {
     expect(context.font).toBe('20px monospace');
   });
 });
+
+describe('Label textAlign', () => {
+  it.each([
+    ['left', 10],
+    ['center', 60],
+    ['right', 110],
+  ] as const)('aligns %s', (textAlign, expectedX) => {
+    const context = createFakeCanvasContext();
+    const label = new Label({
+      x: 10,
+      y: 0,
+      width: 100,
+      height: 20,
+      text: 'Hi',
+      style: { base: { textAlign } },
+    });
+    label.render(context);
+    expect(context.fillText).toHaveBeenCalledWith('Hi', expectedX, 10);
+    expect(context.textAlign).toBe(textAlign);
+  });
+});

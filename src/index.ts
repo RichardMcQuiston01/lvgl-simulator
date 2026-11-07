@@ -1,9 +1,11 @@
+import { createAnimationEngine, type AnimationEngine } from './animation/Animation.js';
 import { createRenderLoop } from './core/RenderLoop.js';
 import {
   createDisplayDriver,
   type ColorFormat,
   type DisplayDriver,
 } from './display/DisplayDriver.js';
+import { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
 import { attachInteraction } from './interaction/InteractionController.js';
 import { mergeStyle, paddingAll } from './style/Style.js';
 import { Container, type ContainerLayout } from './widgets/Container.js';
@@ -21,16 +23,53 @@ export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
 export type { LvState, Style, StyleSet } from './style/Style.js';
 export { withOpacity } from './style/color.js';
 
-export type { LvEvent, LvEventMap } from './events/LvEvent.js';
+export type {
+  LvEvent,
+  LvEventMap,
+  LvGestureDirection,
+  LvGestureEvent,
+  LvKeyEvent,
+} from './events/LvEvent.js';
 
 export { attachInteraction } from './interaction/InteractionController.js';
-export type { InteractionController } from './interaction/InteractionController.js';
+export type {
+  InteractionController,
+  InteractionOptions,
+} from './interaction/InteractionController.js';
 export { hitTest } from './interaction/hitTest.js';
 export { isPointerDraggable } from './interaction/PointerDraggable.js';
 export type { PointerDraggable } from './interaction/PointerDraggable.js';
 
+export { createAnimationEngine, evaluateAnimation, startTimeline } from './animation/Animation.js';
+export type {
+  AnimationEngine,
+  AnimationEngineOptions,
+  AnimationFrameScheduler,
+  AnimationHandle,
+  AnimationOptions,
+  TimelineEntry,
+} from './animation/Animation.js';
+export { cubicBezier, easings } from './animation/easing.js';
+export type { EasingFunction, EasingName } from './animation/easing.js';
+
+export { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
+export type { FocusGroupMode, FocusGroupOptions, KeyboardController } from './focus/FocusGroup.js';
+
+export { createTextMeasurer, fontString, textMeasurer } from './text/measureText.js';
+export type { TextMeasurer } from './text/measureText.js';
+export { TextEditState } from './text/TextEditState.js';
+export type { TextEditStateOptions } from './text/TextEditState.js';
+
 export { createNavigator } from './navigation/Navigator.js';
 export type { Navigator, NavigatorOptions } from './navigation/Navigator.js';
+
+export { applyScrollSnap, computeScrollRange, findScrollTarget } from './scroll/scrollMath.js';
+export type {
+  ScrollDirection,
+  ScrollRange,
+  ScrollSnap,
+  ScrollbarMode,
+} from './scroll/scrollMath.js';
 
 export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
@@ -98,6 +137,14 @@ export interface Simulator {
   readonly displayDriver: DisplayDriver;
   /** Root of the object tree, analogous to LVGL's `lv_scr_act()`. */
   readonly screen: Container;
+  /** Animation engine (`lv_anim`); repaints the canvas on every frame while any animation runs. */
+  readonly animations: AnimationEngine;
+  /**
+   * Keyboard/encoder focus group (`lv_group_t`). Add the objects keys
+   * should reach; Tab/Shift+Tab move focus, and pressing an object in the
+   * group focuses it. The canvas is focusable so it receives key events.
+   */
+  readonly focusGroup: FocusGroup;
   /** Starts the render loop (full repaint on every animation frame). */
   start(): void;
   /** Stops the render loop. */
@@ -147,8 +194,15 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     screen.render(displayDriver.context);
   }
 
+  const animations = createAnimationEngine({ onFrame: renderOnce });
   const loop = createRenderLoop(renderOnce);
-  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce);
+  const focusGroup = new FocusGroup();
+  const interaction = attachInteraction(displayDriver.canvas, screen, renderOnce, {
+    animations,
+    focusGroup,
+  });
+  displayDriver.canvas.tabIndex = 0;
+  const keyboard = attachKeyboard(displayDriver.canvas, focusGroup, renderOnce);
 
   container.appendChild(displayDriver.canvas);
   renderOnce();
@@ -157,12 +211,16 @@ export function createSimulator(container: HTMLElement, options: SimulatorOption
     canvas: displayDriver.canvas,
     displayDriver,
     screen,
+    animations,
+    focusGroup,
     start: () => loop.start(),
     stop: () => loop.stop(),
     renderOnce,
     destroy: () => {
       loop.stop();
+      animations.cancelAll();
       interaction.dispose();
+      keyboard.dispose();
     },
   };
 }

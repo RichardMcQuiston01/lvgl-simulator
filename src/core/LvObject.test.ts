@@ -216,3 +216,36 @@ describe('LvObject', () => {
     expect(pressed).not.toHaveBeenCalled();
   });
 });
+
+describe('LvObject flags', () => {
+  it('skips painting and layout for hidden objects', () => {
+    const parent = new LvObject({ width: 100, height: 100 });
+    const child = new LvObject({
+      width: 10,
+      height: 10,
+      hidden: true,
+      style: { base: { bgColor: '#ff0000' } },
+    });
+    parent.addChild(child);
+    const fillRect = vi.fn();
+    parent.render({ fillRect } as unknown as CanvasRenderingContext2D);
+    expect(fillRect).not.toHaveBeenCalled();
+    expect(child.participatesInLayout).toBe(false);
+  });
+
+  it('excludes floating and ignoreLayout objects from layout participation', () => {
+    expect(new LvObject({ width: 1, height: 1, floating: true }).participatesInLayout).toBe(false);
+    expect(new LvObject({ width: 1, height: 1, ignoreLayout: true }).participatesInLayout).toBe(
+      false,
+    );
+    expect(new LvObject({ width: 1, height: 1 }).participatesInLayout).toBe(true);
+  });
+
+  it('passes event detail through dispatchEvent', () => {
+    const object = new LvObject({ width: 1, height: 1 });
+    const listener = vi.fn();
+    object.addEventListener('key', listener);
+    object.dispatchEvent('key', { key: 'Enter' });
+    expect(listener).toHaveBeenCalledWith({ key: 'Enter', target: object });
+  });
+});

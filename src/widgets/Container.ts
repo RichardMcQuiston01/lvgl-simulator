@@ -24,6 +24,7 @@ export interface ContainerOptions extends LvObjectOptions {
 export class Container extends LvObject {
   layout: ContainerLayout | undefined;
 
+  /** Creates a container, folding the `padding` shorthand into its base style unless a per-side pad is set. */
   constructor(options: ContainerOptions) {
     const hasExplicitPadding =
       options.style?.base.padTop !== undefined ||
@@ -41,6 +42,26 @@ export class Container extends LvObject {
     this.layout = options.layout;
   }
 
+  /** The padding that counts toward the scrollable area: the layout's padding when a layout applies it, otherwise none. */
+  override get scrollContentInsets(): {
+    readonly left: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+  } {
+    if (!this.layout) {
+      return super.scrollContentInsets;
+    }
+    const style = this.resolvedStyle;
+    return {
+      left: style.padLeft ?? 0,
+      top: style.padTop ?? 0,
+      right: style.padRight ?? 0,
+      bottom: style.padBottom ?? 0,
+    };
+  }
+
+  /** Lays out the children that participate in layout (excluding hidden, floating and ignore-layout ones) inside the padded content box. */
   protected override updateLayout(): void {
     if (!this.layout) {
       return;
@@ -55,13 +76,14 @@ export class Container extends LvObject {
     const contentWidth = Math.max(0, this.width - padLeft - padRight);
     const contentHeight = Math.max(0, this.height - padTop - padBottom);
 
+    const laidOutChildren = this.children.filter((child) => child.participatesInLayout);
     if (this.layout.type === 'flex') {
-      applyFlexLayout(this.children, contentWidth, contentHeight, this.layout);
+      applyFlexLayout(laidOutChildren, contentWidth, contentHeight, this.layout);
     } else {
-      applyGridLayout(this.children, contentWidth, contentHeight, this.layout);
+      applyGridLayout(laidOutChildren, contentWidth, contentHeight, this.layout);
     }
 
-    for (const child of this.children) {
+    for (const child of laidOutChildren) {
       child.x += padLeft;
       child.y += padTop;
     }

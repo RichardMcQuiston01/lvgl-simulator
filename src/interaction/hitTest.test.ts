@@ -52,3 +52,22 @@ describe('hitTest', () => {
     expect(hitTest(root, 9, 9)).toBe(root);
   });
 });
+
+describe('hitTest flags', () => {
+  it('skips hidden subtrees', () => {
+    const root = new LvObject({ width: 100, height: 100 });
+    const hidden = new LvObject({ width: 50, height: 50, hidden: true });
+    root.addChild(hidden);
+    expect(hitTest(root, 10, 10)).toBe(root);
+  });
+
+  it('skips non-clickable objects but still tests their children', () => {
+    const root = new LvObject({ width: 100, height: 100 });
+    const wrapper = new LvObject({ width: 50, height: 50, clickable: false });
+    const inner = new LvObject({ width: 20, height: 20 });
+    root.addChild(wrapper);
+    wrapper.addChild(inner);
+    expect(hitTest(root, 5, 5)).toBe(inner);
+    expect(hitTest(root, 30, 30)).toBe(root);
+  });
+});
