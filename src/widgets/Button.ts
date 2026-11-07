@@ -40,6 +40,7 @@ export class Button extends LvObject {
     this.text = options.text;
   }
 
+  /** Paints the background and border (honoring radius and gradient), then the centered label text. */
   protected override paintSelf(context: CanvasRenderingContext2D): void {
     const style = this.resolvedStyle;
     const { x, y } = this.getAbsolutePosition();

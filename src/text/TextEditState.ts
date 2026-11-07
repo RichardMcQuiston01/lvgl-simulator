@@ -23,6 +23,7 @@ export class TextEditState {
   private caretIndex: number;
   private anchorIndex: number | null = null;
 
+  /** Creates an edit state with optional initial text and constraints; the caret starts at the end. */
   constructor(options: TextEditStateOptions = {}) {
     this.value = options.text ?? '';
     this.caretIndex = this.value.length;
@@ -50,6 +51,7 @@ export class TextEditState {
     };
   }
 
+  /** The currently selected text, or an empty string when nothing is selected. */
   get selectedText(): string {
     const range = this.selection;
     return range ? this.value.slice(range.start, range.end) : '';
@@ -72,6 +74,7 @@ export class TextEditState {
     this.caretIndex = Math.max(0, Math.min(this.value.length, index));
   }
 
+  /** Moves the caret by `delta`; `extend` grows the selection, and a plain 1-step move collapses an existing selection to its near edge. */
   moveCaret(delta: number, extend = false): void {
     const range = this.selection;
     if (!extend && range && Math.abs(delta) === 1) {
@@ -191,6 +194,7 @@ export class TextEditState {
     return false;
   }
 
+  /** Deletes the selection, or one character before (`-1`) or after (`1`) the caret. Returns whether anything was removed. */
   private deleteRange(direction: -1 | 1): boolean {
     const range = this.selection;
     let start: number;

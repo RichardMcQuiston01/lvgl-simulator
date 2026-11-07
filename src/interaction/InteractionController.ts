@@ -74,6 +74,7 @@ export function attachInteraction(
   let velocityX = 0;
   let velocityY = 0;
 
+  /** Cancels any pending long-press timeout and its repeat interval. */
   function clearLongPress(): void {
     if (longPressTimer !== null) {
       clearTimeout(longPressTimer);
@@ -138,6 +139,7 @@ export function attachInteraction(
     });
   }
 
+  /** Classifies a press-to-release displacement as a swipe direction, or `null` when it is under the gesture limit. */
   function detectGesture(deltaX: number, deltaY: number): LvGestureDirection | null {
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
@@ -155,6 +157,7 @@ export function attachInteraction(
     return { x: x - objectX, y: y - objectY };
   }
 
+  /** Starts a press: hit-tests the pointer, focuses the target, dispatches `pressed`, and arms the long-press timer. */
   function onPointerDown(event: PointerEvent): void {
     const hit = hitTest(screen, event.offsetX, event.offsetY);
     if (!hit || hit.disabled) {
@@ -196,6 +199,7 @@ export function attachInteraction(
     render();
   }
 
+  /** Tracks pointer movement: cancels a long press past the scroll limit, forwards position to draggable widgets, and otherwise scrolls the nearest scrollable ancestor. */
   function onPointerMove(event: PointerEvent): void {
     if (!activeObject || event.pointerId !== activePointerId) {
       return;
@@ -240,6 +244,7 @@ export function attachInteraction(
     render();
   }
 
+  /** Ends a press: finishes any scroll, otherwise dispatches `released` and then `gesture` or `clicked`. */
   function onPointerUp(event: PointerEvent): void {
     if (!activeObject || event.pointerId !== activePointerId) {
       return;
@@ -275,6 +280,7 @@ export function attachInteraction(
     render();
   }
 
+  /** Abandons a press when the browser cancels the pointer, dispatching `released` (or finishing a scroll) without a click. */
   function onPointerCancel(event: PointerEvent): void {
     if (!activeObject || event.pointerId !== activePointerId) {
       return;
@@ -300,6 +306,7 @@ export function attachInteraction(
     render();
   }
 
+  /** Scrolls the nearest scrollable ancestor under the pointer by the wheel delta, preventing the page scroll only when it consumed the event. */
   function onWheel(event: WheelEvent): void {
     const scale = event.deltaMode === 1 ? 16 : 1;
     const dx = event.deltaX * scale;

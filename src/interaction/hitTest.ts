@@ -41,6 +41,7 @@ export function hitTest(root: LvObject, x: number, y: number): LvObject | null {
   return root.clickable && containsPoint(root, x, y) ? root : null;
 }
 
+/** Whether `(x, y)` falls inside `object`'s untransformed bounds. */
 function containsPoint(object: LvObject, x: number, y: number): boolean {
   const { x: objectX, y: objectY } = object.getAbsolutePosition();
   return x >= objectX && x < objectX + object.width && y >= objectY && y < objectY + object.height;

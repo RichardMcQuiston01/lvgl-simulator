@@ -98,6 +98,7 @@ export class LvObject {
   private readonly childObjects: LvObject[] = [];
   private readonly eventEmitter = new EventEmitter<LvEventMap>();
 
+  /** Creates an object with the given geometry, style, flags and state; omitted options take LVGL's defaults. */
   constructor(options: LvObjectOptions) {
     this.x = options.x ?? 0;
     this.y = options.y ?? 0;

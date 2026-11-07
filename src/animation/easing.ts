@@ -33,6 +33,7 @@ export function cubicBezier(x1: number, y1: number, x2: number, y2: number): Eas
   };
 }
 
+/** Ease-out bounce: reaches 1 and settles after several decaying rebounds. */
 function bounceOut(t: number): number {
   const n = 7.5625;
   const d = 2.75;

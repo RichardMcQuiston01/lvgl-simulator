@@ -39,6 +39,7 @@ export class Label extends LvObject {
     this.text = options.text;
   }
 
+  /** Paints the background, then the text aligned left, center or right per `textAlign`. */
   protected override paintSelf(context: CanvasRenderingContext2D): void {
     super.paintSelf(context);
 

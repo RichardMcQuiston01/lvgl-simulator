@@ -88,6 +88,7 @@ export function findScrollTarget(start: LvObject, dx: number, dy: number): LvObj
   return null;
 }
 
+/** Snaps one axis of a landing offset to the nearest child edge for `mode`, clamped to `[min, max]`. */
 function snapAxis(
   object: LvObject,
   axis: 'x' | 'y',

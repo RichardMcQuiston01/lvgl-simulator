@@ -97,12 +97,14 @@ export function evaluateAnimation(
   return { value: restValue, done: false };
 }
 
+/** Creates an {@link AnimationEngine}. With a scheduler (the default `requestAnimationFrame`) it ticks itself while any animation is active; with `scheduler: null` it is driven manually through `tick`. */
 export function createAnimationEngine(options: AnimationEngineOptions = {}): AnimationEngine {
   const now = options.now ?? ((): number => performance.now());
   const scheduler = options.scheduler === undefined ? getDefaultScheduler() : options.scheduler;
   const active = new Set<ActiveAnimation>();
   let frameHandle: number | null = null;
 
+  /** Requests the next engine frame while an animation is active and none is already pending. */
   function scheduleFrame(): void {
     if (!scheduler || frameHandle !== null || active.size === 0) {
       return;
@@ -116,6 +118,7 @@ export function createAnimationEngine(options: AnimationEngineOptions = {}): Ani
   }
 
   const engine: AnimationEngine = {
+    /** Registers `animation`, starting after its `delayMs`, and returns a handle that can cancel it. */
     start(animation: AnimationOptions): AnimationHandle {
       const easing =
         typeof animation.easing === 'function'
@@ -127,6 +130,7 @@ export function createAnimationEngine(options: AnimationEngineOptions = {}): Ani
         easing,
         handle: {
           finished: false,
+          /** Stops this animation without calling `onComplete`. No-op once finished. */
           cancel(): void {
             if (!entry.handle.finished) {
               entry.handle.finished = true;
@@ -140,6 +144,7 @@ export function createAnimationEngine(options: AnimationEngineOptions = {}): Ani
       return entry.handle;
     },
 
+    /** Advances every active animation to `nowMs`, delivering `onUpdate` values and `onComplete` for the ones that finish. */
     tick(nowMs: number): void {
       for (const entry of [...active]) {
         if (entry.handle.finished || nowMs < entry.startMs) {
@@ -163,6 +168,7 @@ export function createAnimationEngine(options: AnimationEngineOptions = {}): Ani
       return active.size;
     },
 
+    /** Cancels every active animation without calling their `onComplete` callbacks. */
     cancelAll(): void {
       for (const entry of [...active]) {
         entry.handle.cancel();
@@ -191,6 +197,7 @@ export function startTimeline(
     }),
   );
   return {
+    /** Cancels every animation in the timeline. */
     cancel(): void {
       for (const handle of handles) {
         handle.cancel();
@@ -202,6 +209,7 @@ export function startTimeline(
   };
 }
 
+/** The `requestAnimationFrame` scheduler, or `null` outside a browser. */
 function getDefaultScheduler(): AnimationFrameScheduler | null {
   if (typeof requestAnimationFrame !== 'function') {
     return null;

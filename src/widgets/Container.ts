@@ -24,6 +24,7 @@ export interface ContainerOptions extends LvObjectOptions {
 export class Container extends LvObject {
   layout: ContainerLayout | undefined;
 
+  /** Creates a container, folding the `padding` shorthand into its base style unless a per-side pad is set. */
   constructor(options: ContainerOptions) {
     const hasExplicitPadding =
       options.style?.base.padTop !== undefined ||
@@ -41,6 +42,7 @@ export class Container extends LvObject {
     this.layout = options.layout;
   }
 
+  /** The padding that counts toward the scrollable area: the layout's padding when a layout applies it, otherwise none. */
   override get scrollContentInsets(): {
     readonly left: number;
     readonly top: number;
@@ -59,6 +61,7 @@ export class Container extends LvObject {
     };
   }
 
+  /** Lays out the children that participate in layout (excluding hidden, floating and ignore-layout ones) inside the padded content box. */
   protected override updateLayout(): void {
     if (!this.layout) {
       return;

@@ -35,6 +35,7 @@ export class FocusGroup {
   private readonly members: LvObject[] = [];
   private focusedObject: LvObject | null = null;
 
+  /** Creates an empty group; `mode` defaults to `'keypad'` and `wrap` to `true`. */
   constructor(options: FocusGroupOptions = {}) {
     this.mode = options.mode ?? 'keypad';
     this.wrap = options.wrap ?? true;
@@ -158,6 +159,7 @@ export class FocusGroup {
     return true;
   }
 
+  /** Handles Enter: toggles edit mode on an editable object in encoder mode, otherwise activates the object like a click. */
   private handleEnter(focused: LvObject): boolean {
     if (this.mode === 'encoder' && focused.editable) {
       this.editing = !this.editing;
@@ -171,10 +173,12 @@ export class FocusGroup {
     return true;
   }
 
+  /** Whether `object` can hold focus: neither hidden nor disabled. */
   private isFocusable(object: LvObject): boolean {
     return !object.hidden && !object.disabled;
   }
 
+  /** Moves focus one focusable member in `direction`. Returns whether focus changed. */
   private step(direction: 1 | -1): boolean {
     const current = this.focusedObject ? this.members.indexOf(this.focusedObject) : -1;
     const next = this.findFocusable(current, direction, this.wrap);
@@ -219,6 +223,7 @@ export function attachKeyboard(
   group: FocusGroup,
   render: () => void,
 ): KeyboardController {
+  /** Routes a `keydown` into the focus group, preventing the default and rendering only when the key was consumed. */
   function onKeyDown(event: Event): void {
     const keyEvent = event as KeyboardEvent;
     if (keyEvent.ctrlKey || keyEvent.metaKey || keyEvent.altKey) {

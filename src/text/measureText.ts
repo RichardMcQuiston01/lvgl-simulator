@@ -10,10 +10,12 @@ export interface TextMeasurer {
   readonly size: number;
 }
 
+/** Creates a measurer that caches up to `maxEntries` widths, evicting the least recently used. */
 export function createTextMeasurer(maxEntries = 1000): TextMeasurer {
   const cache = new Map<string, number>();
 
   return {
+    /** Returns the cached width of `text` in `font`, measuring and caching it on a miss. */
     measure(context, text, font): number {
       const key = `${font}\u0000${text}`;
       const cached = cache.get(key);
