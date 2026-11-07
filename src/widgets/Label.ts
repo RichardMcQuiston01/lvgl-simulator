@@ -46,8 +46,11 @@ export class Label extends LvObject {
     const { x, y } = this.getAbsolutePosition();
     context.fillStyle = style.textColor ?? defaultTheme.textColor;
     context.font = `${style.textFontSize ?? defaultTheme.fontSize}px ${style.textFontFamily ?? defaultTheme.fontFamily}`;
-    context.textAlign = 'left';
+    const align =
+      style.textAlign === 'center' || style.textAlign === 'right' ? style.textAlign : 'left';
+    context.textAlign = align;
     context.textBaseline = 'middle';
-    context.fillText(this.text, x, y + this.height / 2);
+    const textX = align === 'center' ? x + this.width / 2 : align === 'right' ? x + this.width : x;
+    context.fillText(this.text, textX, y + this.height / 2);
   }
 }

@@ -137,19 +137,21 @@ node type in `SceneSchema.ts`/`loadScreen()`, a case in the Playwright
 fixture, and a `GETTING_STARTED.md` entry. Each phase is released as a minor
 version, with a CHANGELOG entry.
 
-### Phase W0: Foundations (blocks later phases)
+### Phase W0: Foundations (blocks later phases) — done
 
-- [ ] Scrolling: scrollable containers, scrollbar part, drag + wheel,
-      momentum, snap (`scroll_*` styles/flags)
-- [ ] Object flags: `hidden`, `clickable`, `scrollable`, `floating`, `ignore_layout`
-- [ ] Style gaps: gradients, shadow, outline, `text_align`, `line_*`, `arc_*`
-      props, transforms (rotate/scale), `clip_corner`
-- [ ] Animation engine (`lv_anim`: timeline, easing, repeat) + render-loop hook
-- [ ] Focus groups: keyboard/encoder navigation, `focused` state, `key`/
+- [x] Scrolling: scrollable containers, clipping, scrollbars, drag + wheel,
+      throw momentum, scroll chaining, snap (`src/scroll/`)
+- [x] Object flags: `hidden`, `clickable`, `scrollable`, `floating`, `ignore_layout`
+- [x] Style gaps: gradients, shadow, outline, `text_align`, `line_*`, `arc_*`
+      props, transforms (rotate/scale), `clip_corner`. Note: `line_*`/`arc_*`
+      props are style fields only until `Line`/`Arc` ship in W1; transforms
+      are not yet honored by slider drag math.
+- [x] Animation engine (`lv_anim`: timeline, easing, repeat) + render-loop hook
+- [x] Focus groups: keyboard/encoder navigation, `focused` state, `key`/
       `focused`/`defocused` events
-- [ ] New events: `longPressed`, `longPressedRepeat`, `scroll`, `gesture`,
+- [x] New events: `longPressed`, `longPressedRepeat`, `scroll`, `gesture`,
       `valueChanged` for all value widgets
-- [ ] Reusable text-input caret/selection and a text-measure cache
+- [x] Reusable text-input caret/selection and a text-measure cache
 
 ### Phase W1: Simple display and value widgets
 

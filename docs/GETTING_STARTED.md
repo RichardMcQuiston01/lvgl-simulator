@@ -15,6 +15,9 @@ writing code, or jump to a section below as reference while you build.
 - [Styling & state](#styling--state)
 - [Layout](#layout)
 - [Events & interaction](#events--interaction)
+- [Scrolling](#scrolling)
+- [Focus & keyboard input](#focus--keyboard-input)
+- [Animations](#animations)
 - [Scenes (JSON UIs)](#scenes-json-uis)
 - [Navigation (multi-view UIs)](#navigation-multi-view-uis)
 - [Framework integration](#framework-integration)
@@ -299,12 +302,19 @@ object tree (deepest/topmost object under the cursor, skipping `disabled`
 objects) and dispatches LVGL-style events through
 `addEventListener`/`dispatchEvent`, mirroring `lv_obj_add_event_cb`:
 
-| Event          | Fires when                                                                     |
-| -------------- | ------------------------------------------------------------------------------ |
-| `pressed`      | A pointer goes down on the object                                              |
-| `released`     | The pointer that pressed it is released or cancelled                           |
-| `clicked`      | A release lands back on the same object it was pressed on                      |
-| `valueChanged` | A widget's own value changes (`Checkbox`/`Switch` toggling, `Slider` dragging) |
+| Event                                  | Fires when                                                                                             |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `pressed`                              | A pointer goes down on the object                                                                      |
+| `released`                             | The pointer that pressed it is released or cancelled                                                   |
+| `clicked`                              | A release lands back on the same object it was pressed on                                              |
+| `valueChanged`                         | A widget's own value changes (`Checkbox`/`Switch` toggling, `Slider` dragging)                         |
+| `pressLost`                            | The press turned into a scroll, so no `released`/`clicked` will follow                                 |
+| `longPressed`                          | Held for 400 ms without moving more than 10 px                                                         |
+| `longPressedRepeat`                    | Every 100 ms after `longPressed` while still held                                                      |
+| `gesture`                              | Released after a 50 px+ swipe (`event.direction`: `left`/`right`/`top`/`bottom`), instead of `clicked` |
+| `scrollBegin` / `scroll` / `scrollEnd` | A scroll gesture or throw starts, moves, and settles                                                   |
+| `key`                                  | A key reaches the focused object (`event.key`)                                                         |
+| `focused` / `defocused`                | A `FocusGroup` moves focus onto / off the object                                                       |
 
 ```ts
 button.addEventListener('clicked', (event) => {
@@ -320,6 +330,75 @@ while your widget is the active (pointer-captured) target, with the
 position local to your widget's own top-left corner. The interaction
 controller duck-types for this interface rather than special-casing
 specific classes, so any widget can opt in.
+
+## Scrolling
+
+Any object whose children overflow it scrolls (`scrollable`, default
+`true`): drag, mouse wheel, or the API. Content is clipped to the object, a
+scrollbar shows per `scrollbarMode` (`'auto'` default, `'on'`, `'active'`,
+`'off'`), a fast release throws the content, and a child at its scroll
+limit passes the drag to its scrolling parent (like LVGL's scroll chain).
+
+```ts
+const list = new Container({
+  width: 200,
+  height: 120,
+  layout: { type: 'flex', direction: 'column' },
+  scrollDirection: 'vertical', // 'all' (default) | 'horizontal' | 'none'
+  scrollSnapY: 'start', // settle on the nearest child edge: 'start' | 'center' | 'end'
+});
+list.scrollTo(0, 80); // clamped to list.getScrollRange(); dispatches `scroll`
+list.scrollBy(0, 20);
+list.scrollToView(someChild);
+```
+
+Padding counts toward the scrollable area only when the container applies it
+through a flex/grid `layout`; manually positioned children are measured
+against the border box. Per-object flags: `hidden`, `clickable`, `floating`,
+`ignoreLayout` (the last two keep a child out of flex/grid layout).
+
+## Focus & keyboard input
+
+`simulator.focusGroup` is a `FocusGroup` (`lv_group_t`). Add the objects
+keys should reach; the first one added takes focus, pressing an object in
+the group focuses it, and a focused object draws the theme's focus outline
+(set `outlineWidth` yourself to override, or `0` to hide it) and applies
+`style.states.focused`.
+
+```ts
+simulator.focusGroup.add(okButton);
+simulator.focusGroup.add(cancelButton);
+okButton.addEventListener('key', (event) => console.log(event.key));
+```
+
+`'keypad'` mode (default): Tab / Shift+Tab move focus, Enter clicks the
+focused object, everything else arrives as a `key` event. `'encoder'` mode:
+arrows move focus until Enter puts an `editable` object into edit mode
+(arrows then arrive as `key` events until Enter/Escape). Click the canvas
+(it is focusable) before typing.
+
+## Animations
+
+`simulator.animations` is an `lv_anim`-style engine that repaints the canvas
+while anything runs — no `start()` needed.
+
+```ts
+simulator.animations.start({
+  from: 0,
+  to: 100,
+  durationMs: 400,
+  easing: 'easeOut', // linear | easeIn | easeOut | easeInOut | overshoot | bounce | step
+  repeatCount: Infinity,
+  playbackDurationMs: 400, // ping-pong back to `from`
+  onUpdate: (value) => {
+    slider.value = value;
+  },
+});
+```
+
+`startTimeline(engine, [{ atMs, animation }, ...])` sequences several, and
+`createAnimationEngine({ now, scheduler: null })` gives a manually ticked
+engine for tests.
 
 ## Scenes (JSON UIs)
 

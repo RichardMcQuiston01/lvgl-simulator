@@ -13,6 +13,10 @@ export const defaultTheme = {
   backgroundColor: '#ffffff',
   borderColor: '#d6d6d6',
   disabledColor: '#e0e0e0',
+  /** Outline drawn around a focused object that sets no `outlineWidth` of its own. */
+  focusOutlineWidth: 2,
+  focusOutlineColor: '#1976d2',
+  focusOutlinePad: 1,
   radius: 6,
   fontSize: 14,
   fontFamily: 'sans-serif',
