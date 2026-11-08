@@ -20,7 +20,7 @@ export type { ColorFormat, DisplayDriver, DisplayDriverOptions } from './display
 export { defaultTheme } from './theme/defaultTheme.js';
 
 export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
-export type { LvState, Style, StyleSet } from './style/Style.js';
+export type { LvState, Style, StyleSet, TextDecoration } from './style/Style.js';
 export { mixColors, withOpacity } from './style/color.js';
 
 export type {
@@ -71,6 +71,14 @@ export {
   wrapLines,
 } from './text/layout.js';
 export type { MeasureText, TextLine } from './text/layout.js';
+export { layoutSpans, truncateLineWithEllipsis } from './text/spanLayout.js';
+export type {
+  MeasureSpanText,
+  SpanFragment,
+  SpanInput,
+  SpanLayoutOptions,
+  SpanLine,
+} from './text/spanLayout.js';
 export { TextEditState } from './text/TextEditState.js';
 export type { TextEditStateOptions } from './text/TextEditState.js';
 
@@ -178,6 +186,8 @@ export {
   stepDigitIndex,
   stepValue,
 } from './widgets/spinboxMath.js';
+export { Span } from './widgets/Span.js';
+export type { SpanDefinition, SpanMode, SpanOptions, SpanOverflow } from './widgets/Span.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
