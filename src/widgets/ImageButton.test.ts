@@ -109,4 +109,71 @@ describe('ImageButton', () => {
     expect(toggle.checked).toBe(false);
     expect(listener).toHaveBeenCalledTimes(2);
   });
+
+  describe('loading URL sources', () => {
+    type Listener = () => void;
+    class FakeImage {
+      static instances: FakeImage[] = [];
+      naturalWidth = 20;
+      naturalHeight = 10;
+      src = '';
+      private readonly listeners = new Map<string, Listener>();
+      constructor() {
+        FakeImage.instances.push(this);
+      }
+      addEventListener(type: string, listener: Listener): void {
+        this.listeners.set(type, listener);
+      }
+      fire(type: string): void {
+        this.listeners.get(type)?.();
+      }
+    }
+
+    function withFakeImages(run: () => void): void {
+      FakeImage.instances = [];
+      vi.stubGlobal('Image', FakeImage);
+      try {
+        run();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    }
+
+    it('reports a failed load through onError with the URL', () => {
+      withFakeImages(() => {
+        const onError = vi.fn();
+        new ImageButton({
+          width: 40,
+          height: 10,
+          images: { released: { mid: 'missing.png' } },
+          onError,
+        });
+        FakeImage.instances[0]?.fire('error');
+        expect(onError).toHaveBeenCalledWith('missing.png');
+      });
+    });
+
+    it('draws a URL source once it has loaded and reports the load', () => {
+      withFakeImages(() => {
+        const onLoad = vi.fn();
+        const button = new ImageButton({
+          width: 40,
+          height: 10,
+          images: { released: { mid: 'tile.png' } },
+          onLoad,
+        });
+
+        const before = createFakeCanvasContext();
+        button.render(before);
+        expect(before.drawImage).not.toHaveBeenCalled();
+
+        FakeImage.instances[0]?.fire('load');
+        expect(onLoad).toHaveBeenCalledTimes(1);
+
+        const after = createFakeCanvasContext();
+        button.render(after);
+        expect(after.drawImage).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
 });

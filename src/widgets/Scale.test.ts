@@ -82,4 +82,36 @@ describe('Scale', () => {
     new Scale({ width: 200, height: 40, totalTickCount: 0 }).render(context);
     expect(context.stroke).toHaveBeenCalledTimes(1);
   });
+
+  it('styles a tick that sits exactly on a section boundary', () => {
+    const context = createFakeCanvasContext();
+    const strokes: string[] = [];
+    Object.defineProperty(context, 'strokeStyle', {
+      set: (value: string) => strokes.push(value),
+      get: () => '',
+    });
+    new Scale({
+      width: 400,
+      height: 40,
+      totalTickCount: 101,
+      majorTickEvery: 10,
+      sections: [
+        {
+          min: 57,
+          max: 100,
+          indicatorStyle: { lineColor: '#ff0000' },
+          itemsStyle: { lineColor: '#ff0000' },
+        },
+      ],
+    }).render(context);
+    // Ticks 57..100 inclusive are in the section: 44 of them, including tick 57.
+    expect(strokes.filter((color) => color === '#ff0000')).toHaveLength(44);
+  });
+
+  it('balances save and restore around every stroke so cap state cannot leak', () => {
+    const context = createFakeCanvasContext();
+    new Scale({ width: 200, height: 40 }).render(context);
+    expect(context.save).toHaveBeenCalledTimes(12);
+    expect(context.restore).toHaveBeenCalledTimes(12);
+  });
 });

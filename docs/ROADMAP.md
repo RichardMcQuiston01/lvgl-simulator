@@ -128,10 +128,11 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       won't show this until a new version ships and that repo bumps its
       dependency.
 
-## Widget expansion (LVGL 9 parity) — planned
+## Widget expansion (LVGL 9 parity) — in progress (W0 and W1 done)
 
 Goal: cover every LVGL widget a UI editor can emit. Shipped: `Container`
-(`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`.
+(`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`, and
+from W1 `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale`, `ImageButton`.
 Each widget below ships with: class in `src/widgets/`, unit tests, a `Scene`
 node type in `SceneSchema.ts`/`loadScreen()`, a case in the Playwright
 fixture, and a `GETTING_STARTED.md` entry. Each phase is released as a minor

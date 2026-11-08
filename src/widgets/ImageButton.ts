@@ -32,6 +32,8 @@ export interface ImageButtonOptions extends LvObjectOptions {
   readonly checked?: boolean;
   /** Called when a URL source finishes loading. Repaint (`renderOnce()`) to show it. */
   readonly onLoad?: () => void;
+  /** Called with the URL when a source fails to load, so the failure is not silent. */
+  readonly onError?: (src: string) => void;
 }
 
 /** The pixel size of `drawable`, using its natural size where it has one. */
@@ -50,7 +52,8 @@ function sizeOf(drawable: CanvasImageSource): { width: number; height: number } 
 /**
  * A button drawn from per-state images instead of a style, mirroring
  * LVGL's `lv_imagebutton`. A state with no image falls back to the
- * `released` one. Draws nothing until an image has loaded.
+ * `released` one. Draws nothing until an image has loaded; a URL that fails
+ * to load is reported through `onError`.
  */
 export class ImageButton extends LvObject {
   checkable: boolean;
@@ -58,6 +61,7 @@ export class ImageButton extends LvObject {
 
   private readonly drawables = new Map<string, CanvasImageSource>();
   private readonly onLoadCallback: (() => void) | undefined;
+  private readonly onErrorCallback: ((src: string) => void) | undefined;
 
   /** Creates the button and starts loading any URL sources. */
   constructor(options: ImageButtonOptions) {
@@ -65,6 +69,7 @@ export class ImageButton extends LvObject {
     this.checkable = options.checkable ?? false;
     this.checked = options.checked ?? false;
     this.onLoadCallback = options.onLoad;
+    this.onErrorCallback = options.onError;
 
     for (const [state, images] of Object.entries(options.images ?? {})) {
       for (const part of PARTS) {
@@ -95,6 +100,7 @@ export class ImageButton extends LvObject {
       this.drawables.set(key, element);
       this.onLoadCallback?.();
     });
+    element.addEventListener('error', () => this.onErrorCallback?.(source));
     element.src = source;
   }
 

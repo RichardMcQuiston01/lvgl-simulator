@@ -137,4 +137,12 @@ describe('Arc', () => {
     expect(center.x).toBeCloseTo(50 + radius * Math.cos(radians), 5);
     expect(center.y).toBeCloseTo(50 + radius * Math.sin(radians), 5);
   });
+
+  it('restores canvas state after each arc stroke so the cap cannot leak', () => {
+    const context = createFakeCanvasContext();
+    new Arc({ width: 100, height: 100, value: 50 }).render(context);
+    // Background and indicator strokes each save and restore once.
+    expect(context.save).toHaveBeenCalledTimes(2);
+    expect(context.restore).toHaveBeenCalledTimes(2);
+  });
 });

@@ -24,6 +24,8 @@ export function strokeArc(
   if (width <= 0 || style.arcOpa === 0 || endDegrees <= startDegrees) {
     return;
   }
+  // lineCap is sticky canvas state; keep it from leaking into later strokes.
+  context.save();
   context.beginPath();
   context.arc(
     centerX,
@@ -36,4 +38,5 @@ export function strokeArc(
   context.lineWidth = width;
   context.lineCap = style.arcRounded === false ? 'butt' : 'round';
   context.stroke();
+  context.restore();
 }

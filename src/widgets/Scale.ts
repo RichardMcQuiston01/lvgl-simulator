@@ -155,6 +155,8 @@ export class Scale extends LvObject {
     if (width <= 0 || style.lineOpa === 0) {
       return;
     }
+    // lineCap is sticky canvas state; keep it from leaking into later strokes.
+    context.save();
     context.beginPath();
     context.moveTo(from.x, from.y);
     context.lineTo(to.x, to.y);
@@ -162,6 +164,7 @@ export class Scale extends LvObject {
     context.lineWidth = width;
     context.lineCap = style.lineRounded === true ? 'round' : 'butt';
     context.stroke();
+    context.restore();
   }
 
   /** Draws the scale's line (or arc) between two ratios, in `style`. */

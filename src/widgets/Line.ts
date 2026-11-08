@@ -96,6 +96,8 @@ export class Line extends LvObject {
     }
 
     const { x, y } = this.getAbsolutePosition();
+    // Cap and join are sticky canvas state; keep them from leaking into later strokes.
+    context.save();
     context.beginPath();
     this.pointList.forEach((point, index) => {
       const pointX = x + point.x;
@@ -112,5 +114,6 @@ export class Line extends LvObject {
     context.lineCap = rounded ? 'round' : 'butt';
     context.lineJoin = rounded ? 'round' : 'miter';
     context.stroke();
+    context.restore();
   }
 }

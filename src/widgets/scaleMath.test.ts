@@ -45,6 +45,19 @@ describe('computeScaleTicks', () => {
     expect(ticks.map((tick) => tick.label)).toEqual(['0', '3', '7', '10']);
   });
 
+  it('computes interior tick values exactly, so boundary ticks hit their value', () => {
+    // 100 * (57 / 100) is 56.99999999999999; multiplying first gives exactly 57.
+    const ticks = computeScaleTicks(0, 100, 101, 10);
+    expect(ticks[57]?.value).toBe(57);
+    expect(ticks.every((tick) => tick.value === tick.index)).toBe(true);
+  });
+
+  it('pins the first and last tick to min and max exactly', () => {
+    const ticks = computeScaleTicks(0.1, 0.7, 7, 1);
+    expect(ticks[0]?.value).toBe(0.1);
+    expect(ticks[6]?.value).toBe(0.7);
+  });
+
   it('handles a single tick, no ticks, and no major ticks', () => {
     expect(computeScaleTicks(0, 100, 1, 1)).toHaveLength(1);
     expect(computeScaleTicks(0, 100, 1, 1)[0]?.ratio).toBe(0);

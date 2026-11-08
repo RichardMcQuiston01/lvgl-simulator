@@ -41,7 +41,17 @@ export function computeScaleTicks(
   const ticks: ScaleTick[] = [];
   for (let index = 0; index < count; index += 1) {
     const ratio = count === 1 ? 0 : index / (count - 1);
-    const value = min + (max - min) * ratio;
+    // Multiply before dividing and pin the ends: `(max - min) * (index / (count - 1))`
+    // can land just below a whole number (100 * 0.57 is 56.99999999999999), which
+    // would make a tick on a section boundary miss that section.
+    let value: number;
+    if (count === 1 || index === 0) {
+      value = min;
+    } else if (index === count - 1) {
+      value = max;
+    } else {
+      value = min + ((max - min) * index) / (count - 1);
+    }
     const major = majorTickEvery > 0 && index % majorTickEvery === 0;
     let label: string | undefined;
     if (major) {

@@ -73,4 +73,11 @@ describe('Line', () => {
     new Line({ points: POINTS, style: { base: { bgColor: '#eeeeee' } } }).render(context);
     expect(context.fillRect).toHaveBeenCalled();
   });
+
+  it('restores canvas state after stroking so cap and join cannot leak', () => {
+    const context = createFakeCanvasContext();
+    new Line({ points: POINTS }).render(context);
+    expect(context.save).toHaveBeenCalledTimes(1);
+    expect(context.restore).toHaveBeenCalledTimes(1);
+  });
 });
