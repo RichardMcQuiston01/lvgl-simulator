@@ -128,11 +128,12 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       won't show this until a new version ships and that repo bumps its
       dependency.
 
-## Widget expansion (LVGL 9 parity) — in progress (W0 and W1 done)
+## Widget expansion (LVGL 9 parity) — in progress (W0-W2 done)
 
 Goal: cover every LVGL widget a UI editor can emit. Shipped: `Container`
 (`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`, and
-from W1 `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale`, `ImageButton`.
+from W1 `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale`, `ImageButton`, and from
+W2 `Textarea`, `Keyboard`, `Spinbox`, `Span`, `ArcLabel`.
 Each widget below ships with: class in `src/widgets/`, unit tests, a `Scene`
 node type in `SceneSchema.ts`/`loadScreen()`, a case in the Playwright
 fixture, and a `GETTING_STARTED.md` entry. Each phase is released as a minor
@@ -164,13 +165,13 @@ version, with a CHANGELOG entry.
 - [x] `Scale` — linear/round, ticks, labels, sections (needed by gauges; no needle yet)
 - [x] `ImageButton` — per-state images, tiled middle
 
-### Phase W2: Text and input widgets
+### Phase W2: Text and input widgets — done
 
-- [ ] `Textarea` — caret, selection, placeholder, password mode, one-line
-- [ ] `Keyboard` — layouts (lower/upper/special/number), target textarea
-- [ ] `Spinbox` — digits, step, range, increment/decrement
-- [ ] `Span` — multi-style rich text spans, wrapping modes
-- [ ] `ArcLabel` — text along an arc (LVGL 9.3+)
+- [x] `Textarea` — caret, selection, placeholder, password mode, one-line
+- [x] `Keyboard` — layouts (lower/upper/special/number), target textarea (self-contained key layout; `ButtonMatrix` in W3 is separate)
+- [x] `Spinbox` — digits, step, range, increment/decrement
+- [x] `Span` — multi-style rich text spans, wrapping modes
+- [x] `ArcLabel` — text along an arc (LVGL 9.3+)
 
 ### Phase W3: Selection and list widgets (need W0 scrolling)
 

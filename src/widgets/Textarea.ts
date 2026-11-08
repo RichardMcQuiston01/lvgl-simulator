@@ -233,6 +233,7 @@ export class Textarea extends LvObject implements PointerDraggable {
     );
   }
 
+  /** Height of one line of text: the font size times the line-height ratio, rounded. */
   private get lineHeight(): number {
     return Math.round(
       (this.resolvedStyle.textFontSize ?? defaultTheme.fontSize) * LINE_HEIGHT_RATIO,

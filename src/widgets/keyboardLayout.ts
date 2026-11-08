@@ -40,6 +40,7 @@ const ACTIONS: Readonly<Record<string, KeyAction>> = {
   '+/-': 'toggleSign',
 };
 
+/** What pressing the key labelled `label` does; any label that is not a control label types itself. */
 export function keyAction(label: string): KeyAction {
   return ACTIONS[label] ?? 'char';
 }

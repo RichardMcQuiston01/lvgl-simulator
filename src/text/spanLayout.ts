@@ -77,6 +77,7 @@ export function layoutSpans(
   let cursor = options.indent;
   let lastFontSize = spans[0]?.fontSize ?? 0;
 
+  /** Closes the current line: trims trailing whitespace, measures it, records it, and starts the next at x = 0. */
   function finishLine(): void {
     // Drop trailing whitespace on the last fragment, then measure the line.
     const last = fragments[fragments.length - 1];
@@ -105,6 +106,7 @@ export function layoutSpans(
     cursor = 0;
   }
 
+  /** Adds `text` to the current line, merging it into the previous fragment when that is the same span. */
   function place(spanIndex: number, text: string, width: number): void {
     const previous = fragments[fragments.length - 1];
     if (previous && previous.spanIndex === spanIndex) {

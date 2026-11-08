@@ -104,6 +104,7 @@ export class Span extends LvObject {
     return mergeStyle(this.resolvedStyle, this.spans[index]?.style);
   }
 
+  /** The CSS font string of the run at `index`. */
   private fontOf(index: number): string {
     const style = this.styleOf(index);
     return fontString(
