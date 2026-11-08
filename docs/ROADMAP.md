@@ -128,10 +128,11 @@ Ordered by dependency, not by date. Mirrors the stage numbering in
       won't show this until a new version ships and that repo bumps its
       dependency.
 
-## Widget expansion (LVGL 9 parity) — planned
+## Widget expansion (LVGL 9 parity) — in progress (W0 and W1 done)
 
 Goal: cover every LVGL widget a UI editor can emit. Shipped: `Container`
-(`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`.
+(`obj`), `Label`, `Button`, `Checkbox`, `Switch`, `Slider`, `ImageWidget`, and
+from W1 `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale`, `ImageButton`.
 Each widget below ships with: class in `src/widgets/`, unit tests, a `Scene`
 node type in `SceneSchema.ts`/`loadScreen()`, a case in the Playwright
 fixture, and a `GETTING_STARTED.md` entry. Each phase is released as a minor
@@ -153,15 +154,15 @@ version, with a CHANGELOG entry.
       `valueChanged` for all value widgets
 - [x] Reusable text-input caret/selection and a text-measure cache
 
-### Phase W1: Simple display and value widgets
+### Phase W1: Simple display and value widgets — done
 
-- [ ] `Bar` — value/range, start value, symmetrical, vertical
-- [ ] `Arc` — value/range, rotation, bg/fg angles, knob, drag input
-- [ ] `Spinner` — arc + spin animation
-- [ ] `LED` — brightness, color, glow
-- [ ] `Line` — point array, `y_invert`
-- [ ] `Scale` — linear/round, ticks, labels, sections (needed by gauges)
-- [ ] `ImageButton` — per-state images, tiled middle
+- [x] `Bar` — value/range, start value, symmetrical, vertical
+- [x] `Arc` — value/range, rotation, bg/fg angles, knob, drag input
+- [x] `Spinner` — arc + spin animation (constant arc length; see GETTING_STARTED)
+- [x] `LED` (`Led`) — brightness, color, glow
+- [x] `Line` — point array, `y_invert`
+- [x] `Scale` — linear/round, ticks, labels, sections (needed by gauges; no needle yet)
+- [x] `ImageButton` — per-state images, tiled middle
 
 ### Phase W2: Text and input widgets
 

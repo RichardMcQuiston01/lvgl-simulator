@@ -203,6 +203,118 @@ const icon = new ImageWidget({
 });
 ```
 
+### `Bar`
+
+A filled track (`lv_bar`) for progress and levels. `mode` is `'normal'`
+(fills from `min`), `'symmetrical'` (from zero out to `value`), or `'range'`
+(between `startValue` and `value`). It runs vertically, filling upward, when
+it is taller than wide, or force it with `orientation`. The filled part is
+`indicatorStyle`. Not interactive; update it with `setValue()` (fires
+`valueChanged`).
+
+```ts
+const level = new Bar({
+  width: 160,
+  height: 12,
+  min: -100,
+  max: 100,
+  value: 40,
+  mode: 'symmetrical',
+});
+level.setValue(65);
+```
+
+### `Arc`
+
+A circular dial (`lv_arc`) with a knob. The defaults draw a 270° arc opening
+at the bottom (`bgStartAngle: 135`, `bgEndAngle: 45`, angles clockwise from
+3 o'clock); `rotation` turns the whole dial. Dragging sets `value` and fires
+`valueChanged`; a pointer in the gap pins it to the nearer end. Thickness,
+color and caps come from the style's `arcWidth`, `arcColor`, `arcOpa` and
+`arcRounded`: the object's own `style` is the background arc, `indicatorStyle`
+the filled arc, `knobStyle` the knob. Pass `clickable: false` for a read-only
+gauge.
+
+```ts
+const dial = new Arc({ width: 120, height: 120, value: 65, mode: 'normal' });
+```
+
+### `Spinner`
+
+A ring with a spinning arc (`lv_spinner`) for "loading". Its angle comes from
+the clock at paint time, so it only moves while the render loop runs
+(`simulator.start()`); `renderOnce()` draws one frame. `spinTimeMs` is one
+revolution (default 1000) and `arcLengthDegrees` the arc (default 60). Not
+clickable. The arc length is constant, a simplification of LVGL's pulsing arc.
+
+### `Led`
+
+A round indicator light (`lv_led`). `color` is the lit color; `brightness`
+runs 0–255 and anything under 80 draws as dim as "off". Lit LEDs glow.
+`on()`, `off()`, `toggle()` and `setBrightness()` change it (repaint
+afterwards). Not clickable.
+
+```ts
+const power = new Led({ width: 20, height: 20, color: '#4caf50' });
+power.off();
+```
+
+### `Line`
+
+A polyline (`lv_line`) through `points` (relative to the object's top-left).
+Omit `width`/`height` and the object sizes itself to the points, re-sizing on
+`setPoints()`. `yInvert` flips the points within the height. Stroke comes
+from the style's `lineWidth`, `lineColor`, `lineOpa` and `lineRounded`.
+
+```ts
+new Line({
+  points: [
+    { x: 0, y: 30 },
+    { x: 40, y: 0 },
+    { x: 80, y: 30 },
+  ],
+  style: { base: { lineWidth: 3, lineColor: '#e53935' } },
+});
+```
+
+### `Scale`
+
+Tick marks and labels along a line (`lv_scale`), linear or round. `mode` is
+`horizontalTop`, `horizontalBottom`, `verticalLeft`, `verticalRight`,
+`roundInner` or `roundOuter` (vertical scales run min at the bottom to max at
+the top). `totalTickCount` ticks are spread over `min`–`max` with a major tick
+every `majorTickEvery`; major ticks are labelled with their value or from
+`labels`. Round scales use `angleRange` (270) and `rotation` (135).
+`sections` recolor a value range, e.g. a red zone. The object's `style` is the
+line and label text, `indicatorStyle` the major ticks, `itemsStyle` the minor
+ticks. It draws the scale only; draw a needle with a `Line`. Not clickable.
+
+```ts
+new Scale({
+  width: 220,
+  height: 44,
+  sections: [{ min: 70, max: 100, mainStyle: { lineColor: '#e53935' } }],
+});
+```
+
+### `ImageButton`
+
+A button drawn from per-state images (`lv_imagebutton`) instead of a style.
+`images` maps `released`, `pressed`, `disabled` and the `checked*` states to a
+`left` cap, a `right` cap and a `mid` image tiled between them, each a URL or
+a decoded `CanvasImageSource`. A state with no image shows the `released`
+one. `checkable` makes a click toggle `checked` (firing `valueChanged`). URL
+sources load asynchronously, so pass `onLoad` to repaint.
+
+```ts
+new ImageButton({
+  width: 120,
+  height: 32,
+  images: { released: { left: '/l.png', mid: '/m.png', right: '/r.png' } },
+  onLoad: () => simulator.renderOnce(),
+});
+```
+
 ## Styling & state
 
 Every widget's paint properties are a **`StyleSet`** (`src/style/Style.ts`)
