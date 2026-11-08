@@ -127,6 +127,13 @@ export {
   scaleRadius,
 } from './widgets/scaleMath.js';
 export type { ScaleGeometry, ScaleMode, ScaleTick, TickLayout } from './widgets/scaleMath.js';
+export { ImageButton } from './widgets/ImageButton.js';
+export type {
+  ImageButtonImages,
+  ImageButtonOptions,
+  ImageButtonSource,
+  ImageButtonState,
+} from './widgets/ImageButton.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
