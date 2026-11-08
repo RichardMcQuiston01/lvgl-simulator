@@ -97,6 +97,7 @@ export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
   Scene,
+  SceneArcLabelNode,
   SceneArcNode,
   SceneBarNode,
   SceneButtonNode,
@@ -104,6 +105,7 @@ export type {
   SceneContainerNode,
   SceneImageButtonNode,
   SceneImageNode,
+  SceneKeyboardNode,
   SceneLabelNode,
   SceneLedNode,
   SceneLineNode,
@@ -112,7 +114,11 @@ export type {
   SceneScaleNode,
   SceneScaleSection,
   SceneSliderNode,
+  SceneSpanNode,
+  SceneSpanRun,
+  SceneSpinboxNode,
   SceneSpinnerNode,
+  SceneTextareaNode,
   SceneSwitchNode,
   SceneWidgetType,
 } from './scene/SceneSchema.js';
