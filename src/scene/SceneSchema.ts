@@ -1,5 +1,10 @@
 import type { ContainerLayout } from '../widgets/Container.js';
-import type { StyleSet } from '../style/Style.js';
+import type { Style, StyleSet } from '../style/Style.js';
+import type { ArcMode } from '../widgets/arcMath.js';
+import type { BarMode, BarOrientation } from '../widgets/Bar.js';
+import type { LinePoint } from '../widgets/Line.js';
+import type { ImageButtonState } from '../widgets/ImageButton.js';
+import type { ScaleMode } from '../widgets/scaleMath.js';
 
 /**
  * Current version of the scene-description schema. `loadScreen()` rejects
@@ -13,7 +18,20 @@ export const SCENE_SCHEMA_VERSION = 1;
 
 /** Widget types a `SceneNode.type` may be, one per concrete widget class in `src/widgets/`. */
 export type SceneWidgetType =
-  'container' | 'label' | 'button' | 'checkbox' | 'switch' | 'slider' | 'image';
+  | 'container'
+  | 'label'
+  | 'button'
+  | 'checkbox'
+  | 'switch'
+  | 'slider'
+  | 'image'
+  | 'bar'
+  | 'arc'
+  | 'spinner'
+  | 'led'
+  | 'line'
+  | 'scale'
+  | 'imagebutton';
 
 /**
  * Fields every scene node shares, mirroring {@link LvObjectOptions}
@@ -99,6 +117,106 @@ export interface SceneImageNode extends SceneNodeBase {
   readonly src?: string;
 }
 
+/** A `Bar` (see `src/widgets/Bar.ts`). */
+export interface SceneBarNode extends SceneNodeBase {
+  readonly type: 'bar';
+  readonly min?: number;
+  readonly max?: number;
+  readonly value?: number;
+  readonly startValue?: number;
+  readonly mode?: BarMode;
+  readonly orientation?: BarOrientation;
+  readonly indicatorStyle?: StyleSet;
+}
+
+/** An `Arc` (see `src/widgets/Arc.ts`). */
+export interface SceneArcNode extends SceneNodeBase {
+  readonly type: 'arc';
+  readonly min?: number;
+  readonly max?: number;
+  readonly value?: number;
+  readonly bgStartAngle?: number;
+  readonly bgEndAngle?: number;
+  readonly rotation?: number;
+  readonly mode?: ArcMode;
+  readonly indicatorStyle?: StyleSet;
+  readonly knobStyle?: StyleSet;
+}
+
+/**
+ * A `Spinner` (see `src/widgets/Spinner.ts`). `SpinnerOptions.now` is a
+ * function, which cannot be serialized, so it has no place in the schema.
+ */
+export interface SceneSpinnerNode extends SceneNodeBase {
+  readonly type: 'spinner';
+  readonly spinTimeMs?: number;
+  readonly arcLengthDegrees?: number;
+  readonly indicatorStyle?: StyleSet;
+}
+
+/** A `Led` (see `src/widgets/Led.ts`). */
+export interface SceneLedNode extends SceneNodeBase {
+  readonly type: 'led';
+  readonly color?: string;
+  readonly brightness?: number;
+}
+
+/**
+ * A `Line` (see `src/widgets/Line.ts`). Unlike every other node, `width` and
+ * `height` are optional: omitted, the line sizes itself to its points.
+ */
+export interface SceneLineNode extends Omit<SceneNodeBase, 'width' | 'height'> {
+  readonly type: 'line';
+  readonly width?: number;
+  readonly height?: number;
+  readonly points?: readonly LinePoint[];
+  readonly yInvert?: boolean;
+}
+
+/** One section of a `scale` node: a value range drawn with its own look. */
+export interface SceneScaleSection {
+  readonly min: number;
+  readonly max: number;
+  readonly mainStyle?: Partial<Style>;
+  readonly indicatorStyle?: Partial<Style>;
+  readonly itemsStyle?: Partial<Style>;
+}
+
+/** A `Scale` (see `src/widgets/Scale.ts`). */
+export interface SceneScaleNode extends SceneNodeBase {
+  readonly type: 'scale';
+  readonly mode?: ScaleMode;
+  readonly min?: number;
+  readonly max?: number;
+  readonly totalTickCount?: number;
+  readonly majorTickEvery?: number;
+  readonly labelShow?: boolean;
+  readonly labels?: readonly string[];
+  readonly angleRange?: number;
+  readonly rotation?: number;
+  readonly majorTickLength?: number;
+  readonly minorTickLength?: number;
+  readonly sections?: readonly SceneScaleSection[];
+  readonly indicatorStyle?: StyleSet;
+  readonly itemsStyle?: StyleSet;
+}
+
+/**
+ * An `ImageButton` (see `src/widgets/ImageButton.ts`). Only URL strings are
+ * representable in JSON, so each state's `left`/`mid`/`right` is a `src`.
+ */
+export interface SceneImageButtonNode extends SceneNodeBase {
+  readonly type: 'imagebutton';
+  readonly images?: Partial<
+    Record<
+      ImageButtonState,
+      { readonly left?: string; readonly mid?: string; readonly right?: string }
+    >
+  >;
+  readonly checkable?: boolean;
+  readonly checked?: boolean;
+}
+
 export type SceneNode =
   | SceneContainerNode
   | SceneLabelNode
@@ -106,7 +224,14 @@ export type SceneNode =
   | SceneCheckboxNode
   | SceneSwitchNode
   | SceneSliderNode
-  | SceneImageNode;
+  | SceneImageNode
+  | SceneBarNode
+  | SceneArcNode
+  | SceneSpinnerNode
+  | SceneLedNode
+  | SceneLineNode
+  | SceneScaleNode
+  | SceneImageButtonNode;
 
 /**
  * A full screen: the root is always a container (matching `createSimulator`'s

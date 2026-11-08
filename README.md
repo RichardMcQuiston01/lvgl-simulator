@@ -16,7 +16,8 @@ runtime dependencies.
 ## Features
 
 - **Widgets:** `Container`, `Label`, `Button`, `Checkbox`, `Switch`, `Slider`,
-  and `ImageWidget`.
+  `ImageWidget`, `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale`, and
+  `ImageButton`.
 - **Layout:** flex (direction, wrap, main/cross alignment, gaps, `flexGrow`)
   and grid (explicit tracks, spans, gaps).
 - **Styling:** LVGL-style part/state model with `pressed`, `checked`,

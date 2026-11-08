@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { withOpacity } from './color.js';
+import { mixColors, withOpacity } from './color.js';
 
 describe('withOpacity', () => {
   it('returns the color unchanged when opa is undefined', () => {
@@ -24,5 +24,18 @@ describe('withOpacity', () => {
 
   it('clamps a negative opa value to fully transparent', () => {
     expect(withOpacity('#0000ff', -50)).toBe('rgba(0, 0, 255, 0)');
+  });
+});
+
+describe('mixColors', () => {
+  it('returns the foreground at weight 1 and the background at weight 0', () => {
+    expect(mixColors('#ff0000', '#0000ff', 1)).toBe('#ff0000');
+    expect(mixColors('#ff0000', '#0000ff', 0)).toBe('#0000ff');
+  });
+
+  it('blends proportionally and clamps the weight', () => {
+    expect(mixColors('#ffffff', '#000000', 0.5)).toBe('#808080');
+    expect(mixColors('#ffffff', '#000000', 5)).toBe('#ffffff');
+    expect(mixColors('#ffffff', '#000000', -1)).toBe('#000000');
   });
 });

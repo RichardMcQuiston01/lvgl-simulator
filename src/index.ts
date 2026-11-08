@@ -21,7 +21,7 @@ export { defaultTheme } from './theme/defaultTheme.js';
 
 export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
 export type { LvState, Style, StyleSet } from './style/Style.js';
-export { withOpacity } from './style/color.js';
+export { mixColors, withOpacity } from './style/color.js';
 
 export type {
   LvEvent,
@@ -75,14 +75,22 @@ export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
   Scene,
+  SceneArcNode,
+  SceneBarNode,
   SceneButtonNode,
   SceneCheckboxNode,
   SceneContainerNode,
+  SceneImageButtonNode,
   SceneImageNode,
   SceneLabelNode,
+  SceneLedNode,
+  SceneLineNode,
   SceneNode,
   SceneNodeBase,
+  SceneScaleNode,
+  SceneScaleSection,
   SceneSliderNode,
+  SceneSpinnerNode,
   SceneSwitchNode,
   SceneWidgetType,
 } from './scene/SceneSchema.js';
@@ -98,6 +106,42 @@ export type {
 export { applyGridLayout } from './layout/grid.js';
 export type { GridLayout } from './layout/grid.js';
 
+export { Arc } from './widgets/Arc.js';
+export type { ArcOptions } from './widgets/Arc.js';
+export {
+  arcRatio,
+  arcSweep,
+  computeArcIndicator,
+  normalizeDegrees,
+  pointerAngle,
+  valueFromAngle,
+} from './widgets/arcMath.js';
+export type { ArcMode } from './widgets/arcMath.js';
+export { Bar, computeBarFill } from './widgets/Bar.js';
+export type { BarMode, BarOptions, BarOrientation } from './widgets/Bar.js';
+export { Spinner } from './widgets/Spinner.js';
+export type { SpinnerOptions } from './widgets/Spinner.js';
+export { Led, LED_BRIGHTNESS_MAX, LED_BRIGHTNESS_MIN } from './widgets/Led.js';
+export type { LedOptions } from './widgets/Led.js';
+export { Line } from './widgets/Line.js';
+export type { LineOptions, LinePoint } from './widgets/Line.js';
+export { Scale } from './widgets/Scale.js';
+export type { ScaleOptions, ScaleSection } from './widgets/Scale.js';
+export {
+  computeScaleTicks,
+  isRoundMode,
+  layoutScaleTick,
+  scaleAngle,
+  scaleRadius,
+} from './widgets/scaleMath.js';
+export type { ScaleGeometry, ScaleMode, ScaleTick, TickLayout } from './widgets/scaleMath.js';
+export { ImageButton } from './widgets/ImageButton.js';
+export type {
+  ImageButtonImages,
+  ImageButtonOptions,
+  ImageButtonSource,
+  ImageButtonState,
+} from './widgets/ImageButton.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

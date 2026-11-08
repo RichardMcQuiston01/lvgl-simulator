@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { Arc } from '../widgets/Arc.js';
+import { Bar } from '../widgets/Bar.js';
 import { Button } from '../widgets/Button.js';
 import { Checkbox } from '../widgets/Checkbox.js';
 import { Container } from '../widgets/Container.js';
+import { ImageButton } from '../widgets/ImageButton.js';
 import { ImageWidget } from '../widgets/ImageWidget.js';
+import { Led } from '../widgets/Led.js';
+import { Line } from '../widgets/Line.js';
 import { Label } from '../widgets/Label.js';
+import { Scale } from '../widgets/Scale.js';
 import { Slider } from '../widgets/Slider.js';
+import { Spinner } from '../widgets/Spinner.js';
 import { Switch } from '../widgets/Switch.js';
 import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
 import { loadScreen } from './loadScreen.js';
@@ -190,5 +197,132 @@ describe('loadScreen', () => {
     expect(context.fillText).toHaveBeenCalledWith('OK', expect.any(Number), expect.any(Number));
     expect(context.fillText).toHaveBeenCalledWith('Agree', expect.any(Number), expect.any(Number));
     expect(context.fill).toHaveBeenCalled(); // the button's rounded rect
+  });
+});
+
+describe('loadScreen W1 widgets', () => {
+  function loadOne(node: SceneNode): unknown {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 300,
+      height: 300,
+      children: [node],
+    };
+    return loadScreen(scene).children[0];
+  }
+
+  it('builds a Bar with its range, mode and orientation', () => {
+    const bar = loadOne({
+      type: 'bar',
+      width: 100,
+      height: 10,
+      min: -50,
+      max: 50,
+      value: 20,
+      mode: 'symmetrical',
+      orientation: 'horizontal',
+    });
+    expect(bar).toBeInstanceOf(Bar);
+    expect(bar).toMatchObject({ min: -50, max: 50, value: 20, mode: 'symmetrical' });
+  });
+
+  it('builds an Arc with its angles and rotation', () => {
+    const arc = loadOne({
+      type: 'arc',
+      width: 100,
+      height: 100,
+      value: 30,
+      bgStartAngle: 90,
+      bgEndAngle: 360,
+      rotation: 10,
+    });
+    expect(arc).toBeInstanceOf(Arc);
+    expect(arc).toMatchObject({ value: 30, bgStartAngle: 90, bgEndAngle: 360, rotation: 10 });
+  });
+
+  it('builds a Spinner, a Led and a Scale', () => {
+    expect(
+      loadOne({ type: 'spinner', width: 40, height: 40, spinTimeMs: 500, arcLengthDegrees: 90 }),
+    ).toMatchObject({ spinTimeMs: 500, arcLengthDegrees: 90 });
+    expect(loadOne({ type: 'spinner', width: 40, height: 40 })).toBeInstanceOf(Spinner);
+
+    const led = loadOne({ type: 'led', width: 16, height: 16, color: '#00ff00', brightness: 120 });
+    expect(led).toBeInstanceOf(Led);
+    expect(led).toMatchObject({ color: '#00ff00', brightness: 120 });
+
+    const scale = loadOne({
+      type: 'scale',
+      width: 200,
+      height: 40,
+      mode: 'horizontalTop',
+      min: 10,
+      max: 20,
+      totalTickCount: 6,
+      labels: ['a', 'b'],
+      sections: [{ min: 15, max: 20, mainStyle: { lineColor: '#ff0000' } }],
+    });
+    expect(scale).toBeInstanceOf(Scale);
+    expect(scale).toMatchObject({ mode: 'horizontalTop', min: 10, max: 20, totalTickCount: 6 });
+    expect((scale as Scale).sections).toHaveLength(1);
+  });
+
+  it('builds a Line that sizes itself to its points when no size is given', () => {
+    const line = loadOne({
+      type: 'line',
+      points: [
+        { x: 0, y: 0 },
+        { x: 60, y: 30 },
+      ],
+      yInvert: true,
+    });
+    expect(line).toBeInstanceOf(Line);
+    expect(line).toMatchObject({ width: 60, height: 30, yInvert: true });
+  });
+
+  it('builds an ImageButton with its flags', () => {
+    const button = loadOne({
+      type: 'imagebutton',
+      width: 80,
+      height: 30,
+      checkable: true,
+      checked: true,
+      images: { released: { mid: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=' } },
+    });
+    expect(button).toBeInstanceOf(ImageButton);
+    expect(button).toMatchObject({ checkable: true, checked: true });
+  });
+
+  it('names the new types in the unknown-type error', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 10,
+      height: 10,
+      children: [{ type: 'nope', width: 1, height: 1 } as unknown as SceneNode],
+    };
+    expect(() => loadScreen(scene)).toThrow(/spinner, led, line, scale, imagebutton/);
+  });
+
+  it('renders every W1 widget without throwing', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 300,
+      height: 300,
+      children: [
+        { type: 'bar', width: 100, height: 10, value: 40 },
+        { type: 'arc', width: 80, height: 80, value: 40 },
+        { type: 'spinner', width: 40, height: 40 },
+        { type: 'led', width: 16, height: 16 },
+        {
+          type: 'line',
+          points: [
+            { x: 0, y: 0 },
+            { x: 20, y: 20 },
+          ],
+        },
+        { type: 'scale', width: 200, height: 40 },
+        { type: 'imagebutton', width: 80, height: 30 },
+      ],
+    };
+    expect(() => loadScreen(scene).render(createFakeCanvasContext())).not.toThrow();
   });
 });
