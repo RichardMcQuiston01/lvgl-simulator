@@ -7,6 +7,7 @@ import { mergeStyle, resolveStyle, type StyleSet } from '../style/Style.js';
 import { withOpacity } from '../style/color.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
 import {
+  arcRatio,
   arcSweep,
   computeArcIndicator,
   pointerAngle,
@@ -134,8 +135,12 @@ export class Arc extends LvObject implements PointerDraggable {
     const fill = computeArcIndicator(this.min, this.max, this.value, this.mode, startAngle, sweep);
     strokeArc(context, centerX, centerY, radius, fill.start, fill.end, indicator);
 
-    // The knob sits on the moving end of the indicator.
-    const knobAngle = ((this.mode === 'reverse' ? fill.start : fill.end) * Math.PI) / 180;
+    // The knob marks the value itself. That is the indicator's end in 'normal'
+    // mode, its start in 'reverse', and the end away from the middle in
+    // 'symmetrical', so place it by the value's position along the arc.
+    const ratio = arcRatio(this.min, this.max, this.value);
+    const knobAngle =
+      ((startAngle + sweep * (this.mode === 'reverse' ? 1 - ratio : ratio)) * Math.PI) / 180;
     paintCircle(
       context,
       centerX + radius * Math.cos(knobAngle),

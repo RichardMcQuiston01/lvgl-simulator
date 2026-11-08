@@ -113,4 +113,28 @@ describe('Arc', () => {
     }).render(flat);
     expect(flat.lineCap).toBe('butt');
   });
+
+  /** The center the knob circle was drawn at: the last `arc` call's first two arguments. */
+  function knobCenter(context: CanvasRenderingContext2D): { x: number; y: number } {
+    const calls = (context.arc as unknown as { mock: { calls: number[][] } }).mock.calls;
+    const last = calls[calls.length - 1] ?? [];
+    return { x: last[0] ?? NaN, y: last[1] ?? NaN };
+  }
+
+  it.each([
+    // [mode, value, expected knob angle in degrees]
+    ['normal', 25, 202.5],
+    ['symmetrical', 25, 202.5],
+    ['symmetrical', 75, 337.5],
+    ['reverse', 25, 337.5],
+  ] as const)('places the %s knob for value %d at %f degrees', (mode, value, degrees) => {
+    const context = createFakeCanvasContext();
+    new Arc({ width: 100, height: 100, mode, value }).render(context);
+    // Default arc width 12 and knob padding 3 leave a path radius of 50 - 6 - 3.
+    const radius = 41;
+    const radians = (degrees * Math.PI) / 180;
+    const center = knobCenter(context);
+    expect(center.x).toBeCloseTo(50 + radius * Math.cos(radians), 5);
+    expect(center.y).toBeCloseTo(50 + radius * Math.sin(radians), 5);
+  });
 });
