@@ -168,6 +168,16 @@ export {
   layoutKeys,
 } from './widgets/keyboardLayout.js';
 export type { KeyAction, KeyDefinition, KeyRect, KeyboardMode } from './widgets/keyboardLayout.js';
+export { Spinbox } from './widgets/Spinbox.js';
+export type { SpinboxOptions } from './widgets/Spinbox.js';
+export {
+  formatSpinbox,
+  maxMagnitude,
+  nextStep,
+  previousStep,
+  stepDigitIndex,
+  stepValue,
+} from './widgets/spinboxMath.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
