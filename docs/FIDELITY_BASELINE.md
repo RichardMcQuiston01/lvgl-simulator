@@ -60,6 +60,11 @@ diffs" means in practice.
   gained its blue rounded border. The baseline PNG was regenerated for this
   intentional change.
 
+- Widget expansion W1: a second fixture, `e2e/fixtures/w1.ts`, covers `Bar`,
+  `Arc`, `Spinner` (clock frozen), `Led`, `Line`, `Scale` and `ImageButton`
+  against its own baseline, `e2e/w1-widgets.spec.ts-snapshots/`. The Stage 2
+  baseline is unchanged.
+
 ## Updating the baseline
 
 When a change intentionally alters a Stage 2 widget's default appearance,

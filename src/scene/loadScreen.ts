@@ -62,6 +62,7 @@ export function loadScreen(scene: Scene): Container {
   });
 }
 
+/** Builds the widget a scene node describes by dispatching on its `type`; throws on an unknown type. */
 function buildNode(node: SceneNode): LvObject {
   switch (node.type) {
     case 'container':
@@ -104,6 +105,7 @@ function buildNode(node: SceneNode): LvObject {
   }
 }
 
+/** Builds a `Container` and, recursively, all of its `children`. */
 function buildContainer(node: SceneContainerNode): Container {
   const container = new Container({
     x: node.x,

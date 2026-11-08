@@ -153,15 +153,15 @@ version, with a CHANGELOG entry.
       `valueChanged` for all value widgets
 - [x] Reusable text-input caret/selection and a text-measure cache
 
-### Phase W1: Simple display and value widgets
+### Phase W1: Simple display and value widgets — done
 
-- [ ] `Bar` — value/range, start value, symmetrical, vertical
-- [ ] `Arc` — value/range, rotation, bg/fg angles, knob, drag input
-- [ ] `Spinner` — arc + spin animation
-- [ ] `LED` — brightness, color, glow
-- [ ] `Line` — point array, `y_invert`
-- [ ] `Scale` — linear/round, ticks, labels, sections (needed by gauges)
-- [ ] `ImageButton` — per-state images, tiled middle
+- [x] `Bar` — value/range, start value, symmetrical, vertical
+- [x] `Arc` — value/range, rotation, bg/fg angles, knob, drag input
+- [x] `Spinner` — arc + spin animation (constant arc length; see GETTING_STARTED)
+- [x] `LED` (`Led`) — brightness, color, glow
+- [x] `Line` — point array, `y_invert`
+- [x] `Scale` — linear/round, ticks, labels, sections (needed by gauges; no needle yet)
+- [x] `ImageButton` — per-state images, tiled middle
 
 ### Phase W2: Text and input widgets
 

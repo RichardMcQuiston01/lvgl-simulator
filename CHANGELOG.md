@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Widget expansion W1: new `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale` and `ImageButton` widgets, each with a JSON scene node type (additive; schema version unchanged), docs, unit tests and a new visual regression fixture (`e2e/w1-widgets.spec.ts`).
+  - `mixColors()` colour helper exported.
+  - Known limits: `Spinner` keeps a constant arc length, `Scale` has no needle (draw one with `Line`), and vertical scales run min at the bottom.
+
 - No code changes. `package-lock.json` root `funding` URL still pointed at Stripe; now points at Ko-fi.
 - Widget expansion W0 (foundations, no new widgets yet):
   - Object flags `hidden`, `clickable`, `scrollable`, `floating`, `ignoreLayout`.

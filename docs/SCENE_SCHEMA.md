@@ -121,6 +121,93 @@ with a version tag).
 live bitmap and a callback — neither is JSON-serializable, so they have
 no place here; a scene can only ever reference an image by URL.
 
+### `bar`
+
+```json
+{ "type": "bar", "width": 160, "height": 12, "min": 0, "max": 100, "value": 60, "mode": "normal" }
+```
+
+`min`, `max`, `value`, `startValue`, `mode` (`normal`, `symmetrical`,
+`range`), `orientation` (`auto`, `horizontal`, `vertical`), `indicatorStyle`.
+
+### `arc`
+
+```json
+{ "type": "arc", "width": 120, "height": 120, "value": 65, "bgStartAngle": 135, "bgEndAngle": 45 }
+```
+
+`min`, `max`, `value`, `bgStartAngle`, `bgEndAngle`, `rotation`, `mode`
+(`normal`, `symmetrical`, `reverse`), `indicatorStyle`, `knobStyle`.
+
+### `spinner`
+
+```json
+{ "type": "spinner", "width": 44, "height": 44, "spinTimeMs": 1000, "arcLengthDegrees": 60 }
+```
+
+`spinTimeMs`, `arcLengthDegrees`, `indicatorStyle`. `SpinnerOptions.now` is a
+function and is not part of the schema.
+
+### `led`
+
+```json
+{ "type": "led", "width": 20, "height": 20, "color": "#4caf50", "brightness": 255 }
+```
+
+`color`, `brightness` (0-255).
+
+### `line`
+
+```json
+{
+  "type": "line",
+  "points": [
+    { "x": 0, "y": 30 },
+    { "x": 40, "y": 0 },
+    { "x": 80, "y": 30 }
+  ]
+}
+```
+
+`points`, `yInvert`. The only node whose `width` and `height` are optional:
+omitted, the line sizes itself to its points.
+
+### `scale`
+
+```json
+{
+  "type": "scale",
+  "width": 220,
+  "height": 44,
+  "mode": "horizontalBottom",
+  "min": 0,
+  "max": 100,
+  "sections": [{ "min": 70, "max": 100, "mainStyle": { "lineColor": "#e53935" } }]
+}
+```
+
+`mode`, `min`, `max`, `totalTickCount`, `majorTickEvery`, `labelShow`,
+`labels`, `angleRange`, `rotation`, `majorTickLength`, `minorTickLength`,
+`sections` (each `min`, `max`, and partial `mainStyle`/`indicatorStyle`/
+`itemsStyle`), `indicatorStyle`, `itemsStyle`.
+
+### `imagebutton`
+
+```json
+{
+  "type": "imagebutton",
+  "width": 120,
+  "height": 32,
+  "checkable": true,
+  "images": { "released": { "left": "/l.png", "mid": "/m.png", "right": "/r.png" } }
+}
+```
+
+`images` (states `released`, `pressed`, `disabled`, `checkedReleased`,
+`checkedPressed`, `checkedDisabled`, each with `left`/`mid`/`right` URLs),
+`checkable`, `checked`. Only URLs are representable; `ImageButtonOptions`'
+decoded drawables and `onLoad` callback are not.
+
 ## Styling
 
 `style` is a `StyleSet` (`src/style/Style.ts`) — a plain, JSON-safe
