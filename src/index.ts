@@ -62,6 +62,15 @@ export type {
 
 export { createTextMeasurer, fontString, textMeasurer } from './text/measureText.js';
 export type { TextMeasurer } from './text/measureText.js';
+export {
+  caretPosition,
+  lineIndexAt,
+  moveOffsetVertically,
+  offsetAtPoint,
+  offsetAtX,
+  wrapLines,
+} from './text/layout.js';
+export type { MeasureText, TextLine } from './text/layout.js';
 export { TextEditState } from './text/TextEditState.js';
 export type { TextEditStateOptions } from './text/TextEditState.js';
 
@@ -147,6 +156,8 @@ export type {
   ImageButtonSource,
   ImageButtonState,
 } from './widgets/ImageButton.js';
+export { Textarea } from './widgets/Textarea.js';
+export type { TextareaOptions } from './widgets/Textarea.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

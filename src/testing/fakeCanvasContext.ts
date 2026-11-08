@@ -29,6 +29,7 @@ export function createFakeCanvasContext(): CanvasRenderingContext2D {
     fill: vi.fn(),
     stroke: vi.fn(),
     fillText: vi.fn(),
+    measureText: vi.fn((text: string) => ({ width: text.length * 7 })),
     drawImage: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
