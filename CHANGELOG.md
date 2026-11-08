@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-11-08
+
 - Widget expansion W1: new `Bar`, `Arc`, `Spinner`, `Led`, `Line`, `Scale` and `ImageButton` widgets, each with a JSON scene node type (additive; schema version unchanged), docs, unit tests and a new visual regression fixture (`e2e/w1-widgets.spec.ts`).
   - `mixColors()` colour helper exported.
   - Known limits: `Spinner` keeps a constant arc length, `Scale` has no needle (draw one with `Line`), and vertical scales run min at the bottom.
 
-- No code changes. `package-lock.json` root `funding` URL still pointed at Stripe; now points at Ko-fi.
+## 0.2.2 - 2026-11-07
+
 - Widget expansion W0 (foundations, no new widgets yet):
   - Object flags `hidden`, `clickable`, `scrollable`, `floating`, `ignoreLayout`.
   - Scrolling: clipping, scrollbars, drag/wheel, throw, chaining, snap, `scrollTo`/`scrollBy`/`scrollToView`.
@@ -16,12 +19,9 @@
   - New style properties: gradients, shadow, outline, `borderOpa`, `textAlign`, transforms, `clipCorner`, plus `line*`/`arc*` for upcoming widgets.
   - `textMeasurer` cache and `TextEditState` caret/selection model.
   - Behavior change: a plain `Container` now paints `radius` and borders; the visual baseline was regenerated.
+- Donations now point at Ko-fi instead of PayPal: the README badge, the `package.json` `funding` link (and the matching root `funding` URL in `package-lock.json`, which still pointed at Stripe) and a new `.github/FUNDING.yml`. The PayPal QR image is removed.
 - Docs: ROADMAP gains a phased plan (W0-W6) for the remaining LVGL widgets.
 - CI: pin workflow runners to `ubuntu-24.04`; `ubuntu-latest` now resolves to 26.04, which Playwright 1.56.1 cannot install Chromium on.
-
-## 0.2.2 - 2026-11-03
-
-- No code changes. Donations now point at Ko-fi instead of PayPal: the README badge, the `package.json` `funding` link and a new `.github/FUNDING.yml`. The PayPal QR image is removed.
 
 ## 0.2.1 - 2026-10-20
 
