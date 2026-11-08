@@ -158,6 +158,16 @@ export type {
 } from './widgets/ImageButton.js';
 export { Textarea } from './widgets/Textarea.js';
 export type { TextareaOptions } from './widgets/Textarea.js';
+export { Keyboard } from './widgets/Keyboard.js';
+export type { KeyboardOptions } from './widgets/Keyboard.js';
+export {
+  KEYBOARD_LAYOUTS,
+  isControlKey,
+  keyAction,
+  keyAtPoint,
+  layoutKeys,
+} from './widgets/keyboardLayout.js';
+export type { KeyAction, KeyDefinition, KeyRect, KeyboardMode } from './widgets/keyboardLayout.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
