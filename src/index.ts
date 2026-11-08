@@ -113,6 +113,8 @@ export { Bar, computeBarFill } from './widgets/Bar.js';
 export type { BarMode, BarOptions, BarOrientation } from './widgets/Bar.js';
 export { Spinner } from './widgets/Spinner.js';
 export type { SpinnerOptions } from './widgets/Spinner.js';
+export { Led, LED_BRIGHTNESS_MAX, LED_BRIGHTNESS_MIN } from './widgets/Led.js';
+export type { LedOptions } from './widgets/Led.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
