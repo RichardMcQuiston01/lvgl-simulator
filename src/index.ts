@@ -115,6 +115,8 @@ export { Spinner } from './widgets/Spinner.js';
 export type { SpinnerOptions } from './widgets/Spinner.js';
 export { Led, LED_BRIGHTNESS_MAX, LED_BRIGHTNESS_MIN } from './widgets/Led.js';
 export type { LedOptions } from './widgets/Led.js';
+export { Line } from './widgets/Line.js';
+export type { LineOptions, LinePoint } from './widgets/Line.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';
