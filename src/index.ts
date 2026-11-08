@@ -21,7 +21,7 @@ export { defaultTheme } from './theme/defaultTheme.js';
 
 export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
 export type { LvState, Style, StyleSet } from './style/Style.js';
-export { withOpacity } from './style/color.js';
+export { mixColors, withOpacity } from './style/color.js';
 
 export type {
   LvEvent,
@@ -98,6 +98,8 @@ export type {
 export { applyGridLayout } from './layout/grid.js';
 export type { GridLayout } from './layout/grid.js';
 
+export { Bar, computeBarFill } from './widgets/Bar.js';
+export type { BarMode, BarOptions, BarOrientation } from './widgets/Bar.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

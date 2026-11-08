@@ -23,3 +23,19 @@ function hexToRgb(hex: string): { readonly r: number; readonly g: number; readon
     b: value & 0xff,
   };
 }
+
+/**
+ * Blends two `#rrggbb` colors, mirroring `lv_color_mix`: `weight` is how
+ * much of `foreground` shows (0 = all `background`, 1 = all `foreground`).
+ * Returns a `#rrggbb` string.
+ */
+export function mixColors(foreground: string, background: string, weight: number): string {
+  const mix = Math.max(0, Math.min(1, weight));
+  const front = hexToRgb(foreground);
+  const back = hexToRgb(background);
+  const channel = (a: number, b: number): string =>
+    Math.round(a * mix + b * (1 - mix))
+      .toString(16)
+      .padStart(2, '0');
+  return `#${channel(front.r, back.r)}${channel(front.g, back.g)}${channel(front.b, back.b)}`;
+}
