@@ -11,6 +11,11 @@ export type LvGestureDirection = 'left' | 'right' | 'top' | 'bottom';
 /** Payload of a `key` event, mirroring `lv_event_get_key`. Uses DOM `KeyboardEvent.key` names. */
 export interface LvKeyEvent extends LvEvent {
   readonly key: string;
+  /** Present (and `true`) only when the modifier was held, so plain keys keep the minimal `{ key }` shape. */
+  readonly shiftKey?: boolean;
+  readonly ctrlKey?: boolean;
+  readonly metaKey?: boolean;
+  readonly altKey?: boolean;
 }
 
 /** Payload of a `gesture` event, mirroring `lv_indev_get_gesture_dir`. */

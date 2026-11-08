@@ -53,7 +53,12 @@ export { cubicBezier, easings } from './animation/easing.js';
 export type { EasingFunction, EasingName } from './animation/easing.js';
 
 export { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
-export type { FocusGroupMode, FocusGroupOptions, KeyboardController } from './focus/FocusGroup.js';
+export type {
+  FocusGroupMode,
+  FocusGroupOptions,
+  KeyModifiers,
+  KeyboardController,
+} from './focus/FocusGroup.js';
 
 export { createTextMeasurer, fontString, textMeasurer } from './text/measureText.js';
 export type { TextMeasurer } from './text/measureText.js';

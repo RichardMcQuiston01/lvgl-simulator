@@ -13,6 +13,38 @@ export type FocusGroupMode = 'keypad' | 'encoder';
 const UNHANDLED_KEYS =
   /^(Shift|Control|Alt|AltGraph|Meta|OS|CapsLock|NumLock|ScrollLock|Fn|FnLock|F\d{1,2})$/;
 
+/** Modifier keys held with a key press. */
+export interface KeyModifiers {
+  readonly shiftKey?: boolean;
+  readonly ctrlKey?: boolean;
+  readonly metaKey?: boolean;
+  readonly altKey?: boolean;
+}
+
+/** The `key` event payload for `key` pressed with `modifiers`, including only the flags that are set. */
+function keyEventDetail(
+  key: string,
+  shiftKey: boolean,
+  modifiers: KeyModifiers,
+): { key: string; shiftKey?: true; ctrlKey?: true; metaKey?: true; altKey?: true } {
+  const detail: { key: string; shiftKey?: true; ctrlKey?: true; metaKey?: true; altKey?: true } = {
+    key,
+  };
+  if (shiftKey || modifiers.shiftKey) {
+    detail.shiftKey = true;
+  }
+  if (modifiers.ctrlKey) {
+    detail.ctrlKey = true;
+  }
+  if (modifiers.metaKey) {
+    detail.metaKey = true;
+  }
+  if (modifiers.altKey) {
+    detail.altKey = true;
+  }
+  return detail;
+}
+
 export interface FocusGroupOptions {
   readonly mode?: FocusGroupMode;
   /** Whether focus wraps past the first/last object (default `true`). Mirrors `lv_group_set_wrap`. */
@@ -118,7 +150,7 @@ export class FocusGroup {
    * (so a DOM listener knows to `preventDefault`). Key names are DOM
    * `KeyboardEvent.key` values.
    */
-  handleKey(key: string, shiftKey = false): boolean {
+  handleKey(key: string, shiftKey = false, modifiers: KeyModifiers = {}): boolean {
     const focused = this.focusedObject;
 
     if (key === 'Tab') {
@@ -155,7 +187,7 @@ export class FocusGroup {
       return false;
     }
 
-    focused.dispatchEvent('key', { key });
+    focused.dispatchEvent('key', keyEventDetail(key, shiftKey, modifiers));
     return true;
   }
 
@@ -215,8 +247,9 @@ export interface KeyboardController {
 /**
  * Routes `keydown` events on `target` (e.g. the simulator's canvas, which
  * must be focusable via `tabIndex`) into `group`. Consumed keys have their
- * default prevented and trigger `render`. Ctrl/Meta/Alt combinations are
- * ignored so browser shortcuts keep working.
+ * default prevented and trigger `render`. Browser shortcuts (Alt, Ctrl and
+ * Cmd combinations) are left alone, except Ctrl/Cmd+A in an `editable`
+ * object; AltGr passes through so typed characters such as `@` work.
  */
 export function attachKeyboard(
   target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'>,
@@ -226,10 +259,17 @@ export function attachKeyboard(
   /** Routes a `keydown` into the focus group, preventing the default and rendering only when the key was consumed. */
   function onKeyDown(event: Event): void {
     const keyEvent = event as KeyboardEvent;
-    if (keyEvent.ctrlKey || keyEvent.metaKey || keyEvent.altKey) {
+    const { ctrlKey, metaKey, altKey, shiftKey, key } = keyEvent;
+    // Ctrl+Alt is how Windows reports AltGr, which types printable characters.
+    const altGr = ctrlKey && altKey;
+    // Alt on its own, and Ctrl/Cmd shortcuts, belong to the browser, with one
+    // exception: Ctrl/Cmd+A selects all in an editable object.
+    const browserShortcut = (altKey && !altGr && !metaKey) || ((ctrlKey || metaKey) && !altGr);
+    const selectAll = key.toLowerCase() === 'a' && group.focusedItem?.editable === true;
+    if (browserShortcut && !selectAll) {
       return;
     }
-    if (group.handleKey(keyEvent.key, keyEvent.shiftKey)) {
+    if (group.handleKey(key, shiftKey, { ctrlKey, metaKey, altKey })) {
       keyEvent.preventDefault();
       render();
     }
