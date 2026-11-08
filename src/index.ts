@@ -75,14 +75,22 @@ export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
   Scene,
+  SceneArcNode,
+  SceneBarNode,
   SceneButtonNode,
   SceneCheckboxNode,
   SceneContainerNode,
+  SceneImageButtonNode,
   SceneImageNode,
   SceneLabelNode,
+  SceneLedNode,
+  SceneLineNode,
   SceneNode,
   SceneNodeBase,
+  SceneScaleNode,
+  SceneScaleSection,
   SceneSliderNode,
+  SceneSpinnerNode,
   SceneSwitchNode,
   SceneWidgetType,
 } from './scene/SceneSchema.js';
