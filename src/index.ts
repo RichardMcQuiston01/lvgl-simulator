@@ -188,6 +188,10 @@ export {
 } from './widgets/spinboxMath.js';
 export { Span } from './widgets/Span.js';
 export type { SpanDefinition, SpanMode, SpanOptions, SpanOverflow } from './widgets/Span.js';
+export { ArcLabel } from './widgets/ArcLabel.js';
+export type { ArcLabelOptions, ArcLabelVerticalAlign } from './widgets/ArcLabel.js';
+export { layoutArcLabel } from './widgets/arcLabelMath.js';
+export type { ArcLabelAlign, ArcLabelDirection, GlyphPlacement } from './widgets/arcLabelMath.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

@@ -20,6 +20,8 @@ export function createFakeCanvasContext(): CanvasRenderingContext2D {
     fillRect: vi.fn(),
     clearRect: vi.fn(),
     scale: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
     beginPath: vi.fn(),
     closePath: vi.fn(),
     moveTo: vi.fn(),
