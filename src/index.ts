@@ -111,6 +111,8 @@ export {
 export type { ArcMode } from './widgets/arcMath.js';
 export { Bar, computeBarFill } from './widgets/Bar.js';
 export type { BarMode, BarOptions, BarOrientation } from './widgets/Bar.js';
+export { Spinner } from './widgets/Spinner.js';
+export type { SpinnerOptions } from './widgets/Spinner.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

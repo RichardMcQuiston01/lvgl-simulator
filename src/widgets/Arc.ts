@@ -1,8 +1,9 @@
 import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
 import type { PointerDraggable } from '../interaction/PointerDraggable.js';
 import { paintBackgroundAndBorder } from '../rendering/box.js';
+import { DEFAULT_ARC_WIDTH, strokeArc } from '../rendering/arcs.js';
 import { paintCircle } from '../rendering/shapes.js';
-import { mergeStyle, resolveStyle, type Style, type StyleSet } from '../style/Style.js';
+import { mergeStyle, resolveStyle, type StyleSet } from '../style/Style.js';
 import { withOpacity } from '../style/color.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
 import {
@@ -13,7 +14,6 @@ import {
   type ArcMode,
 } from './arcMath.js';
 
-const DEFAULT_ARC_WIDTH = 12;
 /** How far the knob's radius extends past the indicator arc's own half-width. */
 const KNOB_EXTRA = 3;
 
@@ -109,34 +109,6 @@ export class Arc extends LvObject implements PointerDraggable {
     this.dispatchEvent('valueChanged');
   }
 
-  /** Strokes one arc from `startDegrees` to `endDegrees` (clockwise, rotation already applied). */
-  private strokeArc(
-    context: CanvasRenderingContext2D,
-    centerX: number,
-    centerY: number,
-    radius: number,
-    startDegrees: number,
-    endDegrees: number,
-    style: Style,
-  ): void {
-    const width = style.arcWidth ?? DEFAULT_ARC_WIDTH;
-    if (width <= 0 || style.arcOpa === 0 || endDegrees <= startDegrees) {
-      return;
-    }
-    context.beginPath();
-    context.arc(
-      centerX,
-      centerY,
-      Math.max(0, radius),
-      (startDegrees * Math.PI) / 180,
-      (endDegrees * Math.PI) / 180,
-    );
-    context.strokeStyle = withOpacity(style.arcColor ?? defaultTheme.borderColor, style.arcOpa);
-    context.lineWidth = width;
-    context.lineCap = style.arcRounded === false ? 'butt' : 'round';
-    context.stroke();
-  }
-
   /** Paints the object box, the background arc, the indicator arc, then the knob at the indicator's end. */
   protected override paintSelf(context: CanvasRenderingContext2D): void {
     const style = this.resolvedStyle;
@@ -157,10 +129,10 @@ export class Arc extends LvObject implements PointerDraggable {
 
     const sweep = this.sweep;
     const startAngle = this.bgStartAngle + this.rotation;
-    this.strokeArc(context, centerX, centerY, radius, startAngle, startAngle + sweep, style);
+    strokeArc(context, centerX, centerY, radius, startAngle, startAngle + sweep, style);
 
     const fill = computeArcIndicator(this.min, this.max, this.value, this.mode, startAngle, sweep);
-    this.strokeArc(context, centerX, centerY, radius, fill.start, fill.end, indicator);
+    strokeArc(context, centerX, centerY, radius, fill.start, fill.end, indicator);
 
     // The knob sits on the moving end of the indicator.
     const knobAngle = ((this.mode === 'reverse' ? fill.start : fill.end) * Math.PI) / 180;
