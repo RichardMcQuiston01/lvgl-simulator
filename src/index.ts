@@ -98,6 +98,17 @@ export type {
 export { applyGridLayout } from './layout/grid.js';
 export type { GridLayout } from './layout/grid.js';
 
+export { Arc } from './widgets/Arc.js';
+export type { ArcOptions } from './widgets/Arc.js';
+export {
+  arcRatio,
+  arcSweep,
+  computeArcIndicator,
+  normalizeDegrees,
+  pointerAngle,
+  valueFromAngle,
+} from './widgets/arcMath.js';
+export type { ArcMode } from './widgets/arcMath.js';
 export { Bar, computeBarFill } from './widgets/Bar.js';
 export type { BarMode, BarOptions, BarOrientation } from './widgets/Bar.js';
 export { Container } from './widgets/Container.js';
