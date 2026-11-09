@@ -1,20 +1,26 @@
 import { Arc } from '../widgets/Arc.js';
+import { ArcLabel } from '../widgets/ArcLabel.js';
 import { Bar } from '../widgets/Bar.js';
 import { Button } from '../widgets/Button.js';
 import { Checkbox } from '../widgets/Checkbox.js';
 import { Container } from '../widgets/Container.js';
 import { ImageButton } from '../widgets/ImageButton.js';
 import { ImageWidget } from '../widgets/ImageWidget.js';
+import { Keyboard } from '../widgets/Keyboard.js';
 import { Led } from '../widgets/Led.js';
 import { Line } from '../widgets/Line.js';
 import { Label } from '../widgets/Label.js';
 import type { LvObject } from '../core/LvObject.js';
 import { Scale } from '../widgets/Scale.js';
 import { Slider } from '../widgets/Slider.js';
+import { Span } from '../widgets/Span.js';
+import { Spinbox } from '../widgets/Spinbox.js';
 import { Spinner } from '../widgets/Spinner.js';
+import { Textarea } from '../widgets/Textarea.js';
 import {
   SCENE_SCHEMA_VERSION,
   type Scene,
+  type SceneArcLabelNode,
   type SceneArcNode,
   type SceneBarNode,
   type SceneButtonNode,
@@ -22,6 +28,7 @@ import {
   type SceneContainerNode,
   type SceneImageButtonNode,
   type SceneImageNode,
+  type SceneKeyboardNode,
   type SceneLabelNode,
   type SceneLedNode,
   type SceneLineNode,
@@ -29,7 +36,10 @@ import {
   type SceneNodeBase,
   type SceneScaleNode,
   type SceneSliderNode,
+  type SceneSpanNode,
+  type SceneSpinboxNode,
   type SceneSpinnerNode,
+  type SceneTextareaNode,
   type SceneSwitchNode,
 } from './SceneSchema.js';
 import { Switch } from '../widgets/Switch.js';
@@ -93,13 +103,23 @@ function buildNode(node: SceneNode): LvObject {
       return buildScale(node);
     case 'imagebutton':
       return buildImageButton(node);
+    case 'textarea':
+      return buildTextarea(node);
+    case 'keyboard':
+      return buildKeyboard(node);
+    case 'spinbox':
+      return buildSpinbox(node);
+    case 'span':
+      return buildSpan(node);
+    case 'arclabel':
+      return buildArcLabel(node);
     default: {
       // Exhaustive in TypeScript; a real runtime guard for untyped JSON.
       const unknownType = (node as { readonly type?: unknown }).type;
       throw new Error(
         `Unknown scene node type ${JSON.stringify(unknownType)}. Supported types: ` +
           `container, label, button, checkbox, switch, slider, image, bar, arc, spinner, led, line, scale, ` +
-          `imagebutton.`,
+          `imagebutton, textarea, keyboard, spinbox, span, arclabel.`,
       );
     }
   }
@@ -380,5 +400,84 @@ function buildImageButton(node: SceneImageButtonNode): ImageButton {
     images: node.images,
     checkable: node.checkable,
     checked: node.checked,
+  });
+}
+
+function buildTextarea(node: SceneTextareaNode): Textarea {
+  return new Textarea({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    text: node.text,
+    placeholder: node.placeholder,
+    oneLine: node.oneLine,
+    passwordMode: node.passwordMode,
+    passwordChar: node.passwordChar,
+    maxLength: node.maxLength,
+    acceptedChars: node.acceptedChars,
+    blinkMs: node.blinkMs,
+    placeholderStyle: node.placeholderStyle,
+    selectionStyle: node.selectionStyle,
+    cursorStyle: node.cursorStyle,
+  });
+}
+
+function buildKeyboard(node: SceneKeyboardNode): Keyboard {
+  return new Keyboard({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    mode: node.mode,
+    gap: node.gap,
+    padding: node.padding,
+    itemsStyle: node.itemsStyle,
+    controlKeyStyle: node.controlKeyStyle,
+  });
+}
+
+function buildSpinbox(node: SceneSpinboxNode): Spinbox {
+  return new Spinbox({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    value: node.value,
+    min: node.min,
+    max: node.max,
+    digitCount: node.digitCount,
+    decimalDigits: node.decimalDigits,
+    step: node.step,
+    rollover: node.rollover,
+    cursorStyle: node.cursorStyle,
+  });
+}
+
+function buildSpan(node: SceneSpanNode): Span {
+  return new Span({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    spans: node.spans,
+    mode: node.mode,
+    overflow: node.overflow,
+    maxLines: node.maxLines,
+    indent: node.indent,
+    lineSpacing: node.lineSpacing,
+  });
+}
+
+function buildArcLabel(node: SceneArcLabelNode): ArcLabel {
+  return new ArcLabel({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    text: node.text,
+    radius: node.radius,
+    startAngle: node.startAngle,
+    sweepAngle: node.sweepAngle,
+    direction: node.direction,
+    align: node.align,
+    verticalAlign: node.verticalAlign,
+    centerOffsetX: node.centerOffsetX,
+    centerOffsetY: node.centerOffsetY,
   });
 }

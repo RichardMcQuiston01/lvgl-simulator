@@ -208,6 +208,64 @@ omitted, the line sizes itself to its points.
 `checkable`, `checked`. Only URLs are representable; `ImageButtonOptions`'
 decoded drawables and `onLoad` callback are not.
 
+### `textarea`
+
+```json
+{ "type": "textarea", "width": 220, "height": 36, "oneLine": true, "placeholder": "Your name" }
+```
+
+`text`, `placeholder`, `oneLine`, `passwordMode`, `passwordChar`, `maxLength`,
+`acceptedChars`, `blinkMs`, `placeholderStyle`, `selectionStyle`, `cursorStyle`.
+`TextareaOptions.now` is a function and is not part of the schema.
+
+### `keyboard`
+
+```json
+{ "type": "keyboard", "width": 340, "height": 160, "mode": "textLower" }
+```
+
+`mode` (`textLower`, `textUpper`, `special`, `number`), `gap`, `padding`,
+`itemsStyle`, `controlKeyStyle`. `KeyboardOptions.target` is a live widget that a
+scene cannot reference, so a loaded keyboard has no target: set
+`keyboard.target` in code after `loadScreen()`.
+
+### `spinbox`
+
+```json
+{ "type": "spinbox", "width": 120, "height": 36, "min": 0, "value": 12345, "decimalDigits": 2 }
+```
+
+`value` (an integer, see `decimalDigits`), `min`, `max`, `digitCount`,
+`decimalDigits`, `step`, `rollover`, `cursorStyle`.
+
+### `span`
+
+```json
+{
+  "type": "span",
+  "width": 220,
+  "height": 60,
+  "spans": [
+    { "text": "Rich ", "style": { "textColor": "#e53935" } },
+    { "text": "text", "style": { "textFontSize": 22, "textDecor": "underline" } }
+  ]
+}
+```
+
+`spans` (each a `text` and an optional partial `style`), `mode` (`fixed`,
+`break`, `expand`), `overflow` (`clip`, `ellipsis`), `maxLines`, `indent`,
+`lineSpacing`.
+
+### `arclabel`
+
+```json
+{ "type": "arclabel", "width": 150, "height": 150, "text": "CURVED TEXT", "radius": 55 }
+```
+
+`text`, `radius`, `startAngle`, `sweepAngle`, `direction` (`clockwise`,
+`counterClockwise`), `align` (`left`, `center`, `right`), `verticalAlign`
+(`outside`, `inside`), `centerOffsetX`, `centerOffsetY`.
+
 ## Styling
 
 `style` is a `StyleSet` (`src/style/Style.ts`) — a plain, JSON-safe

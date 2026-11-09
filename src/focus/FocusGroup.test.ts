@@ -161,6 +161,28 @@ describe('FocusGroup review fixes', () => {
   );
 });
 
+describe('FocusGroup key modifiers', () => {
+  it('adds only the held modifier flags to the key event', () => {
+    const [a] = makeObjects(1) as [LvObject];
+    const group = new FocusGroup();
+    group.add(a);
+    const keys = vi.fn();
+    a.addEventListener('key', keys);
+
+    group.handleKey('x');
+    group.handleKey('ArrowRight', true);
+    group.handleKey('a', false, { ctrlKey: true });
+    group.handleKey('@', false, { ctrlKey: true, altKey: true });
+
+    expect(keys.mock.calls.map((call) => call[0])).toEqual([
+      { key: 'x', target: a },
+      { key: 'ArrowRight', shiftKey: true, target: a },
+      { key: 'a', ctrlKey: true, target: a },
+      { key: '@', ctrlKey: true, altKey: true, target: a },
+    ]);
+  });
+});
+
 describe('attachKeyboard', () => {
   function fakeTarget(): {
     target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'>;
@@ -202,5 +224,63 @@ describe('attachKeyboard', () => {
 
     keyboard.dispose();
     expect(removed()).toBe(true);
+  });
+});
+
+describe('attachKeyboard shortcut handling', () => {
+  function bridge(editable: boolean): {
+    fire: (event: Partial<KeyboardEvent>) => { preventDefault: ReturnType<typeof vi.fn> };
+    keys: ReturnType<typeof vi.fn>;
+  } {
+    const target = new LvObject({ width: 10, height: 10, editable });
+    const group = new FocusGroup();
+    group.add(target);
+    const keys = vi.fn();
+    target.addEventListener('key', keys);
+    let handler: ((event: Event) => void) | null = null;
+    attachKeyboard(
+      {
+        addEventListener: (_type: string, listener: unknown) => {
+          handler = listener as (event: Event) => void;
+        },
+        removeEventListener: () => {},
+      },
+      group,
+      vi.fn(),
+    );
+    return {
+      keys,
+      fire: (event) => {
+        const preventDefault = vi.fn();
+        handler?.({ preventDefault, ...event } as unknown as Event);
+        return { preventDefault };
+      },
+    };
+  }
+
+  it('lets AltGr characters through so keys like @ can be typed', () => {
+    const { fire, keys } = bridge(false);
+    const { preventDefault } = fire({ key: '@', ctrlKey: true, altKey: true });
+    expect(keys).toHaveBeenCalledTimes(1);
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves Alt-only and Ctrl/Cmd shortcuts to the browser', () => {
+    const { fire, keys } = bridge(true);
+    fire({ key: 'ArrowLeft', altKey: true });
+    fire({ key: 'c', ctrlKey: true });
+    fire({ key: 'v', metaKey: true });
+    expect(keys).not.toHaveBeenCalled();
+  });
+
+  it('forwards Ctrl/Cmd+A only to an editable object', () => {
+    const editable = bridge(true);
+    editable.fire({ key: 'a', ctrlKey: true });
+    editable.fire({ key: 'A', metaKey: true, shiftKey: true });
+    expect(editable.keys).toHaveBeenCalledTimes(2);
+
+    const plain = bridge(false);
+    plain.fire({ key: 'a', ctrlKey: true });
+    expect(plain.keys).not.toHaveBeenCalled();
   });
 });

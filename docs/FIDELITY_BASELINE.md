@@ -65,6 +65,12 @@ diffs" means in practice.
   against its own baseline, `e2e/w1-widgets.spec.ts-snapshots/`. The Stage 2
   baseline is unchanged.
 
+- Widget expansion W2: a third fixture, `e2e/fixtures/w2.ts`, covers `Textarea`
+  (text with a selection and caret, placeholder, password), `Spinbox`, `Span`,
+  `ArcLabel` (clockwise and counterclockwise) and `Keyboard` against its own
+  baseline, `e2e/w2-widgets.spec.ts-snapshots/`. The Stage 2 and W1 baselines are
+  unchanged.
+
 ## Updating the baseline
 
 When a change intentionally alters a Stage 2 widget's default appearance,

@@ -315,6 +315,99 @@ new ImageButton({
 });
 ```
 
+### `Textarea`
+
+An editable text box (`lv_textarea`) with a caret, selection, word wrapping or a
+single scrolling line (`oneLine`), a `placeholder`, and `passwordMode`
+(`passwordChar` masks each character). It receives keys from a focus group, so
+add it to `simulator.focusGroup` and click it (or Tab to it) before typing; it
+also handles Shift+arrows and Ctrl/Cmd+A for selection, Up/Down in multi-line
+mode, and pointer press and drag to place the caret and select. The caret only
+shows while it has focus. `maxLength` and `acceptedChars` limit what can be
+entered.
+
+Events: `valueChanged` when the text changes, `ready` on Enter in one-line
+mode, `cancel` on Escape. `setText()`, `insertText()`, `deleteBackward()` and
+`moveCaret()` edit it from code. `placeholderStyle`, `selectionStyle` and
+`cursorStyle` are the LVGL parts of the same names. Input arrives key by key,
+so IME composition and paste are not handled.
+
+```ts
+const name = new Textarea({ width: 220, height: 36, oneLine: true, placeholder: 'Your name' });
+simulator.focusGroup.add(name);
+name.addEventListener('ready', () => console.log(name.text));
+```
+
+### `Keyboard`
+
+An on-screen keyboard (`lv_keyboard`) with `textLower`, `textUpper`, `special`
+and `number` layouts (the `ABC`, `abc` and `1#` keys switch between them). Set
+`target` to a `Textarea` and keys type into it; backspace, the arrows and Enter
+act on it too. The check key fires `ready` and the hide key fires `cancel` on
+the keyboard, and every key fires `valueChanged` with the key's label in
+`lastKey`. `gap` and `padding` space the keys; `itemsStyle` (with
+`states.pressed`) and `controlKeyStyle` restyle them. A keyboard loaded from a
+JSON scene has no target, so set `keyboard.target` in code afterwards.
+
+```ts
+const keyboard = new Keyboard({ width: 340, height: 160, target: name });
+keyboard.addEventListener('ready', () => (keyboard.hidden = true));
+```
+
+### `Spinbox`
+
+A number you step with the keys (`lv_spinbox`). The value is an **integer** with
+a fixed count of `decimalDigits`, so there is no floating-point error: 12345
+with two decimals shows as `123.45` (`decimalValue` gives the real number).
+One digit is selected: Up/Down change the value by that digit's place (`step`),
+Left/Right move the selection, and pressing a digit selects it. `min`, `max`
+(limited to what `digitCount` digits can show) and `rollover` bound it. A sign
+shows when the range includes negatives. `valueChanged` fires on a change and
+`ready` on Enter.
+
+```ts
+const price = new Spinbox({ width: 120, height: 36, min: 0, value: 12345, decimalDigits: 2 });
+```
+
+### `Span`
+
+Rich text (`lv_spangroup`): `spans` are runs that each override the group's text
+color, size, family and `textDecor` (`'underline'` or `'strikethrough'`). Runs
+wrap together and share a baseline, so mixed sizes line up. `mode` is `'break'`
+(fixed width, height grows to the wrapped text, the default), `'fixed'` (keeps
+its size and clips) or `'expand'` (one line, width grows). `maxLines` with
+`overflow: 'ellipsis'` ends the last line in an ellipsis, `indent` indents the
+first line, `lineSpacing` adds to every line, and the group's `textAlign`
+aligns each line. A line can break between two spans even with no whitespace
+between them. In `'break'` and `'expand'` mode the object resizes itself when
+painted, so siblings in a flex or grid parent pick up the new size on the next
+repaint.
+
+```ts
+new Span({
+  width: 220,
+  height: 60,
+  spans: [
+    { text: 'Rich ', style: { textColor: '#e53935' } },
+    { text: 'text', style: { textFontSize: 22, textDecor: 'underline' } },
+  ],
+});
+```
+
+### `ArcLabel`
+
+Text set along an arc (`lv_arclabel`, LVGL 9.3+). Each glyph is rotated to
+stand on a circle of `radius`, running `direction` (`'clockwise'` or
+`'counterClockwise'`) from `startAngle` for up to `sweepAngle` degrees, placed
+by `align` within that sweep. `verticalAlign` puts the glyphs outside or inside
+the circle, and `centerOffsetX`/`centerOffsetY` shift it. Text longer than the
+sweep is cut off at its end. Glyph widths are measured one character at a time,
+so kerning between glyphs is not applied.
+
+```ts
+new ArcLabel({ width: 150, height: 150, text: 'CURVED TEXT', radius: 55 });
+```
+
 ## Styling & state
 
 Every widget's paint properties are a **`StyleSet`** (`src/style/Style.ts`)

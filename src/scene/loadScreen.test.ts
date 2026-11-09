@@ -1,17 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { Arc } from '../widgets/Arc.js';
+import { ArcLabel } from '../widgets/ArcLabel.js';
 import { Bar } from '../widgets/Bar.js';
 import { Button } from '../widgets/Button.js';
 import { Checkbox } from '../widgets/Checkbox.js';
 import { Container } from '../widgets/Container.js';
 import { ImageButton } from '../widgets/ImageButton.js';
 import { ImageWidget } from '../widgets/ImageWidget.js';
+import { Keyboard } from '../widgets/Keyboard.js';
 import { Led } from '../widgets/Led.js';
 import { Line } from '../widgets/Line.js';
 import { Label } from '../widgets/Label.js';
 import { Scale } from '../widgets/Scale.js';
 import { Slider } from '../widgets/Slider.js';
+import { Span } from '../widgets/Span.js';
+import { Spinbox } from '../widgets/Spinbox.js';
 import { Spinner } from '../widgets/Spinner.js';
+import { Textarea } from '../widgets/Textarea.js';
 import { Switch } from '../widgets/Switch.js';
 import { createFakeCanvasContext } from '../testing/fakeCanvasContext.js';
 import { loadScreen } from './loadScreen.js';
@@ -321,6 +326,143 @@ describe('loadScreen W1 widgets', () => {
         },
         { type: 'scale', width: 200, height: 40 },
         { type: 'imagebutton', width: 80, height: 30 },
+      ],
+    };
+    expect(() => loadScreen(scene).render(createFakeCanvasContext())).not.toThrow();
+  });
+});
+
+describe('loadScreen W2 widgets', () => {
+  function loadOne(node: SceneNode): unknown {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 400,
+      height: 400,
+      children: [node],
+    };
+    return loadScreen(scene).children[0];
+  }
+
+  it('builds a Textarea with its text and editing options', () => {
+    const textarea = loadOne({
+      type: 'textarea',
+      width: 200,
+      height: 40,
+      text: 'hi',
+      placeholder: 'Name',
+      oneLine: true,
+      passwordMode: true,
+      maxLength: 8,
+      acceptedChars: 'abc',
+    });
+    expect(textarea).toBeInstanceOf(Textarea);
+    expect(textarea).toMatchObject({
+      text: 'hi',
+      placeholder: 'Name',
+      oneLine: true,
+      passwordMode: true,
+    });
+  });
+
+  it('builds a Keyboard with no target, and one that can be given a target afterwards', () => {
+    const keyboard = loadOne({
+      type: 'keyboard',
+      width: 320,
+      height: 160,
+      mode: 'number',
+      gap: 2,
+    });
+    expect(keyboard).toBeInstanceOf(Keyboard);
+    expect(keyboard).toMatchObject({ mode: 'number', gap: 2, target: undefined });
+  });
+
+  it('builds a Spinbox', () => {
+    const spinbox = loadOne({
+      type: 'spinbox',
+      width: 120,
+      height: 40,
+      value: 250,
+      min: 0,
+      max: 500,
+      digitCount: 4,
+      decimalDigits: 1,
+      step: 10,
+      rollover: true,
+    });
+    expect(spinbox).toBeInstanceOf(Spinbox);
+    expect(spinbox).toMatchObject({
+      value: 250,
+      max: 500,
+      digitCount: 4,
+      step: 10,
+      rollover: true,
+    });
+    expect((spinbox as Spinbox).text).toBe('025.0');
+  });
+
+  it('builds a Span with its runs', () => {
+    const span = loadOne({
+      type: 'span',
+      width: 200,
+      height: 40,
+      spans: [
+        { text: 'a', style: { textColor: '#ff0000', textDecor: 'underline' } },
+        { text: 'b' },
+      ],
+      mode: 'fixed',
+      overflow: 'ellipsis',
+      maxLines: 2,
+    });
+    expect(span).toBeInstanceOf(Span);
+    expect(span).toMatchObject({ mode: 'fixed', overflow: 'ellipsis', maxLines: 2 });
+    expect((span as Span).spans).toHaveLength(2);
+    expect((span as Span).text).toBe('ab');
+  });
+
+  it('builds an ArcLabel', () => {
+    const arcLabel = loadOne({
+      type: 'arclabel',
+      width: 200,
+      height: 200,
+      text: 'Hello',
+      radius: 80,
+      startAngle: 200,
+      sweepAngle: 140,
+      direction: 'counterClockwise',
+      align: 'left',
+      verticalAlign: 'inside',
+    });
+    expect(arcLabel).toBeInstanceOf(ArcLabel);
+    expect(arcLabel).toMatchObject({
+      text: 'Hello',
+      radius: 80,
+      startAngle: 200,
+      direction: 'counterClockwise',
+      verticalAlign: 'inside',
+    });
+  });
+
+  it('names the new types in the unknown-type error', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 10,
+      height: 10,
+      children: [{ type: 'nope', width: 1, height: 1 } as unknown as SceneNode],
+    };
+    expect(() => loadScreen(scene)).toThrow(/textarea, keyboard, spinbox, span, arclabel/);
+  });
+
+  it('renders every W2 widget without throwing', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 400,
+      height: 400,
+      children: [
+        { type: 'textarea', width: 200, height: 40, text: 'hello' },
+        { type: 'keyboard', width: 320, height: 120 },
+        { type: 'spinbox', width: 120, height: 40 },
+        { type: 'span', width: 200, height: 40, spans: [{ text: 'rich text' }] },
+        { type: 'arclabel', width: 200, height: 200, text: 'curved' },
       ],
     };
     expect(() => loadScreen(scene).render(createFakeCanvasContext())).not.toThrow();

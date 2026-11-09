@@ -20,7 +20,7 @@ export type { ColorFormat, DisplayDriver, DisplayDriverOptions } from './display
 export { defaultTheme } from './theme/defaultTheme.js';
 
 export { mergeStyle, paddingAll, resolveStyle } from './style/Style.js';
-export type { LvState, Style, StyleSet } from './style/Style.js';
+export type { LvState, Style, StyleSet, TextDecoration } from './style/Style.js';
 export { mixColors, withOpacity } from './style/color.js';
 
 export type {
@@ -53,10 +53,32 @@ export { cubicBezier, easings } from './animation/easing.js';
 export type { EasingFunction, EasingName } from './animation/easing.js';
 
 export { attachKeyboard, FocusGroup } from './focus/FocusGroup.js';
-export type { FocusGroupMode, FocusGroupOptions, KeyboardController } from './focus/FocusGroup.js';
+export type {
+  FocusGroupMode,
+  FocusGroupOptions,
+  KeyModifiers,
+  KeyboardController,
+} from './focus/FocusGroup.js';
 
 export { createTextMeasurer, fontString, textMeasurer } from './text/measureText.js';
 export type { TextMeasurer } from './text/measureText.js';
+export {
+  caretPosition,
+  lineIndexAt,
+  moveOffsetVertically,
+  offsetAtPoint,
+  offsetAtX,
+  wrapLines,
+} from './text/layout.js';
+export type { MeasureText, TextLine } from './text/layout.js';
+export { layoutSpans, truncateLineWithEllipsis } from './text/spanLayout.js';
+export type {
+  MeasureSpanText,
+  SpanFragment,
+  SpanInput,
+  SpanLayoutOptions,
+  SpanLine,
+} from './text/spanLayout.js';
 export { TextEditState } from './text/TextEditState.js';
 export type { TextEditStateOptions } from './text/TextEditState.js';
 
@@ -75,6 +97,7 @@ export { loadScreen } from './scene/loadScreen.js';
 export { SCENE_SCHEMA_VERSION } from './scene/SceneSchema.js';
 export type {
   Scene,
+  SceneArcLabelNode,
   SceneArcNode,
   SceneBarNode,
   SceneButtonNode,
@@ -82,6 +105,7 @@ export type {
   SceneContainerNode,
   SceneImageButtonNode,
   SceneImageNode,
+  SceneKeyboardNode,
   SceneLabelNode,
   SceneLedNode,
   SceneLineNode,
@@ -90,7 +114,11 @@ export type {
   SceneScaleNode,
   SceneScaleSection,
   SceneSliderNode,
+  SceneSpanNode,
+  SceneSpanRun,
+  SceneSpinboxNode,
   SceneSpinnerNode,
+  SceneTextareaNode,
   SceneSwitchNode,
   SceneWidgetType,
 } from './scene/SceneSchema.js';
@@ -142,6 +170,34 @@ export type {
   ImageButtonSource,
   ImageButtonState,
 } from './widgets/ImageButton.js';
+export { Textarea } from './widgets/Textarea.js';
+export type { TextareaOptions } from './widgets/Textarea.js';
+export { Keyboard } from './widgets/Keyboard.js';
+export type { KeyboardOptions } from './widgets/Keyboard.js';
+export {
+  KEYBOARD_LAYOUTS,
+  isControlKey,
+  keyAction,
+  keyAtPoint,
+  layoutKeys,
+} from './widgets/keyboardLayout.js';
+export type { KeyAction, KeyDefinition, KeyRect, KeyboardMode } from './widgets/keyboardLayout.js';
+export { Spinbox } from './widgets/Spinbox.js';
+export type { SpinboxOptions } from './widgets/Spinbox.js';
+export {
+  formatSpinbox,
+  maxMagnitude,
+  nextStep,
+  previousStep,
+  stepDigitIndex,
+  stepValue,
+} from './widgets/spinboxMath.js';
+export { Span } from './widgets/Span.js';
+export type { SpanDefinition, SpanMode, SpanOptions, SpanOverflow } from './widgets/Span.js';
+export { ArcLabel } from './widgets/ArcLabel.js';
+export type { ArcLabelOptions, ArcLabelVerticalAlign } from './widgets/ArcLabel.js';
+export { layoutArcLabel } from './widgets/arcLabelMath.js';
+export type { ArcLabelAlign, ArcLabelDirection, GlyphPlacement } from './widgets/arcLabelMath.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

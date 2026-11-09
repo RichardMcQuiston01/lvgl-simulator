@@ -11,6 +11,11 @@ export type LvGestureDirection = 'left' | 'right' | 'top' | 'bottom';
 /** Payload of a `key` event, mirroring `lv_event_get_key`. Uses DOM `KeyboardEvent.key` names. */
 export interface LvKeyEvent extends LvEvent {
   readonly key: string;
+  /** Present (and `true`) only when the modifier was held, so plain keys keep the minimal `{ key }` shape. */
+  readonly shiftKey?: boolean;
+  readonly ctrlKey?: boolean;
+  readonly metaKey?: boolean;
+  readonly altKey?: boolean;
 }
 
 /** Payload of a `gesture` event, mirroring `lv_indev_get_gesture_dir`. */
@@ -30,7 +35,9 @@ export interface LvGestureEvent extends LvEvent {
  * `longPressedRepeat` (every repeat interval after that); `scrollBegin`/
  * `scroll`/`scrollEnd` around a scroll gesture; `gesture` for a swipe;
  * `key` for keyboard/encoder input on a focused object; and `focused`/
- * `defocused` as a {@link FocusGroup} moves focus.
+ * `defocused` as a {@link FocusGroup} moves focus; and `ready`/`cancel` for
+ * a text entry being confirmed (Enter in a one-line `Textarea`, a keyboard's
+ * OK key) or dismissed.
  */
 export interface LvEventMap {
   pressed: LvEvent;
@@ -47,6 +54,8 @@ export interface LvEventMap {
   key: LvKeyEvent;
   focused: LvEvent;
   defocused: LvEvent;
+  ready: LvEvent;
+  cancel: LvEvent;
 }
 
 /** The extra payload fields (beyond `target`) that `type` carries; `[]` when it has none. */

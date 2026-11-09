@@ -10,6 +10,9 @@ export type LvState = 'checked' | 'focused' | 'pressed' | 'disabled';
 /** Horizontal text alignment, mirroring `lv_text_align_t`. `'auto'` behaves as `'left'`. */
 export type TextAlign = 'auto' | 'left' | 'center' | 'right';
 
+/** Text decoration, mirroring `lv_text_decor_t`. */
+export type TextDecoration = 'none' | 'underline' | 'strikethrough';
+
 /** Background gradient direction, mirroring `lv_grad_dir_t`. */
 export type GradientDirection = 'none' | 'ver' | 'hor';
 
@@ -25,7 +28,7 @@ export type GradientDirection = 'none' | 'ver' | 'hor';
  * `style_text_font` (LVGL bundles family+size into one font pointer; we
  * keep them separate since Canvas needs both), `opa` ↔ `style_opa`.
  *
- * Also mirrored 1:1 from LVGL: `borderOpa`, `textAlign`, `bgGradColor`/
+ * Also mirrored 1:1 from LVGL: `borderOpa`, `textAlign`, `textDecor`, `bgGradColor`/
  * `bgGradDir`, `shadow*` (`width`, `offsetX`, `offsetY`, `spread`, `color`,
  * `opa`), `outline*` (`width`, `color`, `opa`, `pad`), `line*`/`arc*`
  * (`width`, `color`, `opa`, `rounded`; read by the `Line`/`Arc` widgets),
@@ -52,6 +55,7 @@ export interface Style {
   readonly opa?: number;
   readonly borderOpa?: number;
   readonly textAlign?: TextAlign;
+  readonly textDecor?: TextDecoration;
   readonly bgGradColor?: string;
   readonly bgGradDir?: GradientDirection;
   readonly shadowWidth?: number;

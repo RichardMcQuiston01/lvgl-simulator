@@ -1,9 +1,13 @@
 import type { ContainerLayout } from '../widgets/Container.js';
 import type { Style, StyleSet } from '../style/Style.js';
+import type { ArcLabelAlign, ArcLabelDirection } from '../widgets/arcLabelMath.js';
+import type { ArcLabelVerticalAlign } from '../widgets/ArcLabel.js';
 import type { ArcMode } from '../widgets/arcMath.js';
 import type { BarMode, BarOrientation } from '../widgets/Bar.js';
 import type { LinePoint } from '../widgets/Line.js';
 import type { ImageButtonState } from '../widgets/ImageButton.js';
+import type { KeyboardMode } from '../widgets/keyboardLayout.js';
+import type { SpanMode, SpanOverflow } from '../widgets/Span.js';
 import type { ScaleMode } from '../widgets/scaleMath.js';
 
 /**
@@ -31,7 +35,12 @@ export type SceneWidgetType =
   | 'led'
   | 'line'
   | 'scale'
-  | 'imagebutton';
+  | 'imagebutton'
+  | 'textarea'
+  | 'keyboard'
+  | 'spinbox'
+  | 'span'
+  | 'arclabel';
 
 /**
  * Fields every scene node shares, mirroring {@link LvObjectOptions}
@@ -217,6 +226,83 @@ export interface SceneImageButtonNode extends SceneNodeBase {
   readonly checked?: boolean;
 }
 
+/**
+ * A `Textarea` (see `src/widgets/Textarea.ts`). `TextareaOptions.now` is a
+ * function, which cannot be serialized, so it has no place in the schema.
+ */
+export interface SceneTextareaNode extends SceneNodeBase {
+  readonly type: 'textarea';
+  readonly text?: string;
+  readonly placeholder?: string;
+  readonly oneLine?: boolean;
+  readonly passwordMode?: boolean;
+  readonly passwordChar?: string;
+  readonly maxLength?: number;
+  readonly acceptedChars?: string;
+  readonly blinkMs?: number;
+  readonly placeholderStyle?: StyleSet;
+  readonly selectionStyle?: StyleSet;
+  readonly cursorStyle?: StyleSet;
+}
+
+/**
+ * A `Keyboard` (see `src/widgets/Keyboard.ts`). `KeyboardOptions.target` is a
+ * live widget, which a scene cannot reference, so a loaded keyboard has no
+ * target: set `keyboard.target` in code after `loadScreen()`.
+ */
+export interface SceneKeyboardNode extends SceneNodeBase {
+  readonly type: 'keyboard';
+  readonly mode?: KeyboardMode;
+  readonly gap?: number;
+  readonly padding?: number;
+  readonly itemsStyle?: StyleSet;
+  readonly controlKeyStyle?: StyleSet;
+}
+
+/** A `Spinbox` (see `src/widgets/Spinbox.ts`). */
+export interface SceneSpinboxNode extends SceneNodeBase {
+  readonly type: 'spinbox';
+  readonly value?: number;
+  readonly min?: number;
+  readonly max?: number;
+  readonly digitCount?: number;
+  readonly decimalDigits?: number;
+  readonly step?: number;
+  readonly rollover?: boolean;
+  readonly cursorStyle?: StyleSet;
+}
+
+/** One run of a `span` node: its text and a partial style (`textColor`, `textFontSize`, `textFontFamily`, `textDecor`). */
+export interface SceneSpanRun {
+  readonly text: string;
+  readonly style?: Partial<Style>;
+}
+
+/** A `Span` (see `src/widgets/Span.ts`). */
+export interface SceneSpanNode extends SceneNodeBase {
+  readonly type: 'span';
+  readonly spans?: readonly SceneSpanRun[];
+  readonly mode?: SpanMode;
+  readonly overflow?: SpanOverflow;
+  readonly maxLines?: number;
+  readonly indent?: number;
+  readonly lineSpacing?: number;
+}
+
+/** An `ArcLabel` (see `src/widgets/ArcLabel.ts`). */
+export interface SceneArcLabelNode extends SceneNodeBase {
+  readonly type: 'arclabel';
+  readonly text?: string;
+  readonly radius?: number;
+  readonly startAngle?: number;
+  readonly sweepAngle?: number;
+  readonly direction?: ArcLabelDirection;
+  readonly align?: ArcLabelAlign;
+  readonly verticalAlign?: ArcLabelVerticalAlign;
+  readonly centerOffsetX?: number;
+  readonly centerOffsetY?: number;
+}
+
 export type SceneNode =
   | SceneContainerNode
   | SceneLabelNode
@@ -231,7 +317,12 @@ export type SceneNode =
   | SceneLedNode
   | SceneLineNode
   | SceneScaleNode
-  | SceneImageButtonNode;
+  | SceneImageButtonNode
+  | SceneTextareaNode
+  | SceneKeyboardNode
+  | SceneSpinboxNode
+  | SceneSpanNode
+  | SceneArcLabelNode;
 
 /**
  * A full screen: the root is always a container (matching `createSimulator`'s
