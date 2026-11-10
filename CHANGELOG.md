@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 - 2026-11-10
+
 - Widget expansion W2: new `Textarea`, `Keyboard`, `Spinbox`, `Span` and `ArcLabel` widgets, each with a JSON scene node type (additive; schema version unchanged), docs, unit tests and a new visual regression fixture (`e2e/w2-widgets.spec.ts`) and a real-browser input test (`e2e/w2-input.spec.ts`: click-to-focus, typing, selection, and the on-screen keyboard).
   - `key` events now carry `shiftKey`/`ctrlKey`/`metaKey`/`altKey` (only when held), and new `ready`/`cancel` events exist.
   - The keyboard bridge now lets AltGr characters (such as `@`) through and forwards Ctrl/Cmd+A to editable objects; other Alt and Ctrl/Cmd shortcuts still go to the browser.
