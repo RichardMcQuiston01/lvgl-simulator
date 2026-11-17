@@ -2,7 +2,10 @@ import { Arc } from '../widgets/Arc.js';
 import { ArcLabel } from '../widgets/ArcLabel.js';
 import { Bar } from '../widgets/Bar.js';
 import { Button } from '../widgets/Button.js';
+import { ButtonMatrix } from '../widgets/ButtonMatrix.js';
 import { Checkbox } from '../widgets/Checkbox.js';
+import { CheckboxGroup } from '../widgets/CheckboxGroup.js';
+import { Dropdown } from '../widgets/Dropdown.js';
 import { Container } from '../widgets/Container.js';
 import { ImageButton } from '../widgets/ImageButton.js';
 import { ImageWidget } from '../widgets/ImageWidget.js';
@@ -10,6 +13,8 @@ import { Keyboard } from '../widgets/Keyboard.js';
 import { Led } from '../widgets/Led.js';
 import { Line } from '../widgets/Line.js';
 import { Label } from '../widgets/Label.js';
+import { List } from '../widgets/List.js';
+import { Roller } from '../widgets/Roller.js';
 import type { LvObject } from '../core/LvObject.js';
 import { Scale } from '../widgets/Scale.js';
 import { Slider } from '../widgets/Slider.js';
@@ -23,17 +28,21 @@ import {
   type SceneArcLabelNode,
   type SceneArcNode,
   type SceneBarNode,
+  type SceneButtonMatrixNode,
   type SceneButtonNode,
   type SceneCheckboxNode,
   type SceneContainerNode,
+  type SceneDropdownNode,
   type SceneImageButtonNode,
   type SceneImageNode,
   type SceneKeyboardNode,
   type SceneLabelNode,
   type SceneLedNode,
   type SceneLineNode,
+  type SceneListNode,
   type SceneNode,
   type SceneNodeBase,
+  type SceneRollerNode,
   type SceneScaleNode,
   type SceneSliderNode,
   type SceneSpanNode,
@@ -54,6 +63,7 @@ import { Switch } from '../widgets/Switch.js';
  * compile time).
  */
 export function loadScreen(scene: Scene): Container {
+  const context: BuildContext = { radioGroups: new Map() };
   if (scene.version !== SCENE_SCHEMA_VERSION) {
     throw new Error(
       `Unsupported scene schema version ${JSON.stringify(scene.version)} — this build of ` +
@@ -61,28 +71,37 @@ export function loadScreen(scene: Scene): Container {
     );
   }
 
-  return buildContainer({
-    type: 'container',
-    width: scene.width,
-    height: scene.height,
-    style: scene.style,
-    layout: scene.layout,
-    padding: scene.padding,
-    children: scene.children,
-  });
+  return buildContainer(
+    {
+      type: 'container',
+      width: scene.width,
+      height: scene.height,
+      style: scene.style,
+      layout: scene.layout,
+      padding: scene.padding,
+      children: scene.children,
+    },
+    context,
+  );
+}
+
+/** State shared by every node built in one {@link loadScreen} call. */
+interface BuildContext {
+  /** Radio groups by name, so checkboxes naming the same group end up in one `CheckboxGroup`. */
+  readonly radioGroups: Map<string, CheckboxGroup>;
 }
 
 /** Builds the widget a scene node describes by dispatching on its `type`; throws on an unknown type. */
-function buildNode(node: SceneNode): LvObject {
+function buildNode(node: SceneNode, context: BuildContext): LvObject {
   switch (node.type) {
     case 'container':
-      return buildContainer(node);
+      return buildContainer(node, context);
     case 'label':
       return buildLabel(node);
     case 'button':
       return buildButton(node);
     case 'checkbox':
-      return buildCheckbox(node);
+      return buildCheckbox(node, context);
     case 'switch':
       return buildSwitch(node);
     case 'slider':
@@ -113,20 +132,28 @@ function buildNode(node: SceneNode): LvObject {
       return buildSpan(node);
     case 'arclabel':
       return buildArcLabel(node);
+    case 'dropdown':
+      return buildDropdown(node);
+    case 'roller':
+      return buildRoller(node);
+    case 'buttonmatrix':
+      return buildButtonMatrix(node);
+    case 'list':
+      return buildList(node);
     default: {
       // Exhaustive in TypeScript; a real runtime guard for untyped JSON.
       const unknownType = (node as { readonly type?: unknown }).type;
       throw new Error(
         `Unknown scene node type ${JSON.stringify(unknownType)}. Supported types: ` +
           `container, label, button, checkbox, switch, slider, image, bar, arc, spinner, led, line, scale, ` +
-          `imagebutton, textarea, keyboard, spinbox, span, arclabel.`,
+          `imagebutton, textarea, keyboard, spinbox, span, arclabel, dropdown, roller, buttonmatrix, list.`,
       );
     }
   }
 }
 
 /** Builds a `Container` and, recursively, all of its `children`. */
-function buildContainer(node: SceneContainerNode): Container {
+function buildContainer(node: SceneContainerNode, context: BuildContext): Container {
   const container = new Container({
     x: node.x,
     y: node.y,
@@ -146,7 +173,7 @@ function buildContainer(node: SceneContainerNode): Container {
   });
 
   for (const child of node.children ?? []) {
-    container.addChild(buildNode(child));
+    container.addChild(buildNode(child, context));
   }
 
   return container;
@@ -195,8 +222,14 @@ function buildButton(node: SceneButtonNode): Button {
   });
 }
 
-function buildCheckbox(node: SceneCheckboxNode): Checkbox {
+function buildCheckbox(node: SceneCheckboxNode, context: BuildContext): Checkbox {
+  let group: CheckboxGroup | undefined;
+  if (node.radioGroup !== undefined) {
+    group = context.radioGroups.get(node.radioGroup) ?? new CheckboxGroup();
+    context.radioGroups.set(node.radioGroup, group);
+  }
   return new Checkbox({
+    group,
     x: node.x,
     y: node.y,
     width: node.width,
@@ -480,4 +513,66 @@ function buildArcLabel(node: SceneArcLabelNode): ArcLabel {
     centerOffsetX: node.centerOffsetX,
     centerOffsetY: node.centerOffsetY,
   });
+}
+
+function buildDropdown(node: SceneDropdownNode): Dropdown {
+  return new Dropdown({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    options: node.options,
+    selected: node.selected,
+    direction: node.direction,
+    text: node.text,
+    symbol: node.symbol,
+    itemHeight: node.itemHeight,
+    maxListHeight: node.maxListHeight,
+    selectedHighlight: node.selectedHighlight,
+    itemsStyle: node.itemsStyle,
+  });
+}
+
+function buildRoller(node: SceneRollerNode): Roller {
+  return new Roller({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    options: node.options,
+    selected: node.selected,
+    visibleRows: node.visibleRows,
+    infinite: node.infinite,
+    selectedStyle: node.selectedStyle,
+  });
+}
+
+function buildButtonMatrix(node: SceneButtonMatrixNode): ButtonMatrix {
+  return new ButtonMatrix({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    map: node.map,
+    // JSON has no `undefined`, so a `null` entry stands for "no flags for this button".
+    controls: node.controls?.map((control) => control ?? undefined),
+    oneChecked: node.oneChecked,
+    gap: node.gap,
+    padding: node.padding,
+    itemsStyle: node.itemsStyle,
+  });
+}
+
+function buildList(node: SceneListNode): List {
+  const list = new List({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    itemHeight: node.itemHeight,
+  });
+  for (const item of node.items ?? []) {
+    if (item.kind === 'text') {
+      list.addText(item.text);
+    } else {
+      list.addButton(item.text, item.icon);
+    }
+  }
+  return list;
 }
