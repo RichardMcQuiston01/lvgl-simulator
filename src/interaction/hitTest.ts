@@ -12,6 +12,34 @@ import { inverseTransformPoint, resolveTransform } from '../rendering/transform.
  * themselves (their children are still tested), matching LVGL's input search.
  */
 export function hitTest(root: LvObject, x: number, y: number): LvObject | null {
+  // Top-layer objects paint above everything, so they are tested first, last-painted first.
+  const topLayer = collectTopLayer(root, []);
+  for (let i = topLayer.length - 1; i >= 0; i -= 1) {
+    const candidate = topLayer[i];
+    const hit = candidate ? hitTestNode(candidate, x, y) : null;
+    if (hit) {
+      return hit;
+    }
+  }
+  return hitTestNode(root, x, y);
+}
+
+/** Every visible top-layer object under `root`, in paint order. */
+function collectTopLayer(root: LvObject, found: LvObject[]): LvObject[] {
+  if (root.hidden) {
+    return found;
+  }
+  for (const child of root.children) {
+    if (child.topLayer && !child.hidden) {
+      found.push(child);
+    }
+    collectTopLayer(child, found);
+  }
+  return found;
+}
+
+/** Hit-tests `root`'s subtree, skipping top-layer children (see {@link hitTest}). */
+function hitTestNode(root: LvObject, x: number, y: number): LvObject | null {
   if (root.hidden) {
     return null;
   }
@@ -32,7 +60,10 @@ export function hitTest(root: LvObject, x: number, y: number): LvObject | null {
     if (!child) {
       continue;
     }
-    const hit = hitTest(child, x, y);
+    if (child.topLayer) {
+      continue;
+    }
+    const hit = hitTestNode(child, x, y);
     if (hit) {
       return hit;
     }

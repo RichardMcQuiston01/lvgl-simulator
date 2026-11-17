@@ -44,6 +44,12 @@ export interface LvObjectOptions {
   readonly floating?: boolean;
   /** Excludes this object from its parent's flex/grid layout. Mirrors `LV_OBJ_FLAG_IGNORE_LAYOUT`. */
   readonly ignoreLayout?: boolean;
+  /**
+   * Paints this object (and its subtree) after the rest of the tree, above everything, and
+   * hit-tests it before everything else. For popups such as an open dropdown list, which must
+   * not be covered by later siblings. Mirrors LVGL's top layer (`lv_layer_top`). Default `false`.
+   */
+  readonly topLayer?: boolean;
   /** Whether a focus group's Enter key puts this object into edit mode (encoder-style). Mirrors `lv_obj_class` `editable`. */
   readonly editable?: boolean;
   /** Axes this object scrolls on (default `'all'`). Mirrors `lv_obj_set_scroll_dir`. */
@@ -55,6 +61,9 @@ export interface LvObjectOptions {
   /** Vertical snap alignment when a scroll settles. Mirrors `lv_obj_set_scroll_snap_y`. */
   readonly scrollSnapY?: ScrollSnap;
 }
+
+/** Top-layer objects found during the current frame's tree walk, or `null` outside a frame. */
+let topLayerQueue: LvObject[] | null = null;
 
 /**
  * A node in the simulator's object tree, mirroring LVGL's `lv_obj_t`
@@ -83,6 +92,7 @@ export class LvObject {
   floating: boolean;
   ignoreLayout: boolean;
   editable: boolean;
+  topLayer: boolean;
   scrollDirection: ScrollDirection;
   scrollbarMode: ScrollbarMode;
   scrollSnapX: ScrollSnap;
@@ -119,6 +129,7 @@ export class LvObject {
     this.floating = options.floating ?? false;
     this.ignoreLayout = options.ignoreLayout ?? false;
     this.editable = options.editable ?? false;
+    this.topLayer = options.topLayer ?? false;
     this.scrollDirection = options.scrollDirection ?? 'all';
     this.scrollbarMode = options.scrollbarMode ?? 'auto';
     this.scrollSnapX = options.scrollSnapX ?? 'none';
@@ -315,6 +326,26 @@ export class LvObject {
    * earlier ones, matching LVGL's z-ordering).
    */
   render(context: CanvasRenderingContext2D): void {
+    const outermost = topLayerQueue === null;
+    const queue: LvObject[] = topLayerQueue ?? [];
+    topLayerQueue = queue;
+    try {
+      this.renderTree(context);
+      // Top-layer objects paint last, unclipped by their ancestors; one may queue another.
+      if (outermost) {
+        for (let next = queue.shift(); next; next = queue.shift()) {
+          next.renderTree(context);
+        }
+      }
+    } finally {
+      if (outermost) {
+        topLayerQueue = null;
+      }
+    }
+  }
+
+  /** Paints this object and its subtree, deferring any top-layer descendants to the end of the frame. */
+  private renderTree(context: CanvasRenderingContext2D): void {
     if (this.hidden) {
       return;
     }
@@ -356,7 +387,11 @@ export class LvObject {
       context.clip();
     }
     for (const child of this.childObjects) {
-      child.render(context);
+      if (child.topLayer && topLayerQueue) {
+        topLayerQueue.push(child);
+      } else {
+        child.renderTree(context);
+      }
     }
     if (clips) {
       context.restore();
