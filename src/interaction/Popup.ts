@@ -32,6 +32,7 @@ export function isPopup(value: unknown): value is Popup {
  */
 export function dismissPopups(root: LvObject, pressed: LvObject | null): boolean {
   let dismissed = false;
+  /** Closes `node` if it is an open popup that `pressed` is outside, then checks its descendants. */
   const visit = (node: LvObject): void => {
     if (isPopup(node) && node.popupOpen && !(pressed && node.ownsPopupTarget(pressed))) {
       node.closePopup();

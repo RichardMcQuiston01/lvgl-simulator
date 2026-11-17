@@ -16,6 +16,8 @@ import {
 const DEFAULT_VISIBLE_ROWS = 3;
 /** Pointer travel (px) below which a release counts as a tap rather than a drag. */
 const TAP_LIMIT = 4;
+/** A pointer that has been still this long (ms) before release has no flick left in it. */
+const FLICK_WINDOW_MS = 100;
 /** How far a throw coasts, as a multiple of release velocity in ms. */
 const THROW_MS = 250;
 
@@ -200,8 +202,10 @@ export class Roller extends LvObject implements PointerDraggable {
       return;
     }
     const count = this.choices.length;
+    // Holding still before letting go cancels the flick.
+    const velocity = this.now() - this.lastTime > FLICK_WINDOW_MS ? 0 : this.velocity;
     const target = this.moved
-      ? settleTarget(this.rowPosition, this.velocity, THROW_MS, count, this.infinite)
+      ? settleTarget(this.rowPosition, velocity, THROW_MS, count, this.infinite)
       : constrainPosition(
           Math.round(this.rowPosition + (this.lastY - this.height / 2) / this.rowHeight),
           count,

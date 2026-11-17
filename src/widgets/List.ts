@@ -6,6 +6,8 @@ import { defaultTheme } from '../theme/defaultTheme.js';
 import { Container, type ContainerOptions } from './Container.js';
 
 const DEFAULT_ITEM_HEIGHT = 40;
+/** The list's border width, which its rows are inset by so they do not paint over it. */
+export const LIST_BORDER_WIDTH = 1;
 const TEXT_ITEM_HEIGHT = 28;
 const ITEM_PADDING = 12;
 const ICON_GAP = 10;
@@ -108,7 +110,11 @@ export class List extends Container {
           {
             bgColor: defaultTheme.backgroundColor,
             borderColor: defaultTheme.borderColor,
-            borderWidth: 1,
+            borderWidth: LIST_BORDER_WIDTH,
+            padTop: LIST_BORDER_WIDTH,
+            padRight: LIST_BORDER_WIDTH,
+            padBottom: LIST_BORDER_WIDTH,
+            padLeft: LIST_BORDER_WIDTH,
             radius: defaultTheme.radius,
             clipCorner: true,
           },

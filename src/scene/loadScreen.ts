@@ -222,6 +222,7 @@ function buildButton(node: SceneButtonNode): Button {
   });
 }
 
+/** Builds a `Checkbox`, joining the scene-wide radio group named by `radioGroup`, if any. */
 function buildCheckbox(node: SceneCheckboxNode, context: BuildContext): Checkbox {
   let group: CheckboxGroup | undefined;
   if (node.radioGroup !== undefined) {
@@ -545,6 +546,7 @@ function buildRoller(node: SceneRollerNode): Roller {
   });
 }
 
+/** Builds a `ButtonMatrix`, reading a `null` control entry as a button with no flags. */
 function buildButtonMatrix(node: SceneButtonMatrixNode): ButtonMatrix {
   return new ButtonMatrix({
     ...commonFields(node),
@@ -560,6 +562,7 @@ function buildButtonMatrix(node: SceneButtonMatrixNode): ButtonMatrix {
   });
 }
 
+/** Builds a `List` and adds each described heading or button row to it. */
 function buildList(node: SceneListNode): List {
   const list = new List({
     ...commonFields(node),

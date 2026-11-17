@@ -145,6 +145,21 @@ describe('Roller dragging', () => {
     expect(target.selectedIndex).toBeGreaterThan(2);
   });
 
+  it('does not throw when the pointer rested before release', () => {
+    clock.time = 0;
+    const target = roller();
+    target.dispatchEvent('pressed');
+    target.handlePointerPosition(50, 80);
+    clock.time += 10;
+    target.handlePointerPosition(50, 50);
+    clock.time += 10;
+    target.handlePointerPosition(50, 35);
+    clock.time += 500;
+    target.dispatchEvent('released');
+    // 45px up is 1.5 rows; with no flick it rounds to 2 rather than coasting on.
+    expect(target.selectedIndex).toBe(2);
+  });
+
   it('selects the tapped row when the pointer barely moves', () => {
     const target = roller();
     target.dispatchEvent('pressed');

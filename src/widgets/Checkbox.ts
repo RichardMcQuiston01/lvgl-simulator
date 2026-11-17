@@ -38,6 +38,7 @@ export class Checkbox extends LvObject {
   /** The radio group this checkbox belongs to, if any. Set it with {@link CheckboxGroup.add}. */
   group: CheckboxGroup | undefined;
 
+  /** Creates a checkbox, joining `options.group` if given; clicking toggles it (or, in a group, selects it). */
   constructor(options: CheckboxOptions) {
     super({
       ...options,
@@ -104,6 +105,7 @@ export class Checkbox extends LvObject {
     return true;
   }
 
+  /** The base states plus `checked` while checked. */
   protected override getActiveStates(): ReadonlySet<LvState> {
     const states = new Set(super.getActiveStates());
     if (this.checked) {
@@ -112,6 +114,7 @@ export class Checkbox extends LvObject {
     return states;
   }
 
+  /** Paints the indicator (a box with a checkmark, or a round radio dot in a group) and the label. */
   protected override paintSelf(context: CanvasRenderingContext2D): void {
     const style = this.resolvedStyle;
     const indicator = resolveStyle(this.indicatorStyle, this.getActiveStates());

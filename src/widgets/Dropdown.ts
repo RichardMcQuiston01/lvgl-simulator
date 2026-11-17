@@ -3,7 +3,7 @@ import type { Popup } from '../interaction/Popup.js';
 import { paintBackgroundAndBorder } from '../rendering/box.js';
 import { mergeStyle, type StyleSet } from '../style/Style.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
-import { List, type ListItem } from './List.js';
+import { LIST_BORDER_WIDTH, List, type ListItem } from './List.js';
 
 const FACE_PADDING = 12;
 const DEFAULT_ITEM_HEIGHT = 36;
@@ -71,6 +71,7 @@ class DropdownList extends List {
  * option to choose it; a press anywhere else closes it. With the keyboard,
  * Up/Down change the selection (and move the highlight when open), Enter or
  * Space opens it and then picks the highlighted option, Escape closes it.
+ * (A focus group delivers Enter as a `clicked` event, so that is what it handles.)
  * Fires `valueChanged` when the selection changes.
  */
 export class Dropdown extends LvObject implements Popup {
@@ -132,7 +133,8 @@ export class Dropdown extends LvObject implements Popup {
     this.list.onItemClicked((item) => this.choose(this.list.buttons.indexOf(item)));
     this.setOptions(options.options ?? [], options.selected);
 
-    this.addEventListener('clicked', () => this.toggle());
+    // A click, and Enter (which a focus group delivers as a click), open the list or pick the highlighted option.
+    this.addEventListener('clicked', () => this.activate());
     this.addEventListener('defocused', () => this.close());
     this.addEventListener('key', (event) => this.handleKey(event.key));
   }
@@ -222,6 +224,7 @@ export class Dropdown extends LvObject implements Popup {
     this.close();
   }
 
+  /** Whether `target` is this dropdown or inside its list, so a press on it leaves the list open. */
   ownsPopupTarget(target: LvObject): boolean {
     for (let node: LvObject | null = target; node; node = node.parent) {
       if (node === this) {
@@ -267,20 +270,25 @@ export class Dropdown extends LvObject implements Popup {
       }
       return;
     }
-    if (key === 'Enter' || key === ' ') {
-      if (this.isOpen) {
-        this.choose(this.highlight);
-      } else {
-        this.open();
-      }
+    if (key === ' ') {
+      this.activate();
     } else if (key === 'Escape') {
       this.close();
     }
   }
 
+  /** Opens the list, or, when it is open, picks the highlighted option (which closes it). */
+  private activate(): void {
+    if (this.isOpen) {
+      this.choose(this.highlight);
+    } else {
+      this.open();
+    }
+  }
+
   /** Sizes the list and places it beside the dropdown on `direction`'s side, within the screen. */
   private positionList(): void {
-    const rows = this.choices.length * this.itemHeight;
+    const rows = this.choices.length * this.itemHeight + LIST_BORDER_WIDTH * 2;
     const screen = this.screenBounds();
     const { x, y } = this.getAbsolutePosition();
     const horizontal = this.direction === 'left' || this.direction === 'right';

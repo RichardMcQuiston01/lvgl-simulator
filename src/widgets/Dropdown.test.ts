@@ -88,14 +88,15 @@ describe('Dropdown opening', () => {
     dropdown.open();
     const list = dropdown.listObject;
     expect(list.width).toBe(120);
-    expect(list.height).toBe(4 * 36);
+    // Four rows plus the list's one-pixel border either side.
+    expect(list.height).toBe(4 * 36 + 2);
     expect(list.getAbsolutePosition()).toEqual({ x: 20, y: 86 });
   });
 
   it('opens upward', () => {
     const { dropdown } = setup({ direction: 'up', y: 200 });
     dropdown.open();
-    expect(dropdown.listObject.getAbsolutePosition()).toEqual({ x: 20, y: 200 - 4 * 36 });
+    expect(dropdown.listObject.getAbsolutePosition()).toEqual({ x: 20, y: 200 - (4 * 36 + 2) });
   });
 
   it('limits an upward list to the room above and scrolls the rest', () => {
@@ -214,13 +215,13 @@ describe('Dropdown keys', () => {
     const { dropdown } = setup();
     const listener = vi.fn();
     dropdown.addEventListener('valueChanged', listener);
-    dropdown.dispatchEvent('key', { key: 'Enter' });
+    dropdown.dispatchEvent('clicked');
     expect(dropdown.isOpen).toBe(true);
     dropdown.dispatchEvent('key', { key: 'ArrowDown' });
     dropdown.dispatchEvent('key', { key: 'ArrowDown' });
     expect(dropdown.selectedText).toBe('Apple');
     expect(listener).not.toHaveBeenCalled();
-    dropdown.dispatchEvent('key', { key: 'Enter' });
+    dropdown.dispatchEvent('clicked');
     expect(dropdown.selectedText).toBe('Cherry');
     expect(dropdown.isOpen).toBe(false);
     expect(listener).toHaveBeenCalledTimes(1);

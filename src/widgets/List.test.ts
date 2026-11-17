@@ -16,8 +16,8 @@ describe('List', () => {
   it('stacks rows in a column, each as wide as the list', () => {
     const list = filled();
     list.render(createFakeCanvasContext());
-    expect(list.items.map((item) => item.y)).toEqual([0, 28, 68, 108]);
-    expect(list.items.every((item) => item.width === 200)).toBe(true);
+    expect(list.items.map((item) => item.y)).toEqual([1, 29, 69, 109]);
+    expect(list.items.every((item) => item.width === 198)).toBe(true);
   });
 
   it('tells headings from buttons', () => {
@@ -36,14 +36,14 @@ describe('List', () => {
     const list = filled();
     list.width = 150;
     list.render(createFakeCanvasContext());
-    expect(list.items.every((item) => item.width === 150)).toBe(true);
+    expect(list.items.every((item) => item.width === 148)).toBe(true);
   });
 
   it('scrolls vertically once the rows overflow its height', () => {
     const list = filled();
     list.render(createFakeCanvasContext());
     expect(list.isScrollable).toBe(true);
-    expect(list.getScrollRange().maxY).toBe(108 + 40 - 100);
+    expect(list.getScrollRange().maxY).toBe(109 + 40 + 1 - 100);
     expect(list.scrollBy(0, 30)).toBe(true);
     expect(list.scrollX).toBe(0);
   });
@@ -98,9 +98,10 @@ describe('List', () => {
     const calls = vi.mocked(context.fillText).mock.calls;
     expect(calls.map((call) => call[0])).toEqual(['Files', '+', 'New', 'Open', 'Save']);
     const xOf = (label: string): number => calls.find((call) => call[0] === label)?.[1] ?? NaN;
-    expect(xOf('Files')).toBe(12);
-    expect(xOf('+')).toBe(12);
-    expect(xOf('New')).toBe(12 + 20 + 10);
-    expect(xOf('Open')).toBe(12);
+    // One pixel of border inset, then 12px of row padding; icon rows add the icon column and gap.
+    expect(xOf('Files')).toBe(13);
+    expect(xOf('+')).toBe(13);
+    expect(xOf('New')).toBe(13 + 20 + 10);
+    expect(xOf('Open')).toBe(13);
   });
 });
