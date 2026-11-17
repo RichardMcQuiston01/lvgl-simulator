@@ -173,13 +173,13 @@ version, with a CHANGELOG entry.
 - [x] `Span` — multi-style rich text spans, wrapping modes
 - [x] `ArcLabel` — text along an arc (LVGL 9.3+)
 
-### Phase W3: Selection and list widgets (need W0 scrolling)
+### Phase W3: Selection and list widgets (need W0 scrolling) — done
 
-- [ ] `Dropdown` — popup list, direction, symbol, selected highlight
-- [ ] `Roller` — infinite mode, visible rows, snap/momentum
-- [ ] `ButtonMatrix` — button map, control flags (checkable, hidden, disabled)
-- [ ] `List` — scrollable list of text/buttons
-- [ ] `Checkbox` radio grouping (`checked` exclusivity)
+- [x] `Dropdown` — popup list, direction, symbol, selected highlight (the list is a new `topLayer` object, so it paints above and is clicked before later siblings; a `Popup` hook closes it on an outside press)
+- [x] `Roller` — infinite mode, visible rows, snap/momentum
+- [x] `ButtonMatrix` — button map, control flags (checkable, hidden, disabled)
+- [x] `List` — scrollable list of text/buttons
+- [x] `Checkbox` radio grouping (`checked` exclusivity) — `CheckboxGroup`
 
 ### Phase W4: Container and navigation widgets
 

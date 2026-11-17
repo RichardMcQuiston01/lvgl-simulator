@@ -92,7 +92,10 @@ with a version tag).
 ```
 
 `text`, `checked`, `indicatorStyle` (LVGL's `LV_PART_INDICATOR` — see
-`src/widgets/Checkbox.ts`).
+`src/widgets/Checkbox.ts`), `radioGroup`: a name that makes the checkbox a
+radio button. Checkboxes anywhere in the same scene that share a name are one
+group (checking one unchecks the others); the names are local to one
+`loadScreen()` call.
 
 ### `switch`
 
@@ -265,6 +268,62 @@ scene cannot reference, so a loaded keyboard has no target: set
 `text`, `radius`, `startAngle`, `sweepAngle`, `direction` (`clockwise`,
 `counterClockwise`), `align` (`left`, `center`, `right`), `verticalAlign`
 (`outside`, `inside`), `centerOffsetX`, `centerOffsetY`.
+
+### `dropdown`
+
+```json
+{
+  "type": "dropdown",
+  "width": 160,
+  "height": 36,
+  "options": ["Apple", "Banana", "Cherry"],
+  "selected": 1
+}
+```
+
+`options`, `selected`, `direction` (`down`, `up`, `left`, `right`), `text`
+(shown instead of the selection), `symbol`, `itemHeight`, `maxListHeight`,
+`selectedHighlight`, `itemsStyle`.
+
+### `roller`
+
+```json
+{ "type": "roller", "width": 100, "height": 96, "options": ["Jan", "Feb", "Mar"], "selected": 1 }
+```
+
+`options`, `selected`, `visibleRows`, `infinite`, `selectedStyle`. A scene
+cannot supply an animation engine, so a loaded roller jumps to its resting row;
+create it in code with `animations` to ease the settling.
+
+### `buttonmatrix`
+
+```json
+{
+  "type": "buttonmatrix",
+  "width": 220,
+  "height": 84,
+  "map": ["Home", "Play", "Stop", "\n", "Prev", "Next"],
+  "controls": [{ "checkable": true, "checked": true }, null, { "disabled": true }]
+}
+```
+
+`map` (a `"\n"` entry starts a new row), `controls` (one entry per button, in
+order: `width` 1–15, `hidden`, `disabled`, `checkable`, `checked`; `null` for a
+button with no flags), `oneChecked`, `gap`, `padding`, `itemsStyle`.
+
+### `list`
+
+```json
+{
+  "type": "list",
+  "width": 220,
+  "height": 110,
+  "items": [{ "kind": "text", "text": "Files" }, { "text": "New", "icon": "+" }, { "text": "Open" }]
+}
+```
+
+`items` (each a `text`, an optional `icon`, and a `kind` of `button`, the
+default, or `text` for a section heading), `itemHeight`.
 
 ## Styling
 

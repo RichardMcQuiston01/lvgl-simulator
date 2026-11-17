@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Widget expansion W3: new `Dropdown`, `Roller`, `ButtonMatrix` and `List` widgets, radio grouping for `Checkbox` (`CheckboxGroup`), JSON scene support for all of them (additive; schema version unchanged, plus a `radioGroup` name on `checkbox`), docs, unit tests and a new visual regression fixture (`e2e/w3-widgets.spec.ts`) and a real-browser interaction test (`e2e/w3-input.spec.ts`: dropdown open/pick/dismiss and key handling, roller drag, button matrix, list wheel scroll and clicks, radio buttons).
+  - New `topLayer` object flag: an object (and its subtree) paints above everything else and is hit-tested first, like LVGL's top layer. An open `Dropdown` list uses it.
+  - New `Popup` interface and `dismissPopups()`: the interaction controller closes an open popup when a press lands outside it.
+  - Known limits: `Roller` has no mouse-wheel support, and its fade toward the edges is a simple falloff rather than LVGL's mask; `Dropdown` opens beside the dropdown only and does not flip sides when there is no room; a loaded `roller` jumps to its resting row (a scene cannot supply the animation engine).
+
 ## 0.4.0 - 2026-11-10
 
 - Widget expansion W2: new `Textarea`, `Keyboard`, `Spinbox`, `Span` and `ArcLabel` widgets, each with a JSON scene node type (additive; schema version unchanged), docs, unit tests and a new visual regression fixture (`e2e/w2-widgets.spec.ts`) and a real-browser input test (`e2e/w2-input.spec.ts`: click-to-focus, typing, selection, and the on-screen keyboard).
