@@ -408,6 +408,105 @@ so kerning between glyphs is not applied.
 new ArcLabel({ width: 150, height: 150, text: 'CURVED TEXT', radius: 55 });
 ```
 
+### `Dropdown`
+
+A closed box showing the selected option that opens a list to choose from
+(`lv_dropdown`). Click it to open the list, click an option to pick it, and a
+press anywhere else closes it. The list floats above everything else on the
+screen (it is a `topLayer` object, so later siblings do not cover it and are not
+clicked through it), opens `direction` `'down'` (default), `'up'`, `'left'` or
+`'right'`, and is limited to the room left on screen (or `maxListHeight`),
+scrolling beyond that and opening scrolled to the selection. With the keyboard,
+Up/Down change the selection (and move the highlight while open), Enter or
+Space opens it and then picks the highlighted option, and Escape closes it.
+`text` shows fixed text (a placeholder) instead of the selection, `symbol`
+replaces the arrow (`''` for none), `itemHeight` and `itemsStyle` shape the rows
+and `selectedHighlight: false` turns the highlight off. `valueChanged` fires
+when the selection changes; read `selectedIndex` / `selectedText`.
+
+```ts
+const fruit = new Dropdown({ width: 160, height: 36, options: ['Apple', 'Banana', 'Cherry'] });
+fruit.addEventListener('valueChanged', () => console.log(fruit.selectedText));
+```
+
+### `Roller`
+
+A drum of options with the centre row selected (`lv_roller`). Drag it (a flick
+keeps it rolling a little, then it settles on a row), tap a row to roll to it,
+or use the arrow keys. `visibleRows` sets how many rows show (the row height is
+the roller's height divided by that), `infinite` wraps the options around like a
+drum, and `selectedStyle` is the highlighted band (`LV_PART_SELECTED`).
+`valueChanged` fires when the settled selection changes. Pass the simulator's
+`animations` engine to ease the settling; without one it jumps to the resting
+row. `setSelected(index, animate)` rolls to an option from code.
+
+```ts
+const month = new Roller({
+  width: 100,
+  height: 96,
+  options: ['Jan', 'Feb', 'Mar', 'Apr'],
+  animations: simulator.animations,
+});
+```
+
+### `ButtonMatrix`
+
+A grid of buttons in one object (`lv_buttonmatrix`). `map` lists the labels, with
+a `'\n'` entry starting a new row, and `controls` gives each button (by
+position) its relative `width` (1–15), and whether it is `hidden`, `disabled`,
+`checkable` or starts `checked`. A click selects the button
+(`selectedIndex` / `selectedText`) and fires `valueChanged`; checkable buttons
+toggle, and with `oneChecked` exactly one is checked at a time, like radio
+buttons. Sliding the pointer off a button before releasing cancels the click.
+When focused, the arrow keys move `focusedIndex` and Enter or Space presses it.
+`setMap()`, `setChecked()` and `setButtonControl()` change it from code;
+`gap`, `padding` and `itemsStyle` (with `states.pressed`, `checked` and
+`disabled`) restyle it.
+
+```ts
+const modes = new ButtonMatrix({
+  width: 220,
+  height: 84,
+  map: ['Home', 'Play', 'Stop', '\n', 'Prev', 'Next'],
+  controls: [{ checkable: true, checked: true }, undefined, { disabled: true }],
+});
+```
+
+### `List`
+
+A scrollable vertical list (`lv_list`). Add section headings with `addText()` and
+pressable rows with `addButton(text, icon?)` (the icon is any glyph or short
+string, like LVGL's `LV_SYMBOL_*`). Rows are as wide as the list, `itemHeight`
+sets the button row height, and the list scrolls vertically when they overflow
+(drag, wheel or throw, like any scrollable). React to a row with its own
+`clicked` event or `list.onItemClicked(listener)`, which returns a function that
+stops listening. `removeItem()` takes a row out; `items` and `buttons` list the
+rows.
+
+```ts
+const menu = new List({ width: 220, height: 110 });
+menu.addText('Files');
+menu.addButton('New', '+');
+menu.onItemClicked((item) => console.log(item.text));
+```
+
+### Radio buttons (`CheckboxGroup`)
+
+LVGL has no radio widget; its examples uncheck the siblings in a callback. A
+`CheckboxGroup` does that for you: checkboxes in one group are exclusive,
+drawn round with a dot, and clicking the checked one leaves it checked unless
+the group is created with `allowUncheck: true`. Pass the group as a checkbox's
+`group` option (or call `group.add(checkbox)`); when one is clicked, each box it
+unchecked and the one checked all fire `valueChanged`. `checkbox.setChecked()`
+respects the group but fires no event. `group.checked` is the checked one.
+
+```ts
+const sizes = new CheckboxGroup();
+for (const text of ['Small', 'Medium', 'Large']) {
+  screen.addChild(new Checkbox({ width: 110, height: 24, text, group: sizes }));
+}
+```
+
 ## Styling & state
 
 Every widget's paint properties are a **`StyleSet`** (`src/style/Style.ts`)
@@ -560,7 +659,9 @@ list.scrollToView(someChild);
 Padding counts toward the scrollable area only when the container applies it
 through a flex/grid `layout`; manually positioned children are measured
 against the border box. Per-object flags: `hidden`, `clickable`, `floating`,
-`ignoreLayout` (the last two keep a child out of flex/grid layout).
+`ignoreLayout` (the last two keep a child out of flex/grid layout) and
+`topLayer` (paints the object and its subtree above everything else and tests
+it for clicks first, as an open `Dropdown` list needs).
 
 ## Focus & keyboard input
 

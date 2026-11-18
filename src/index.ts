@@ -100,17 +100,22 @@ export type {
   SceneArcLabelNode,
   SceneArcNode,
   SceneBarNode,
+  SceneButtonMatrixNode,
   SceneButtonNode,
   SceneCheckboxNode,
   SceneContainerNode,
+  SceneDropdownNode,
   SceneImageButtonNode,
   SceneImageNode,
   SceneKeyboardNode,
   SceneLabelNode,
   SceneLedNode,
   SceneLineNode,
+  SceneListItem,
+  SceneListNode,
   SceneNode,
   SceneNodeBase,
+  SceneRollerNode,
   SceneScaleNode,
   SceneScaleSection,
   SceneSliderNode,
@@ -198,6 +203,39 @@ export { ArcLabel } from './widgets/ArcLabel.js';
 export type { ArcLabelOptions, ArcLabelVerticalAlign } from './widgets/ArcLabel.js';
 export { layoutArcLabel } from './widgets/arcLabelMath.js';
 export type { ArcLabelAlign, ArcLabelDirection, GlyphPlacement } from './widgets/arcLabelMath.js';
+export { ButtonMatrix } from './widgets/ButtonMatrix.js';
+export type { ButtonMatrixOptions } from './widgets/ButtonMatrix.js';
+export {
+  BUTTON_MATRIX_NEWLINE,
+  countButtons,
+  moveSelection,
+  parseButtonMap,
+} from './widgets/buttonMatrixMath.js';
+export type {
+  ButtonCentre,
+  ButtonControl,
+  ButtonDefinition,
+  ButtonMove,
+} from './widgets/buttonMatrixMath.js';
+export { CheckboxGroup } from './widgets/CheckboxGroup.js';
+export type { CheckboxGroupOptions } from './widgets/CheckboxGroup.js';
+export { Dropdown } from './widgets/Dropdown.js';
+export type { DropdownDirection, DropdownOptions } from './widgets/Dropdown.js';
+export { List, ListItem } from './widgets/List.js';
+export type { ListItemKind, ListItemOptions, ListOptions } from './widgets/List.js';
+export { Roller } from './widgets/Roller.js';
+export type { RollerOptions } from './widgets/Roller.js';
+export {
+  constrainPosition,
+  positionAfterDrag,
+  selectedAt,
+  settleTarget,
+  visibleSlots,
+  wrapIndex,
+} from './widgets/rollerMath.js';
+export type { RollerSlot } from './widgets/rollerMath.js';
+export { dismissPopups, isPopup } from './interaction/Popup.js';
+export type { Popup } from './interaction/Popup.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

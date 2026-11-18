@@ -6,7 +6,10 @@ import type { ArcMode } from '../widgets/arcMath.js';
 import type { BarMode, BarOrientation } from '../widgets/Bar.js';
 import type { LinePoint } from '../widgets/Line.js';
 import type { ImageButtonState } from '../widgets/ImageButton.js';
+import type { ButtonControl } from '../widgets/buttonMatrixMath.js';
+import type { DropdownDirection } from '../widgets/Dropdown.js';
 import type { KeyboardMode } from '../widgets/keyboardLayout.js';
+import type { ListItemKind } from '../widgets/List.js';
 import type { SpanMode, SpanOverflow } from '../widgets/Span.js';
 import type { ScaleMode } from '../widgets/scaleMath.js';
 
@@ -40,7 +43,11 @@ export type SceneWidgetType =
   | 'keyboard'
   | 'spinbox'
   | 'span'
-  | 'arclabel';
+  | 'arclabel'
+  | 'dropdown'
+  | 'roller'
+  | 'buttonmatrix'
+  | 'list';
 
 /**
  * Fields every scene node shares, mirroring {@link LvObjectOptions}
@@ -96,6 +103,11 @@ export interface SceneCheckboxNode extends SceneNodeBase {
   readonly text?: string;
   readonly checked?: boolean;
   readonly indicatorStyle?: StyleSet;
+  /**
+   * Makes this a radio button. Checkboxes anywhere in the same scene that
+   * share a name are one group: checking one unchecks the others.
+   */
+  readonly radioGroup?: string;
 }
 
 /** A `Switch` (see `src/widgets/Switch.ts`). */
@@ -303,6 +315,60 @@ export interface SceneArcLabelNode extends SceneNodeBase {
   readonly centerOffsetY?: number;
 }
 
+/** A `Dropdown` (see `src/widgets/Dropdown.ts`). */
+export interface SceneDropdownNode extends SceneNodeBase {
+  readonly type: 'dropdown';
+  readonly options?: readonly string[];
+  readonly selected?: number;
+  readonly direction?: DropdownDirection;
+  readonly text?: string;
+  readonly symbol?: string;
+  readonly itemHeight?: number;
+  readonly maxListHeight?: number;
+  readonly selectedHighlight?: boolean;
+  readonly itemsStyle?: StyleSet;
+}
+
+/**
+ * A `Roller` (see `src/widgets/Roller.ts`). A scene cannot supply an
+ * animation engine, so a loaded roller jumps straight to its resting row;
+ * create the roller in code with `animations` for eased settling.
+ */
+export interface SceneRollerNode extends SceneNodeBase {
+  readonly type: 'roller';
+  readonly options?: readonly string[];
+  readonly selected?: number;
+  readonly visibleRows?: number;
+  readonly infinite?: boolean;
+  readonly selectedStyle?: StyleSet;
+}
+
+/** A `ButtonMatrix` (see `src/widgets/ButtonMatrix.ts`). */
+export interface SceneButtonMatrixNode extends SceneNodeBase {
+  readonly type: 'buttonmatrix';
+  /** Button labels in order; a `"\n"` entry starts a new row. */
+  readonly map?: readonly string[];
+  readonly controls?: readonly (ButtonControl | null)[];
+  readonly oneChecked?: boolean;
+  readonly gap?: number;
+  readonly padding?: number;
+  readonly itemsStyle?: StyleSet;
+}
+
+/** One row of a `list` node: a pressable button (the default) or a section heading. */
+export interface SceneListItem {
+  readonly kind?: ListItemKind;
+  readonly text: string;
+  readonly icon?: string;
+}
+
+/** A `List` (see `src/widgets/List.ts`). */
+export interface SceneListNode extends SceneNodeBase {
+  readonly type: 'list';
+  readonly items?: readonly SceneListItem[];
+  readonly itemHeight?: number;
+}
+
 export type SceneNode =
   | SceneContainerNode
   | SceneLabelNode
@@ -322,7 +388,11 @@ export type SceneNode =
   | SceneKeyboardNode
   | SceneSpinboxNode
   | SceneSpanNode
-  | SceneArcLabelNode;
+  | SceneArcLabelNode
+  | SceneDropdownNode
+  | SceneRollerNode
+  | SceneButtonMatrixNode
+  | SceneListNode;
 
 /**
  * A full screen: the root is always a container (matching `createSimulator`'s

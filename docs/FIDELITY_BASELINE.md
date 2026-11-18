@@ -71,6 +71,12 @@ diffs" means in practice.
   baseline, `e2e/w2-widgets.spec.ts-snapshots/`. The Stage 2 and W1 baselines are
   unchanged.
 
+- Widget expansion W3: a fourth fixture, `e2e/fixtures/w3.ts`, covers `Dropdown`
+  (closed, and open with its list floating over a button under it),
+  `ButtonMatrix` (checked, disabled, hidden and wider buttons), `List`,
+  `Roller` and radio `Checkbox`es against its own baseline,
+  `e2e/w3-widgets.spec.ts-snapshots/`. The earlier baselines are unchanged.
+
 ## Updating the baseline
 
 When a change intentionally alters a Stage 2 widget's default appearance,

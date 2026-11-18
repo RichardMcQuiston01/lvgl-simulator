@@ -3,7 +3,11 @@ import { Arc } from '../widgets/Arc.js';
 import { ArcLabel } from '../widgets/ArcLabel.js';
 import { Bar } from '../widgets/Bar.js';
 import { Button } from '../widgets/Button.js';
+import { ButtonMatrix } from '../widgets/ButtonMatrix.js';
 import { Checkbox } from '../widgets/Checkbox.js';
+import { Dropdown } from '../widgets/Dropdown.js';
+import { List } from '../widgets/List.js';
+import { Roller } from '../widgets/Roller.js';
 import { Container } from '../widgets/Container.js';
 import { ImageButton } from '../widgets/ImageButton.js';
 import { ImageWidget } from '../widgets/ImageWidget.js';
@@ -466,5 +470,145 @@ describe('loadScreen W2 widgets', () => {
       ],
     };
     expect(() => loadScreen(scene).render(createFakeCanvasContext())).not.toThrow();
+  });
+});
+
+describe('loadScreen W3 widgets', () => {
+  function load(children: SceneNode[]): Container {
+    return loadScreen({ version: SCENE_SCHEMA_VERSION, width: 400, height: 400, children });
+  }
+
+  it('builds a Dropdown with its options and settings', () => {
+    const dropdown = load([
+      {
+        type: 'dropdown',
+        width: 120,
+        height: 36,
+        options: ['a', 'b', 'c'],
+        selected: 2,
+        direction: 'up',
+        text: 'Pick',
+        symbol: '+',
+        itemHeight: 30,
+        selectedHighlight: false,
+      },
+    ]).children[0];
+    expect(dropdown).toBeInstanceOf(Dropdown);
+    expect(dropdown).toMatchObject({
+      selectedIndex: 2,
+      direction: 'up',
+      text: 'Pick',
+      symbol: '+',
+      itemHeight: 30,
+      selectedHighlight: false,
+    });
+  });
+
+  it('builds a Roller with its options and settings', () => {
+    const roller = load([
+      {
+        type: 'roller',
+        width: 100,
+        height: 90,
+        options: ['x', 'y', 'z'],
+        selected: 1,
+        visibleRows: 5,
+        infinite: true,
+      },
+    ]).children[0];
+    expect(roller).toBeInstanceOf(Roller);
+    expect(roller).toMatchObject({ selectedIndex: 1, visibleRows: 5, infinite: true });
+  });
+
+  it('builds a ButtonMatrix, reading a null control as "no flags"', () => {
+    const matrix = load([
+      {
+        type: 'buttonmatrix',
+        width: 200,
+        height: 100,
+        map: ['1', '2', '\n', '3'],
+        controls: [null, { checkable: true, checked: true }, { hidden: true }],
+        oneChecked: true,
+      },
+    ]).children[0] as ButtonMatrix;
+    expect(matrix).toBeInstanceOf(ButtonMatrix);
+    expect(matrix.buttonCount).toBe(3);
+    expect(matrix.isChecked(1)).toBe(true);
+    expect(matrix.isPressable(2)).toBe(false);
+    expect(matrix.oneChecked).toBe(true);
+  });
+
+  it('builds a List of buttons and headings', () => {
+    const list = load([
+      {
+        type: 'list',
+        width: 200,
+        height: 120,
+        itemHeight: 32,
+        items: [{ kind: 'text', text: 'Files' }, { text: 'New', icon: '+' }, { text: 'Open' }],
+      },
+    ]).children[0] as List;
+    expect(list).toBeInstanceOf(List);
+    expect(list.items.map((item) => item.kind)).toEqual(['text', 'button', 'button']);
+    expect(list.buttons[0]?.icon).toBe('+');
+    expect(list.buttons[0]?.height).toBe(32);
+  });
+
+  it('groups checkboxes that share a radioGroup name, across containers', () => {
+    const root = load([
+      { type: 'checkbox', width: 100, height: 20, radioGroup: 'size', checked: true },
+      {
+        type: 'container',
+        width: 200,
+        height: 100,
+        children: [
+          { type: 'checkbox', width: 100, height: 20, radioGroup: 'size' },
+          { type: 'checkbox', width: 100, height: 20, radioGroup: 'other' },
+        ],
+      },
+      { type: 'checkbox', width: 100, height: 20 },
+    ]);
+    const [first, container, plain] = root.children as [Checkbox, Container, Checkbox];
+    const [second, other] = container.children as [Checkbox, Checkbox];
+    expect(first.group).toBeDefined();
+    expect(second.group).toBe(first.group);
+    expect(other.group).toBeDefined();
+    expect(other.group).not.toBe(first.group);
+    expect(plain.group).toBeUndefined();
+    second.setChecked(true);
+    expect(first.checked).toBe(false);
+  });
+
+  it('does not share radio groups between separate loads', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 100,
+      height: 100,
+      children: [{ type: 'checkbox', width: 100, height: 20, radioGroup: 'size' }],
+    };
+    const first = loadScreen(scene).children[0] as Checkbox;
+    const second = loadScreen(scene).children[0] as Checkbox;
+    expect(first.group).not.toBe(second.group);
+  });
+
+  it('names the new types in the unknown-type error', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 10,
+      height: 10,
+      children: [{ type: 'nope', width: 1, height: 1 } as unknown as SceneNode],
+    };
+    expect(() => loadScreen(scene)).toThrow(/dropdown, roller, buttonmatrix, list/);
+  });
+
+  it('renders every W3 widget without throwing', () => {
+    const root = load([
+      { type: 'dropdown', width: 120, height: 36, options: ['a', 'b'] },
+      { type: 'roller', width: 100, height: 90, options: ['x', 'y'] },
+      { type: 'buttonmatrix', width: 200, height: 80, map: ['1', '2', '\n', '3'] },
+      { type: 'list', width: 200, height: 100, items: [{ text: 'One' }] },
+      { type: 'checkbox', width: 100, height: 20, radioGroup: 'g', text: 'Radio' },
+    ]);
+    expect(() => root.render(createFakeCanvasContext())).not.toThrow();
   });
 });
