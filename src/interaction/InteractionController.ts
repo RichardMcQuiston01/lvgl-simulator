@@ -5,6 +5,7 @@ import type { FocusGroup } from '../focus/FocusGroup.js';
 import { applyScrollSnap, findScrollTarget } from '../scroll/scrollMath.js';
 import { hitTest } from './hitTest.js';
 import { isPointerDraggable } from './PointerDraggable.js';
+import { dismissPopups } from './Popup.js';
 
 /** Tunables for {@link attachInteraction}, defaulting to LVGL's `LV_INDEV_DEF_*` values. */
 export interface InteractionOptions {
@@ -160,6 +161,10 @@ export function attachInteraction(
   /** Starts a press: hit-tests the pointer, focuses the target, dispatches `pressed`, and arms the long-press timer. */
   function onPointerDown(event: PointerEvent): void {
     const hit = hitTest(screen, event.offsetX, event.offsetY);
+    // A press outside an open popup (a dropdown's list) closes it, wherever it lands.
+    if (dismissPopups(screen, hit)) {
+      render();
+    }
     if (!hit || hit.disabled) {
       return;
     }
