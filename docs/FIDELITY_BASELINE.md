@@ -77,6 +77,12 @@ diffs" means in practice.
   `Roller` and radio `Checkbox`es against its own baseline,
   `e2e/w3-widgets.spec.ts-snapshots/`. The earlier baselines are unchanged.
 
+- Widget expansion W4: a fifth fixture, `e2e/fixtures/w4.ts`, covers `Win`, `Tabview`
+  (middle tab active), `Tileview`, `Msgbox` (wrapped text, close button, footer
+  buttons) and a `Menu` with a sidebar, a section, a separator and a chevron item
+  against its own baseline, `e2e/w4-widgets.spec.ts-snapshots/`. The earlier
+  baselines are unchanged.
+
 ## Updating the baseline
 
 When a change intentionally alters a Stage 2 widget's default appearance,

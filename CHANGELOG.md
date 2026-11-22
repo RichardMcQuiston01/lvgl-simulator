@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Widget expansion W4: new `Win`, `Tabview`, `Tileview`, `Msgbox` and `Menu` widgets, each with a JSON scene node type (additive; schema version unchanged), docs, unit tests and a new visual regression fixture (`e2e/w4-widgets.spec.ts`) and a real-browser interaction test (`e2e/w4-input.spec.ts`: tab click and swipe, tile swipes, window button, menu navigation, and a modal message box blocking what is under it).
+  - `win`, `tabview` and `tileview` scene nodes build their `children` into the content area, each tab page and each tile; `menu` pages refer to each other by `id`, and a missing page, or a section nested in a section, fails with a message naming it.
+  - Fixed: a scroll released after the pointer had rested still coasted with its last drag velocity (so holding a swipe still and letting go could throw a list or tab view several pages). The flick is now dropped when more than 100ms passed since the last move.
+  - Known limits: `Msgbox` wraps its first frame with an estimate of the font's width, `Tileview` has no per-tile transition animation beyond its optional eased moves, `Menu` has no animated page transition and supports one level of sections, and `Win` has its header on top only.
+
 ## 0.5.0 - 2026-11-20
 
 - Widget expansion W3: new `Dropdown`, `Roller`, `ButtonMatrix` and `List` widgets, radio grouping for `Checkbox` (`CheckboxGroup`), JSON scene support for all of them (additive; schema version unchanged, plus a `radioGroup` name on `checkbox`), docs, unit tests and a new visual regression fixture (`e2e/w3-widgets.spec.ts`) and a real-browser interaction test (`e2e/w3-input.spec.ts`: dropdown open/pick/dismiss and key handling, roller drag, button matrix, list wheel scroll and clicks, radio buttons).

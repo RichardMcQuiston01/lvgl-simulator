@@ -42,6 +42,7 @@ class MsgboxText extends LvObject {
     return (text) => text.length * size * FALLBACK_CHAR_RATIO;
   }
 
+  /** The height of one line of text. */
   private get lineHeight(): number {
     return (this.resolvedStyle.textFontSize ?? defaultTheme.fontSize) * LINE_HEIGHT_RATIO;
   }

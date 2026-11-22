@@ -60,6 +60,7 @@ export function tileRange(
     return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
   }
   const { col, row, directions } = active;
+  /** Whether `active` allows moving by `(dCol, dRow)` and a tile is there. */
   const open = (dCol: number, dRow: number, allowed: boolean): boolean =>
     allowed && tileAt(tiles, col + dCol, row + dRow) !== undefined;
   return {

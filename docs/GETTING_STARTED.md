@@ -507,6 +507,105 @@ for (const text of ['Small', 'Medium', 'Large']) {
 }
 ```
 
+### `Win`
+
+A window with a header bar over a content area (`lv_win`). The header is a flex
+row: `addTitle(text)` adds a title that takes the free width, and
+`addButton(text, width?)` adds a button (square by default, so a glyph works as
+an icon). Put your own widgets in `win.content`. `headerHeight`, `headerStyle`
+and `contentStyle` shape it. The header is always on top.
+
+```ts
+const win = new Win({ width: 300, height: 200, title: 'Settings' });
+win.addButton('\u00d7').addEventListener('clicked', () => win.parent?.removeChild(win));
+win.content.addChild(new Label({ x: 12, y: 12, width: 200, height: 20, text: 'Hello' }));
+```
+
+### `Tabview`
+
+Pages you switch between with a bar of tabs (`lv_tabview`). `addTab(name)` returns
+the page (a `Container`) to fill; `tabs: ['A', 'B']` adds empty ones up front.
+The bar sits on `tabPosition` `'top'` (default), `'bottom'`, `'left'` or `'right'`,
+`tabBarSize` thick. The pages lie side by side in a scroller that snaps to a
+whole page, so a swipe, a throw and a click all land on a page; a page taller
+than the view scrolls vertically on its own. The line under the active tab slides
+along with a swipe (`indicatorColor`, `indicatorThickness`). `setActive(index)`
+switches from code, and `valueChanged` fires when the active tab changes
+(`activeIndex`). Pass the simulator's `animations` to ease clicks and
+`setActive(index, true)`. `tabStyle` (with `states.checked` and `states.pressed`)
+and `barStyle` restyle the bar.
+
+```ts
+const tabs = new Tabview({ width: 320, height: 200, tabs: ['Home', 'Chat'] });
+tabs.pages[0]?.addChild(new Label({ x: 12, y: 12, width: 200, height: 20, text: 'Home' }));
+```
+
+### `Tileview`
+
+A grid of full-size tiles you swipe between (`lv_tileview`). `addTile(col, row,
+directions?)` returns the tile (a `Container`) to fill; the first tile added is
+active. The view scrolls one tile at a time toward neighbours that exist and that
+the current tile allows (`directions: { right: false }` forbids leaving that way;
+the default allows all), and snaps onto a whole tile. `setActiveTile(col, row)`
+and the arrow keys move from code or a keyboard, `activeTile` reads it, and
+`valueChanged` fires when it changes. Pass `animations` to ease moves.
+
+```ts
+const tiles = new Tileview({ width: 200, height: 120 });
+tiles.addTile(0, 0);
+tiles.addTile(1, 0, { left: true, right: false });
+```
+
+### `Msgbox`
+
+A message box (`lv_msgbox`) with a title, wrapped `text`, an optional
+`closeButton` and footer `buttons`. Its height follows the text. A footer button
+fires `valueChanged` with its index in `lastButtonIndex` (and label in
+`lastButtonText`) and does not close the box: call `close()` yourself. The close
+button and Escape fire `cancel` and close it. With `modal: true` the object is a
+dimmed backdrop the size of `width` x `height` (the screen), on the top layer so
+it covers and blocks clicks to everything under it, with a `boxWidth`-wide box
+centred in it; `dismissOnBackdrop: true` closes it, firing `cancel`, when the
+dimmed area is clicked. Add it to a screen to show it and `close()` to hide it.
+The first frame wraps text with an estimate of the font's width and the next uses
+the real one.
+
+```ts
+const box = new Msgbox({
+  width: 400,
+  height: 300,
+  modal: true,
+  title: 'Delete file?',
+  text: 'This cannot be undone.',
+  buttons: ['Cancel', 'Delete'],
+});
+box.addEventListener('valueChanged', () => box.close());
+simulator.screen.addChild(box);
+```
+
+### `Menu`
+
+A page-based settings-style menu (`lv_menu`). `createPage(title?)` returns a
+page to fill with `addItem(text, { icon, page })`, `addSection(title?)` (a framed
+group with its own `addItem`) and `addSeparator()`. An item with a `page` shows a
+chevron and opens that page, pushing it so the header's back button returns to
+the previous one; `setPage(page)` shows a root page and clears the history, and
+`push()`, `back()`, `currentPage`, `canGoBack` and `historyDepth` drive it from
+code. `setSidebarPage(page)` keeps a page on the left (`sidebarWidth`); its items
+replace the main page instead of stacking. The header shows the page title and the
+back button (only when there is somewhere to go back, unless `alwaysShowBack`),
+and is left out when there is neither. `valueChanged` fires when the page on show
+changes. Pages scroll when their rows overflow.
+
+```ts
+const menu = new Menu({ width: 320, height: 240 });
+const settings = menu.createPage('Settings');
+const display = menu.createPage('Display');
+settings.addItem('Display', { page: display });
+display.addItem('Brightness');
+menu.setPage(settings);
+```
+
 ## Styling & state
 
 Every widget's paint properties are a **`StyleSet`** (`src/style/Style.ts`)

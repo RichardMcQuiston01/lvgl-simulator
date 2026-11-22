@@ -699,6 +699,7 @@ function buildMenu(node: SceneMenuNode): Menu {
   for (const description of node.pages ?? []) {
     pages.set(description.id, menu.createPage(description.title));
   }
+  /** The page with `id`, or an error naming `usedBy` and the ids that exist. */
   const lookup = (id: string, usedBy: string): MenuPage => {
     const page = pages.get(id);
     if (!page) {
@@ -709,6 +710,7 @@ function buildMenu(node: SceneMenuNode): Menu {
     }
     return page;
   };
+  /** Adds each described entry to `column`. */
   const fill = (column: MenuColumn, entries: SceneMenuPage['items'], owner: string): void => {
     for (const entry of entries ?? []) {
       addMenuEntry(column, entry, owner, lookup);
