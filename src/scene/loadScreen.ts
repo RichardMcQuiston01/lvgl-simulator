@@ -13,6 +13,8 @@ import { Keyboard } from '../widgets/Keyboard.js';
 import { Led } from '../widgets/Led.js';
 import { Line } from '../widgets/Line.js';
 import { Label } from '../widgets/Label.js';
+import { Menu, MenuPage, type MenuColumn } from '../widgets/Menu.js';
+import { Msgbox } from '../widgets/Msgbox.js';
 import { List } from '../widgets/List.js';
 import { Roller } from '../widgets/Roller.js';
 import type { LvObject } from '../core/LvObject.js';
@@ -21,6 +23,9 @@ import { Slider } from '../widgets/Slider.js';
 import { Span } from '../widgets/Span.js';
 import { Spinbox } from '../widgets/Spinbox.js';
 import { Spinner } from '../widgets/Spinner.js';
+import { Tabview } from '../widgets/Tabview.js';
+import { Tileview } from '../widgets/Tileview.js';
+import { Win } from '../widgets/Win.js';
 import { Textarea } from '../widgets/Textarea.js';
 import {
   SCENE_SCHEMA_VERSION,
@@ -39,6 +44,12 @@ import {
   type SceneLabelNode,
   type SceneLedNode,
   type SceneLineNode,
+  type SceneMenuItem,
+  type SceneMenuNode,
+  type SceneMenuPage,
+  type SceneMenuSection,
+  type SceneMenuSeparator,
+  type SceneMsgboxNode,
   type SceneListNode,
   type SceneNode,
   type SceneNodeBase,
@@ -48,6 +59,9 @@ import {
   type SceneSpanNode,
   type SceneSpinboxNode,
   type SceneSpinnerNode,
+  type SceneTabviewNode,
+  type SceneTileviewNode,
+  type SceneWinNode,
   type SceneTextareaNode,
   type SceneSwitchNode,
 } from './SceneSchema.js';
@@ -140,13 +154,23 @@ function buildNode(node: SceneNode, context: BuildContext): LvObject {
       return buildButtonMatrix(node);
     case 'list':
       return buildList(node);
+    case 'win':
+      return buildWin(node, context);
+    case 'tabview':
+      return buildTabview(node, context);
+    case 'tileview':
+      return buildTileview(node, context);
+    case 'msgbox':
+      return buildMsgbox(node);
+    case 'menu':
+      return buildMenu(node);
     default: {
       // Exhaustive in TypeScript; a real runtime guard for untyped JSON.
       const unknownType = (node as { readonly type?: unknown }).type;
       throw new Error(
         `Unknown scene node type ${JSON.stringify(unknownType)}. Supported types: ` +
           `container, label, button, checkbox, switch, slider, image, bar, arc, spinner, led, line, scale, ` +
-          `imagebutton, textarea, keyboard, spinbox, span, arclabel, dropdown, roller, buttonmatrix, list.`,
+          `imagebutton, textarea, keyboard, spinbox, span, arclabel, dropdown, roller, buttonmatrix, list, win, tabview, tileview, msgbox, menu.`,
       );
     }
   }
@@ -578,4 +602,153 @@ function buildList(node: SceneListNode): List {
     }
   }
   return list;
+}
+
+/** Builds a `Win`, adding its header buttons and building `children` into its content area. */
+function buildWin(node: SceneWinNode, context: BuildContext): Win {
+  const win = new Win({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    title: node.title,
+    headerHeight: node.headerHeight,
+    headerStyle: node.headerStyle,
+    contentStyle: node.contentStyle,
+  });
+  for (const button of node.headerButtons ?? []) {
+    win.addButton(button.text, button.width);
+  }
+  for (const child of node.children ?? []) {
+    win.content.addChild(buildNode(child, context));
+  }
+  return win;
+}
+
+/** Builds a `Tabview` with one page per tab, each filled from that tab's `children`. */
+function buildTabview(node: SceneTabviewNode, context: BuildContext): Tabview {
+  const view = new Tabview({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    tabPosition: node.tabPosition,
+    tabBarSize: node.tabBarSize,
+    barStyle: node.barStyle,
+    tabStyle: node.tabStyle,
+    indicatorColor: node.indicatorColor,
+    indicatorThickness: node.indicatorThickness,
+  });
+  for (const tab of node.tabs ?? []) {
+    const page = view.addTab(tab.name);
+    for (const child of tab.children ?? []) {
+      page.addChild(buildNode(child, context));
+    }
+  }
+  return view;
+}
+
+/** Builds a `Tileview` with each described tile, filled from its `children`. */
+function buildTileview(node: SceneTileviewNode, context: BuildContext): Tileview {
+  const view = new Tileview({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+  });
+  for (const tile of node.tiles ?? []) {
+    const container = view.addTile(tile.col, tile.row, tile.directions);
+    for (const child of tile.children ?? []) {
+      container.addChild(buildNode(child, context));
+    }
+  }
+  return view;
+}
+
+/** Builds a `Msgbox`. */
+function buildMsgbox(node: SceneMsgboxNode): Msgbox {
+  return new Msgbox({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    title: node.title,
+    text: node.text,
+    buttons: node.buttons,
+    closeButton: node.closeButton,
+    modal: node.modal,
+    boxWidth: node.boxWidth,
+    dismissOnBackdrop: node.dismissOnBackdrop,
+    boxStyle: node.boxStyle,
+  });
+}
+
+/**
+ * Builds a `Menu`. Every page is created first so items can name any page,
+ * including ones defined later; then their rows are filled in, and the root
+ * (and sidebar) page set. A `page` naming no page throws.
+ */
+function buildMenu(node: SceneMenuNode): Menu {
+  const menu = new Menu({
+    ...commonFields(node),
+    width: node.width,
+    height: node.height,
+    headerHeight: node.headerHeight,
+    sidebarWidth: node.sidebarWidth,
+    itemHeight: node.itemHeight,
+    alwaysShowBack: node.alwaysShowBack,
+    headerStyle: node.headerStyle,
+  });
+  const pages = new Map<string, MenuPage>();
+  for (const description of node.pages ?? []) {
+    pages.set(description.id, menu.createPage(description.title));
+  }
+  const lookup = (id: string, usedBy: string): MenuPage => {
+    const page = pages.get(id);
+    if (!page) {
+      throw new Error(
+        `Menu ${usedBy} refers to the page ${JSON.stringify(id)}, but the menu's pages are ` +
+          `${JSON.stringify([...pages.keys()])}.`,
+      );
+    }
+    return page;
+  };
+  const fill = (column: MenuColumn, entries: SceneMenuPage['items'], owner: string): void => {
+    for (const entry of entries ?? []) {
+      addMenuEntry(column, entry, owner, lookup);
+    }
+  };
+  for (const description of node.pages ?? []) {
+    const page = lookup(description.id, 'itself');
+    fill(page, description.items, `page ${JSON.stringify(description.id)}`);
+  }
+  const root = node.rootPage ?? node.pages?.[0]?.id;
+  if (root !== undefined) {
+    menu.setPage(lookup(root, 'rootPage'));
+  }
+  if (node.sidebarPage !== undefined) {
+    menu.setSidebarPage(lookup(node.sidebarPage, 'sidebarPage'));
+  }
+  return menu;
+}
+
+/** Adds one described row, section or separator to `column`. */
+function addMenuEntry(
+  column: MenuColumn,
+  entry: SceneMenuItem | SceneMenuSection | SceneMenuSeparator,
+  owner: string,
+  lookup: (id: string, usedBy: string) => MenuPage,
+): void {
+  if (entry.kind === 'separator') {
+    column.addSeparator();
+  } else if (entry.kind === 'section') {
+    if (!(column instanceof MenuPage)) {
+      throw new Error(`Menu ${owner} puts a section inside a section, which is not supported.`);
+    }
+    const section = column.addSection(entry.title);
+    for (const inner of entry.items ?? []) {
+      addMenuEntry(section, inner, owner, lookup);
+    }
+  } else {
+    column.addItem(entry.text, {
+      icon: entry.icon,
+      page: entry.page === undefined ? undefined : lookup(entry.page, owner),
+    });
+  }
 }
