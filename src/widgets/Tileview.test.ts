@@ -327,3 +327,18 @@ describe('Tileview wheel steps and taking over from an easing move', () => {
     expect(view.scrollX % 100).toBe(0);
   });
 });
+
+describe('Tileview trackpad gestures', () => {
+  it('steps one tile for a stream of small wheel events, not one per event', () => {
+    const clock = { time: 0 };
+    const view = new Tileview({ width: 100, height: 50, now: () => clock.time });
+    for (let col = 0; col < 4; col += 1) {
+      view.addTile(col, 0);
+    }
+    for (let event = 0; event < 6; event += 1) {
+      view.scrollBy(8, 0);
+      clock.time += 16;
+    }
+    expect(view.activeTile).toEqual({ col: 1, row: 0 });
+  });
+});

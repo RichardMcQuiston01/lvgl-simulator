@@ -1,6 +1,7 @@
 import type { AnimationEngine, AnimationHandle } from '../animation/Animation.js';
 import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
 import type { ScrollRange } from '../scroll/scrollMath.js';
+import { WheelGesture } from '../scroll/wheelGesture.js';
 import { mergeStyle } from '../style/Style.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
 import { Container } from './Container.js';
@@ -17,6 +18,8 @@ import {
 export interface TileviewOptions extends LvObjectOptions {
   /** Animates moving to a tile from code or a key when given; without it the view jumps to the tile. */
   readonly animations?: AnimationEngine;
+  /** Clock in ms for telling one wheel gesture from the next, defaulting to `performance.now()`. Inject one for deterministic output. */
+  readonly now?: () => number;
 }
 
 /** A tile's position in the grid. */
@@ -40,6 +43,7 @@ export class Tileview extends LvObject {
   private readonly animations: AnimationEngine | undefined;
   private moving: AnimationHandle | undefined;
   private settling = false;
+  private readonly wheel: WheelGesture;
   /** While an animated move runs, the span between where it started and where it ends. */
   private moveRange: ScrollRange | undefined;
 
@@ -57,6 +61,7 @@ export class Tileview extends LvObject {
       },
     });
     this.animations = options.animations;
+    this.wheel = new WheelGesture(options.now ?? ((): number => performance.now()));
     // Dragging the view takes over from an easing move, which would otherwise fight the drag.
     this.addEventListener('scrollBegin', () => this.takeOverFromMove());
     this.addEventListener('scrollEnd', () => this.settle());
@@ -207,7 +212,8 @@ export class Tileview extends LvObject {
   /**
    * Settles a scroll no drag drove (a wheel). A move shorter than half a tile
    * steps to the neighbour in its direction, when there is one the tile allows,
-   * rather than rounding back to where it started.
+   * rather than rounding back to where it started. Only the first such event of
+   * a wheel gesture steps, so a stream of small events does not race ahead.
    */
   private settleScrolled(): void {
     const from = this.active;
@@ -225,6 +231,11 @@ export class Tileview extends LvObject {
     );
     if (nearest !== from || (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5)) {
       this.settle();
+      return;
+    }
+    if (!this.wheel.allowStep()) {
+      // The rest of a gesture that already stepped: stay on the tile it reached.
+      this.settleOn(from);
       return;
     }
     const horizontal = Math.abs(dx) >= Math.abs(dy);

@@ -530,7 +530,7 @@ The bar sits on `tabPosition` `'top'` (default), `'bottom'`, `'left'` or `'right
 whole page, so a swipe, a throw and a click all land on a page; a page taller
 than the view scrolls vertically on its own. The line under the active tab slides
 along with a swipe (`indicatorColor`, `indicatorThickness`). `setActive(index)`
-switches from code, and `valueChanged` fires when the active tab changes
+switches from code, a horizontal wheel or trackpad steps one page per gesture, and `valueChanged` fires when the active tab changes
 (`activeIndex`). Pass the simulator's `animations` to ease clicks and
 `setActive(index, true)`. `tabStyle` (with `states.checked` and `states.pressed`)
 and `barStyle` restyle the bar.

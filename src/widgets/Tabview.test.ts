@@ -278,13 +278,16 @@ describe('Tabview wheel and programmatic scrolling', () => {
   });
 
   it('steps one page for a wheel notch smaller than half a page, in the direction of the scroll', () => {
-    const view = tabview();
+    const clock = { time: 0 };
+    const view = tabview({ now: () => clock.time });
     const scroller = view.children[0];
     // A notch of 100px on a 300px page would round back to the first page if it snapped to the nearest.
     scroller?.scrollBy(100, 0);
     view.render(createFakeCanvasContext());
     expect(view.activeIndex).toBe(1);
     expect(scroller?.scrollX).toBe(300);
+    // A new gesture, after a pause.
+    clock.time += 500;
     scroller?.scrollBy(-100, 0);
     expect(view.activeIndex).toBe(0);
   });
@@ -319,5 +322,28 @@ describe('Tabview animation against a drag', () => {
     animations.tick(now);
     expect(scroller?.scrollX).toBe(midway);
     expect(view.activeIndex).toBe(0);
+  });
+});
+
+describe('Tabview trackpad gestures', () => {
+  it('steps one page for a stream of small wheel events, not one per event', () => {
+    const clock = { time: 0 };
+    const view = tabview({ now: () => clock.time });
+    const scroller = view.children[0];
+    for (let event = 0; event < 6; event += 1) {
+      scroller?.scrollBy(8, 0);
+      clock.time += 16;
+    }
+    expect(view.activeIndex).toBe(1);
+  });
+
+  it('steps again for a new gesture after a pause', () => {
+    const clock = { time: 0 };
+    const view = tabview({ now: () => clock.time });
+    const scroller = view.children[0];
+    scroller?.scrollBy(8, 0);
+    clock.time += 500;
+    scroller?.scrollBy(8, 0);
+    expect(view.activeIndex).toBe(2);
   });
 });

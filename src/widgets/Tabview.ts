@@ -2,6 +2,7 @@ import type { AnimationEngine, AnimationHandle } from '../animation/Animation.js
 import { LvObject, type LvObjectOptions } from '../core/LvObject.js';
 import type { PointerDraggable } from '../interaction/PointerDraggable.js';
 import { paintBackgroundAndBorder } from '../rendering/box.js';
+import { WheelGesture } from '../scroll/wheelGesture.js';
 import { paintRoundedRect } from '../rendering/shapes.js';
 import { mergeStyle, resolveStyle, type LvState, type StyleSet } from '../style/Style.js';
 import { defaultTheme } from '../theme/defaultTheme.js';
@@ -36,6 +37,8 @@ export interface TabviewOptions extends LvObjectOptions {
   readonly indicatorThickness?: number;
   /** Animates switching tabs when given; without it a tab switch jumps straight to the page. */
   readonly animations?: AnimationEngine;
+  /** Clock in ms for telling one wheel gesture from the next, defaulting to `performance.now()`. Inject one for deterministic output. */
+  readonly now?: () => number;
 }
 
 /**
@@ -67,6 +70,7 @@ export class Tabview extends LvObject implements PointerDraggable {
   private readonly animations: AnimationEngine | undefined;
   private switching: AnimationHandle | undefined;
   private snapping = false;
+  private readonly wheel: WheelGesture;
 
   /** Creates a tab view, adding a page for each of `options.tabs`. */
   constructor(options: TabviewOptions) {
@@ -91,6 +95,7 @@ export class Tabview extends LvObject implements PointerDraggable {
     this.indicatorColor = options.indicatorColor ?? defaultTheme.primaryColor;
     this.indicatorThickness = options.indicatorThickness ?? DEFAULT_INDICATOR_THICKNESS;
     this.animations = options.animations;
+    this.wheel = new WheelGesture(options.now ?? ((): number => performance.now()));
     this.barStyle = {
       base: mergeStyle({ bgColor: '#eceff1' }, options.barStyle?.base),
       states: options.barStyle?.states,
@@ -283,8 +288,9 @@ export class Tabview extends LvObject implements PointerDraggable {
   private snapToDisplayed(): void {
     let index = this.displayedIndex;
     const delta = this.scroller.scrollX - this.committedIndex * this.pageWidth;
-    // A move shorter than half a page (one wheel notch) steps a page in its direction, rather than rounding back.
-    if (index === this.committedIndex && Math.abs(delta) > 0.5) {
+    // A move shorter than half a page (a wheel notch) steps a page in its direction, rather than
+    // rounding back, but only once per gesture so a stream of small events does not race ahead.
+    if (index === this.committedIndex && Math.abs(delta) > 0.5 && this.wheel.allowStep()) {
       index = Math.min(this.pageList.length - 1, Math.max(0, index + Math.sign(delta)));
     }
     this.snapping = true;
