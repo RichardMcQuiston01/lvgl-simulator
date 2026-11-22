@@ -10,6 +10,8 @@ import type { ButtonControl } from '../widgets/buttonMatrixMath.js';
 import type { DropdownDirection } from '../widgets/Dropdown.js';
 import type { KeyboardMode } from '../widgets/keyboardLayout.js';
 import type { ListItemKind } from '../widgets/List.js';
+import type { TabPosition } from '../widgets/tabviewMath.js';
+import type { TileDirections } from '../widgets/tileviewMath.js';
 import type { SpanMode, SpanOverflow } from '../widgets/Span.js';
 import type { ScaleMode } from '../widgets/scaleMath.js';
 
@@ -47,7 +49,12 @@ export type SceneWidgetType =
   | 'dropdown'
   | 'roller'
   | 'buttonmatrix'
-  | 'list';
+  | 'list'
+  | 'win'
+  | 'tabview'
+  | 'tileview'
+  | 'msgbox'
+  | 'menu';
 
 /**
  * Fields every scene node shares, mirroring {@link LvObjectOptions}
@@ -369,6 +376,109 @@ export interface SceneListNode extends SceneNodeBase {
   readonly itemHeight?: number;
 }
 
+/** A button added to a `win` node's header. */
+export interface SceneWinButton {
+  readonly text: string;
+  readonly width?: number;
+}
+
+/** A `Win` (see `src/widgets/Win.ts`). `children` go in the window's content area. */
+export interface SceneWinNode extends SceneNodeBase {
+  readonly type: 'win';
+  readonly title?: string;
+  readonly headerHeight?: number;
+  readonly headerButtons?: readonly SceneWinButton[];
+  readonly headerStyle?: StyleSet;
+  readonly contentStyle?: StyleSet;
+  readonly children?: readonly SceneNode[];
+}
+
+/** One tab of a `tabview` node: its name and the widgets on its page. */
+export interface SceneTab {
+  readonly name: string;
+  readonly children?: readonly SceneNode[];
+}
+
+/** A `Tabview` (see `src/widgets/Tabview.ts`). */
+export interface SceneTabviewNode extends SceneNodeBase {
+  readonly type: 'tabview';
+  readonly tabs?: readonly SceneTab[];
+  readonly tabPosition?: TabPosition;
+  readonly tabBarSize?: number;
+  readonly barStyle?: StyleSet;
+  readonly tabStyle?: StyleSet;
+  readonly indicatorColor?: string;
+  readonly indicatorThickness?: number;
+}
+
+/** One tile of a `tileview` node: where it sits, which directions it allows leaving in, and its widgets. */
+export interface SceneTile {
+  readonly col: number;
+  readonly row: number;
+  readonly directions?: Partial<TileDirections>;
+  readonly children?: readonly SceneNode[];
+}
+
+/** A `Tileview` (see `src/widgets/Tileview.ts`). The first tile listed is the active one. */
+export interface SceneTileviewNode extends SceneNodeBase {
+  readonly type: 'tileview';
+  readonly tiles?: readonly SceneTile[];
+}
+
+/** A `Msgbox` (see `src/widgets/Msgbox.ts`). `height` is required when `modal`, and otherwise ignored. */
+export interface SceneMsgboxNode extends Omit<SceneNodeBase, 'height'> {
+  readonly type: 'msgbox';
+  readonly height?: number;
+  readonly title?: string;
+  readonly text?: string;
+  readonly buttons?: readonly string[];
+  readonly closeButton?: boolean;
+  readonly modal?: boolean;
+  readonly boxWidth?: number;
+  readonly dismissOnBackdrop?: boolean;
+  readonly boxStyle?: StyleSet;
+}
+
+/** A row in a `menu` page or section. `page` is the `id` of the page it opens. */
+export interface SceneMenuItem {
+  readonly kind?: 'item';
+  readonly text: string;
+  readonly icon?: string;
+  readonly page?: string;
+}
+
+/** A framed group of rows, with an optional heading. */
+export interface SceneMenuSection {
+  readonly kind: 'section';
+  readonly title?: string;
+  readonly items?: readonly (SceneMenuItem | SceneMenuSeparator)[];
+}
+
+/** A thin divider. */
+export interface SceneMenuSeparator {
+  readonly kind: 'separator';
+}
+
+/** One page of a `menu` node. Pages refer to each other by `id`, since a scene cannot hold live objects. */
+export interface SceneMenuPage {
+  readonly id: string;
+  readonly title?: string;
+  readonly items?: readonly (SceneMenuItem | SceneMenuSection | SceneMenuSeparator)[];
+}
+
+/** A `Menu` (see `src/widgets/Menu.ts`). `rootPage` and `sidebarPage` name pages by `id`; the first page is the root by default. */
+export interface SceneMenuNode extends SceneNodeBase {
+  readonly type: 'menu';
+  readonly pages?: readonly SceneMenuPage[];
+  readonly rootPage?: string;
+  readonly sidebarPage?: string;
+  readonly headerHeight?: number;
+  readonly sidebarWidth?: number;
+  readonly itemHeight?: number;
+  readonly alwaysShowBack?: boolean;
+  readonly headerStyle?: StyleSet;
+}
+
 export type SceneNode =
   | SceneContainerNode
   | SceneLabelNode
@@ -392,7 +502,12 @@ export type SceneNode =
   | SceneDropdownNode
   | SceneRollerNode
   | SceneButtonMatrixNode
-  | SceneListNode;
+  | SceneListNode
+  | SceneWinNode
+  | SceneTabviewNode
+  | SceneTileviewNode
+  | SceneMsgboxNode
+  | SceneMenuNode;
 
 /**
  * A full screen: the root is always a container (matching `createSimulator`'s

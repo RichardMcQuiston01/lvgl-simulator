@@ -192,3 +192,63 @@ describe('applyFlexLayout', () => {
     expect(secondLine.y).toBe(30);
   });
 });
+
+describe('applyFlexLayout flexGrow after the free space changes', () => {
+  function child(width: number, flexGrow?: number): LvObject {
+    return new LvObject({ width, height: 20, flexGrow });
+  }
+
+  it('shrinks a grown child back when a sibling is added', () => {
+    const grower = child(0, 1);
+    const first = child(30);
+    const row = [grower, first];
+    applyFlexLayout(row, 200, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(170);
+    const added = child(50);
+    row.push(added);
+    applyFlexLayout(row, 200, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(120);
+    expect(added.x + added.width).toBe(200);
+  });
+
+  it('grows again when the container widens, and shrinks when it narrows', () => {
+    const grower = child(10, 1);
+    const other = child(40);
+    applyFlexLayout([grower, other], 200, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(160);
+    applyFlexLayout([grower, other], 300, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(260);
+    applyFlexLayout([grower, other], 100, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(60);
+  });
+
+  it('returns a grown child to its own width when no space is left', () => {
+    const grower = child(25, 1);
+    const other = child(100);
+    applyFlexLayout([grower, other], 300, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(200);
+    applyFlexLayout([grower, other], 120, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(25);
+  });
+
+  it('takes a width the caller sets as the new starting width', () => {
+    const grower = child(10, 1);
+    const other = child(40);
+    applyFlexLayout([grower, other], 200, 20, { type: 'flex', direction: 'row' });
+    grower.width = 50;
+    applyFlexLayout([grower, other], 200, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(160);
+    // Starting again from the 50 it was given: 100 less its 50 and the other's 40 leaves 10 to grow into.
+    applyFlexLayout([grower, other], 100, 20, { type: 'flex', direction: 'row' });
+    expect(grower.width).toBe(60);
+  });
+
+  it('does the same down a column', () => {
+    const grower = new LvObject({ width: 20, height: 0, flexGrow: 1 });
+    const fixed = new LvObject({ width: 20, height: 30 });
+    applyFlexLayout([grower, fixed], 20, 100, { type: 'flex', direction: 'column' });
+    expect(grower.height).toBe(70);
+    applyFlexLayout([grower, fixed], 20, 60, { type: 'flex', direction: 'column' });
+    expect(grower.height).toBe(30);
+  });
+});

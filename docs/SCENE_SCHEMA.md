@@ -325,6 +325,112 @@ button with no flags), `oneChecked`, `gap`, `padding`, `itemsStyle`.
 `items` (each a `text`, an optional `icon`, and a `kind` of `button`, the
 default, or `text` for a section heading), `itemHeight`.
 
+### `win`
+
+```json
+{
+  "type": "win",
+  "width": 300,
+  "height": 200,
+  "title": "Settings",
+  "headerButtons": [{ "text": "x" }],
+  "children": [{ "type": "label", "x": 12, "y": 12, "width": 200, "height": 20, "text": "Hello" }]
+}
+```
+
+`title`, `headerHeight`, `headerButtons` (each a `text` and optional `width`),
+`headerStyle`, `contentStyle`. `children` are built into the window's content
+area, not the header.
+
+### `tabview`
+
+```json
+{
+  "type": "tabview",
+  "width": 320,
+  "height": 200,
+  "tabs": [
+    {
+      "name": "Home",
+      "children": [
+        { "type": "label", "x": 12, "y": 12, "width": 200, "height": 20, "text": "Home" }
+      ]
+    },
+    { "name": "Chat" }
+  ]
+}
+```
+
+`tabs` (each a `name` and the `children` of that tab's page), `tabPosition`
+(`top`, `bottom`, `left`, `right`), `tabBarSize`, `barStyle`, `tabStyle`,
+`indicatorColor`, `indicatorThickness`.
+
+### `tileview`
+
+```json
+{
+  "type": "tileview",
+  "width": 200,
+  "height": 120,
+  "tiles": [
+    { "col": 0, "row": 0, "directions": { "left": false }, "children": [] },
+    { "col": 1, "row": 0 }
+  ]
+}
+```
+
+`tiles` (each a `col`, `row`, optional `directions` of `left`, `right`, `top` and
+`bottom` booleans, default all allowed, and the `children` of that tile). The
+first tile listed is the active one.
+
+### `msgbox`
+
+```json
+{
+  "type": "msgbox",
+  "width": 260,
+  "title": "Delete file?",
+  "text": "This cannot be undone.",
+  "buttons": ["Cancel", "Delete"],
+  "closeButton": true
+}
+```
+
+`title`, `text`, `buttons`, `closeButton`, `modal`, `boxWidth`,
+`dismissOnBackdrop`, `boxStyle`. `height` is required when `modal` (the backdrop
+fills `width` x `height`) and otherwise ignored, as the box's height follows its
+content.
+
+### `menu`
+
+```json
+{
+  "type": "menu",
+  "width": 320,
+  "height": 240,
+  "pages": [
+    {
+      "id": "root",
+      "title": "Settings",
+      "items": [
+        { "text": "Display", "page": "display" },
+        { "kind": "separator" },
+        { "kind": "section", "title": "More", "items": [{ "text": "About" }] }
+      ]
+    },
+    { "id": "display", "title": "Display", "items": [{ "text": "Brightness" }] }
+  ]
+}
+```
+
+`pages` (each an `id`, a `title` and `items`), `rootPage` (an `id`; the first page
+by default), `sidebarPage` (an `id`), `headerHeight`, `sidebarWidth`,
+`itemHeight`, `alwaysShowBack`, `headerStyle`. An item is a `text` with an
+optional `icon` and `page` (the `id` of the page it opens, which may be defined
+later in the list); a `{ "kind": "section" }` groups items under an optional
+`title` (sections do not nest) and `{ "kind": "separator" }` is a divider. An
+`id` that names no page is an error that lists the ones that exist.
+
 ## Styling
 
 `style` is a `StyleSet` (`src/style/Style.ts`) — a plain, JSON-safe

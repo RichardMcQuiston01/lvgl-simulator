@@ -49,6 +49,9 @@ export function applyFlexLayout(
 ): void {
   const isRow = (layout.direction ?? 'row') === 'row';
   const wrap = layout.wrap ?? 'nowrap';
+  for (const child of children) {
+    restoreBaseSize(child, isRow);
+  }
   const mainAlign = layout.mainAlign ?? 'start';
   const crossAlign = layout.crossAlign ?? 'start';
   const mainGap = isRow ? (layout.columnGap ?? 0) : (layout.rowGap ?? 0);
@@ -82,14 +85,47 @@ export function applyFlexLayout(
   }
 }
 
+/** What a `flexGrow` child's main size was before it grew, and what it grew to. */
+interface GrowRecord {
+  readonly isRow: boolean;
+  readonly base: number;
+  readonly grown: number;
+}
+
+/** Sizes `flexGrow` children grew to, so the next layout can start again from the size they had. */
+const growRecords = new WeakMap<LvObject, GrowRecord>();
+
+/**
+ * Puts a `flexGrow` child back to the main size it had before it last grew,
+ * unless the caller has resized it since (then its current size is the new
+ * starting size). Without this, growth only ever accumulated: a child that
+ * grew into free space kept it when a sibling was added or the container
+ * narrowed, and overflowed.
+ */
+function restoreBaseSize(child: LvObject, isRow: boolean): void {
+  const record = growRecords.get(child);
+  growRecords.delete(child);
+  if (!record || record.isRow !== isRow || mainSize(child, isRow) !== record.grown) {
+    return;
+  }
+  if (isRow) {
+    child.width = record.base;
+  } else {
+    child.height = record.base;
+  }
+}
+
+/** A child's size along the main axis: its width in a row, its height in a column. */
 function mainSize(child: LvObject, isRow: boolean): number {
   return isRow ? child.width : child.height;
 }
 
+/** A child's size across the main axis: its height in a row, its width in a column. */
 function crossSize(child: LvObject, isRow: boolean): number {
   return isRow ? child.height : child.width;
 }
 
+/** Splits `children` into lines that each fit `contentMain` along the main axis, or one line when not wrapping. */
 function splitIntoLines(
   children: readonly LvObject[],
   contentMain: number,
@@ -118,6 +154,7 @@ function splitIntoLines(
   return lines;
 }
 
+/** Lays out one line: grows `flexGrow` children into the free space, distributes the rest per `mainAlign`, and aligns each child across the line. */
 function layoutLine(line: readonly LvObject[], params: LineLayoutParams): void {
   const { isRow, mainAlign, crossAlign, mainGap, contentMain, crossOffset, lineCrossSize } = params;
   if (line.length === 0) {
@@ -136,11 +173,13 @@ function layoutLine(line: readonly LvObject[], params: LineLayoutParams): void {
         continue;
       }
       const extra = (freeSpace * grow) / totalGrow;
+      const base = mainSize(child, isRow);
       if (isRow) {
         child.width += extra;
       } else {
         child.height += extra;
       }
+      growRecords.set(child, { isRow, base, grown: mainSize(child, isRow) });
     }
     freeSpace = 0;
   }
@@ -163,6 +202,7 @@ function layoutLine(line: readonly LvObject[], params: LineLayoutParams): void {
   }
 }
 
+/** The offset of the first child and the gap between children for `mainAlign` given `freeSpace` and `count` children. */
 function distributeMainAlign(
   align: FlexMainAlign,
   freeSpace: number,
@@ -192,6 +232,7 @@ function distributeMainAlign(
   }
 }
 
+/** The cross-axis offset of a child of `childCrossSize` within a line `lineCrossSize` thick. */
 function alignCross(align: FlexCrossAlign, lineCrossSize: number, childCrossSize: number): number {
   switch (align) {
     case 'center':

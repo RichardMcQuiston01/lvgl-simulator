@@ -7,6 +7,11 @@ import { ButtonMatrix } from '../widgets/ButtonMatrix.js';
 import { Checkbox } from '../widgets/Checkbox.js';
 import { Dropdown } from '../widgets/Dropdown.js';
 import { List } from '../widgets/List.js';
+import { Menu } from '../widgets/Menu.js';
+import { Msgbox } from '../widgets/Msgbox.js';
+import { Tabview } from '../widgets/Tabview.js';
+import { Tileview } from '../widgets/Tileview.js';
+import { Win } from '../widgets/Win.js';
 import { Roller } from '../widgets/Roller.js';
 import { Container } from '../widgets/Container.js';
 import { ImageButton } from '../widgets/ImageButton.js';
@@ -608,6 +613,187 @@ describe('loadScreen W3 widgets', () => {
       { type: 'buttonmatrix', width: 200, height: 80, map: ['1', '2', '\n', '3'] },
       { type: 'list', width: 200, height: 100, items: [{ text: 'One' }] },
       { type: 'checkbox', width: 100, height: 20, radioGroup: 'g', text: 'Radio' },
+    ]);
+    expect(() => root.render(createFakeCanvasContext())).not.toThrow();
+  });
+});
+
+describe('loadScreen W4 widgets', () => {
+  function load(children: SceneNode[]): Container {
+    return loadScreen({ version: SCENE_SCHEMA_VERSION, width: 400, height: 400, children });
+  }
+
+  it('builds a Win with header buttons and widgets in its content area', () => {
+    const win = load([
+      {
+        type: 'win',
+        width: 300,
+        height: 200,
+        title: 'Settings',
+        headerHeight: 36,
+        headerButtons: [{ text: 'X' }, { text: 'Help', width: 60 }],
+        children: [{ type: 'label', x: 5, y: 5, width: 80, height: 20, text: 'Hello' }],
+      },
+    ]).children[0] as Win;
+    expect(win).toBeInstanceOf(Win);
+    expect(win.headerHeight).toBe(36);
+    // The title and two buttons.
+    expect(win.header.children).toHaveLength(3);
+    expect(win.content.children).toHaveLength(1);
+  });
+
+  it('builds a Tabview with a page per tab, filled with each tab children', () => {
+    const view = load([
+      {
+        type: 'tabview',
+        width: 300,
+        height: 200,
+        tabPosition: 'bottom',
+        tabs: [
+          { name: 'One', children: [{ type: 'label', width: 50, height: 20, text: 'a' }] },
+          { name: 'Two' },
+        ],
+      },
+    ]).children[0] as Tabview;
+    expect(view).toBeInstanceOf(Tabview);
+    expect(view.tabPosition).toBe('bottom');
+    expect(view.names).toEqual(['One', 'Two']);
+    expect(view.pages[0]?.children).toHaveLength(1);
+    expect(view.pages[1]?.children).toHaveLength(0);
+  });
+
+  it('builds a Tileview, the first tile being active, with its directions', () => {
+    const view = load([
+      {
+        type: 'tileview',
+        width: 200,
+        height: 100,
+        tiles: [
+          {
+            col: 0,
+            row: 0,
+            directions: { right: false },
+            children: [{ type: 'switch', width: 44, height: 24 }],
+          },
+          { col: 1, row: 0 },
+        ],
+      },
+    ]).children[0] as Tileview;
+    expect(view).toBeInstanceOf(Tileview);
+    expect(view.activeTile).toEqual({ col: 0, row: 0 });
+    expect(view.tileContainer(0, 0)?.children).toHaveLength(1);
+    expect(view.getScrollRange().maxX).toBe(0);
+  });
+
+  it('builds a Msgbox, including a modal one', () => {
+    const [plain, modal] = load([
+      { type: 'msgbox', width: 260, title: 'Hi', text: 'Body', buttons: ['OK'], closeButton: true },
+      { type: 'msgbox', width: 400, height: 400, modal: true, boxWidth: 200, text: 'Wait' },
+    ]).children as [Msgbox, Msgbox];
+    expect(plain).toBeInstanceOf(Msgbox);
+    expect(plain.buttons).toHaveLength(1);
+    expect(plain.closeButton).toBeDefined();
+    expect(modal.modal).toBe(true);
+    expect(modal.box.width).toBe(200);
+  });
+
+  it('builds a Menu whose items open pages by id, including pages defined later', () => {
+    const menu = load([
+      {
+        type: 'menu',
+        width: 300,
+        height: 240,
+        sidebarPage: 'nav',
+        pages: [
+          {
+            id: 'root',
+            title: 'Settings',
+            items: [
+              { text: 'Display', icon: '*', page: 'display' },
+              { kind: 'separator' },
+              { kind: 'section', title: 'More', items: [{ text: 'Sound', page: 'sound' }] },
+            ],
+          },
+          { id: 'display', title: 'Display', items: [{ text: 'Brightness' }] },
+          { id: 'sound', title: 'Sound' },
+          { id: 'nav', title: 'Menu', items: [{ text: 'Sound', page: 'sound' }] },
+        ],
+      },
+    ]).children[0] as Menu;
+    expect(menu).toBeInstanceOf(Menu);
+    expect(menu.pages).toHaveLength(4);
+    expect(menu.currentPage?.title).toBe('Settings');
+    expect(menu.sidebarPage?.title).toBe('Menu');
+    menu.currentPage?.entries[0]?.dispatchEvent('clicked');
+    expect(menu.currentPage?.title).toBe('Display');
+  });
+
+  it('uses the rootPage the menu names', () => {
+    const menu = load([
+      {
+        type: 'menu',
+        width: 300,
+        height: 240,
+        rootPage: 'b',
+        pages: [
+          { id: 'a', title: 'A' },
+          { id: 'b', title: 'B' },
+        ],
+      },
+    ]).children[0] as Menu;
+    expect(menu.currentPage?.title).toBe('B');
+  });
+
+  it('names a missing page in the error, with the pages that exist', () => {
+    const scene: SceneNode = {
+      type: 'menu',
+      width: 300,
+      height: 240,
+      pages: [{ id: 'a', items: [{ text: 'Go', page: 'nowhere' }] }],
+    };
+    expect(() => load([scene])).toThrow(/"nowhere".*\["a"\]/);
+    expect(() => load([{ ...scene, pages: [{ id: 'a' }], rootPage: 'missing' }])).toThrow(
+      /rootPage.*"missing"/,
+    );
+  });
+
+  it('rejects a section nested inside a section', () => {
+    const scene = {
+      type: 'menu',
+      width: 300,
+      height: 240,
+      pages: [
+        {
+          id: 'a',
+          items: [{ kind: 'section', items: [{ kind: 'section', items: [] }] }],
+        },
+      ],
+    } as unknown as SceneNode;
+    expect(() => load([scene])).toThrow(/section inside a section/);
+  });
+
+  it('names the new types in the unknown-type error', () => {
+    const scene: Scene = {
+      version: SCENE_SCHEMA_VERSION,
+      width: 10,
+      height: 10,
+      children: [{ type: 'nope', width: 1, height: 1 } as unknown as SceneNode],
+    };
+    expect(() => loadScreen(scene)).toThrow(/win, tabview, tileview, msgbox, menu/);
+  });
+
+  it('renders every W4 widget without throwing', () => {
+    const root = load([
+      { type: 'win', width: 200, height: 120, title: 'Win' },
+      { type: 'tabview', width: 200, height: 120, tabs: [{ name: 'A' }, { name: 'B' }] },
+      { type: 'tileview', width: 200, height: 120, tiles: [{ col: 0, row: 0 }] },
+      { type: 'msgbox', width: 200, text: 'Hello', buttons: ['OK'] },
+      {
+        type: 'menu',
+        width: 200,
+        height: 120,
+        pages: [{ id: 'a', title: 'A', items: [{ text: 'One' }] }],
+      },
     ]);
     expect(() => root.render(createFakeCanvasContext())).not.toThrow();
   });

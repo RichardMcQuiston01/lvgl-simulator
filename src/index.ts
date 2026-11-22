@@ -111,6 +111,12 @@ export type {
   SceneLabelNode,
   SceneLedNode,
   SceneLineNode,
+  SceneMenuItem,
+  SceneMenuNode,
+  SceneMenuPage,
+  SceneMenuSection,
+  SceneMenuSeparator,
+  SceneMsgboxNode,
   SceneListItem,
   SceneListNode,
   SceneNode,
@@ -123,6 +129,12 @@ export type {
   SceneSpanRun,
   SceneSpinboxNode,
   SceneSpinnerNode,
+  SceneTab,
+  SceneTabviewNode,
+  SceneTile,
+  SceneTileviewNode,
+  SceneWinButton,
+  SceneWinNode,
   SceneTextareaNode,
   SceneSwitchNode,
   SceneWidgetType,
@@ -236,6 +248,32 @@ export {
 export type { RollerSlot } from './widgets/rollerMath.js';
 export { dismissPopups, isPopup } from './interaction/Popup.js';
 export type { Popup } from './interaction/Popup.js';
+export { Win } from './widgets/Win.js';
+export type { WinOptions } from './widgets/Win.js';
+export { Tabview } from './widgets/Tabview.js';
+export type { TabviewOptions } from './widgets/Tabview.js';
+export {
+  activeIndexAt,
+  tabButtonRects,
+  tabIndicatorRect,
+  tabviewLayout,
+} from './widgets/tabviewMath.js';
+export type { TabPosition, TabRect } from './widgets/tabviewMath.js';
+export { Tileview } from './widgets/Tileview.js';
+export type { TilePosition, TileviewOptions } from './widgets/Tileview.js';
+export {
+  ALL_TILE_DIRECTIONS,
+  nearestTile,
+  reachableTiles,
+  resolveDirections,
+  tileAt,
+  tileRange,
+} from './widgets/tileviewMath.js';
+export type { TileDirections, TileInfo, TileRange } from './widgets/tileviewMath.js';
+export { Msgbox } from './widgets/Msgbox.js';
+export type { MsgboxOptions } from './widgets/Msgbox.js';
+export { Menu, MenuColumn, MenuItem, MenuPage, MenuSection } from './widgets/Menu.js';
+export type { MenuItemOptions, MenuOptions } from './widgets/Menu.js';
 export { Container } from './widgets/Container.js';
 export type { ContainerLayout, ContainerOptions } from './widgets/Container.js';
 export { Label } from './widgets/Label.js';

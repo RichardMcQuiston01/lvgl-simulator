@@ -59,6 +59,8 @@ export function attachInteraction(
   const scrollLimit = options.scrollLimit ?? 10;
   const gestureLimit = options.gestureLimit ?? 50;
   const scrollThrowMs = options.scrollThrowMs ?? 250;
+  /** A pointer that rested this long (ms) before release has no flick left in it. */
+  const flickWindowMs = 100;
 
   let activeObject: LvObject | null = null;
   let activePointerId: number | null = null;
@@ -265,6 +267,11 @@ export function attachInteraction(
       const finishedTarget = scrollTarget;
       scrollTarget = null;
       releasedObject.pressed = false;
+      if ((event.timeStamp ?? lastTime) - lastTime > flickWindowMs) {
+        // Holding still before letting go cancels the flick, so the scroll just settles.
+        velocityX = 0;
+        velocityY = 0;
+      }
       releaseScroll(finishedTarget);
       render();
       return;

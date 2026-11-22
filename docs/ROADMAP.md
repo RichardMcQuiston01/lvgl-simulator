@@ -181,13 +181,13 @@ version, with a CHANGELOG entry.
 - [x] `List` — scrollable list of text/buttons
 - [x] `Checkbox` radio grouping (`checked` exclusivity) — `CheckboxGroup`
 
-### Phase W4: Container and navigation widgets
+### Phase W4: Container and navigation widgets — done
 
-- [ ] `Tabview` — tab bar position, swipe, content pages
-- [ ] `Tileview` — grid of tiles, swipe directions
-- [ ] `Msgbox` — title, text, close button, footer buttons, modal backdrop
-- [ ] `Win` — header, title, buttons, content
-- [ ] `Menu` — sidebar/main pages, back button, separators, sections
+- [x] `Tabview` — tab bar position, swipe, content pages
+- [x] `Tileview` — grid of tiles, swipe directions
+- [x] `Msgbox` — title, text, close button, footer buttons, modal backdrop
+- [x] `Win` — header, title, buttons, content
+- [x] `Menu` — sidebar/main pages, back button, separators, sections
 
 ### Phase W5: Data widgets
 
