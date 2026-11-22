@@ -353,4 +353,44 @@ describe('review fixes', () => {
     expect(scrollEnd).toHaveBeenCalledTimes(1);
     expect(engine.activeCount).toBe(0);
   });
+
+  it('does not throw a scroll when the pointer rested before release', () => {
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 100, height: 100 });
+    const list = new LvObject({ width: 100, height: 100 });
+    for (let i = 0; i < 5; i += 1) {
+      list.addChild(new LvObject({ y: i * 40, width: 100, height: 40 }));
+    }
+    screen.addChild(list);
+    const engine = createAnimationEngine({ now: () => 0, scheduler: null });
+    attachInteraction(canvas, screen, vi.fn(), { animations: engine });
+
+    canvas.dispatch('pointerdown', { pointerId: 1, offsetX: 50, offsetY: 90, timeStamp: 0 });
+    canvas.dispatch('pointermove', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 10 });
+    // Half a second later, with no movement in between.
+    canvas.dispatch('pointerup', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 510 });
+
+    expect(list.scrollY).toBe(30);
+    expect(list.scrolling).toBe(false);
+    expect(engine.activeCount).toBe(0);
+  });
+
+  it('still throws a scroll released straight after a quick move', () => {
+    const canvas = createFakeCanvas();
+    const screen = new LvObject({ width: 100, height: 100 });
+    const list = new LvObject({ width: 100, height: 100 });
+    for (let i = 0; i < 5; i += 1) {
+      list.addChild(new LvObject({ y: i * 40, width: 100, height: 40 }));
+    }
+    screen.addChild(list);
+    const engine = createAnimationEngine({ now: () => 0, scheduler: null });
+    attachInteraction(canvas, screen, vi.fn(), { animations: engine });
+
+    canvas.dispatch('pointerdown', { pointerId: 1, offsetX: 50, offsetY: 90, timeStamp: 0 });
+    canvas.dispatch('pointermove', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 10 });
+    canvas.dispatch('pointerup', { pointerId: 1, offsetX: 50, offsetY: 60, timeStamp: 20 });
+
+    expect(list.scrolling).toBe(true);
+    expect(engine.activeCount).toBe(1);
+  });
 });
