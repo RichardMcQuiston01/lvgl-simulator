@@ -122,7 +122,7 @@ export class Msgbox extends LvObject {
   private readonly closeButtonObject: Button | undefined;
   private readonly body: MsgboxText;
   private readonly footer: Button[] = [];
-  private readonly boxWidth: number;
+  private readonly modalBoxWidth: number;
 
   /** Creates a message box. A `modal` one needs `height` too, as it fills that space. */
   constructor(options: MsgboxOptions) {
@@ -147,7 +147,7 @@ export class Msgbox extends LvObject {
       },
     });
     this.modal = modal;
-    this.boxWidth = boxWidth;
+    this.modalBoxWidth = boxWidth;
     this.dismissOnBackdrop = options.dismissOnBackdrop ?? false;
 
     this.box = new Container({
@@ -205,6 +205,11 @@ export class Msgbox extends LvObject {
       }
     });
     this.layoutBox();
+  }
+
+  /** The box's width: the configured `boxWidth` when modal, otherwise the object's own current width. */
+  private get boxWidth(): number {
+    return this.modal ? this.modalBoxWidth : this.width;
   }
 
   /** The title text, or `undefined` when there is none. */

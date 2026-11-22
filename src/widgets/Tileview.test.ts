@@ -203,3 +203,70 @@ describe('Tileview scrolling', () => {
     expect(vi.mocked(context.fillText).mock.calls.map((call) => call[0])).toContain('Top tile');
   });
 });
+
+describe('Tileview diagonal swipes and animated moves', () => {
+  /** A 2 x 2 grid in a 100 x 50 view. */
+  function grid(): Tileview {
+    const view = new Tileview({ width: 100, height: 50 });
+    view.addTile(0, 0);
+    view.addTile(1, 0);
+    view.addTile(0, 1);
+    view.addTile(1, 1);
+    return view;
+  }
+
+  it('settles on a neighbour, never the diagonal tile, after a diagonal drag', () => {
+    const view = grid();
+    view.scrolling = true;
+    view.scrollTo(80, 40);
+    view.scrolling = false;
+    view.dispatchEvent('scrollEnd');
+    const active = view.activeTile;
+    expect(active && active.col + active.row).toBe(1);
+  });
+
+  it('does not settle on a neighbour the active tile forbids', () => {
+    const view = new Tileview({ width: 100, height: 50 });
+    view.addTile(0, 0, { right: false });
+    view.addTile(1, 0);
+    view.addTile(0, 1);
+    view.scrolling = true;
+    view.scrollTo(80, 0);
+    view.scrolling = false;
+    view.dispatchEvent('scrollEnd');
+    expect(view.activeTile).toEqual({ col: 0, row: 0 });
+  });
+
+  it('eases from the start tile even when the destination forbids leaving back toward it', () => {
+    let now = 0;
+    const animations = createAnimationEngine({ now: () => now, scheduler: null });
+    const view = new Tileview({ width: 100, height: 50, animations });
+    view.addTile(0, 0);
+    view.addTile(1, 0, { left: false });
+    view.setActiveTile(1, 0, true);
+    now = 20;
+    animations.tick(now);
+    // Early in the move the view is still near the start tile, not jumped to the destination.
+    expect(view.scrollX).toBeLessThan(60);
+    now = 1000;
+    animations.tick(now);
+    expect(view.scrollX).toBe(100);
+    expect(view.activeTile).toEqual({ col: 1, row: 0 });
+  });
+
+  it('eases a long move through the tiles in between', () => {
+    let now = 0;
+    const animations = createAnimationEngine({ now: () => now, scheduler: null });
+    const view = new Tileview({ width: 100, height: 50, animations });
+    view.addTile(0, 0);
+    view.addTile(1, 0);
+    view.addTile(2, 0);
+    view.setActiveTile(2, 0, true);
+    now = 20;
+    animations.tick(now);
+    expect(view.scrollX).toBeLessThan(100);
+    now = 1000;
+    animations.tick(now);
+    expect(view.scrollX).toBe(200);
+  });
+});

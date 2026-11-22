@@ -81,3 +81,25 @@ describe('Win', () => {
     expect(win.isScrollable).toBe(false);
   });
 });
+
+describe('Win header after it has been laid out', () => {
+  it('shrinks the title when a button is added later, keeping the button inside the header', () => {
+    const win = new Win({ width: 300, height: 200, title: 'Settings' });
+    win.render(createFakeCanvasContext());
+    const title = win.header.children[0];
+    expect(title?.width).toBe(300 - 16);
+    const button = win.addButton('X');
+    win.render(createFakeCanvasContext());
+    expect(title?.width).toBe(300 - 16 - 4 - 32);
+    expect(button.x + button.width).toBe(300 - 8);
+  });
+
+  it('shrinks the title when the window narrows', () => {
+    const win = new Win({ width: 300, height: 200, title: 'Settings' });
+    win.addButton('X');
+    win.render(createFakeCanvasContext());
+    win.width = 200;
+    win.render(createFakeCanvasContext());
+    expect(win.header.children[0]?.width).toBe(200 - 16 - 4 - 32);
+  });
+});

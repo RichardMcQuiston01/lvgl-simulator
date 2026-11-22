@@ -211,3 +211,22 @@ describe('Msgbox painting', () => {
     expect(vi.mocked(context.fillText)).not.toHaveBeenCalled();
   });
 });
+
+describe('Msgbox resizing', () => {
+  it('follows its width when it is not modal', () => {
+    const box = msgbox({ text: 'Hi', buttons: ['No', 'Yes'], title: 'T', closeButton: true });
+    box.width = 400;
+    box.render(createFakeCanvasContext());
+    expect(box.box.width).toBe(400);
+    expect(box.buttons[0]?.width).toBe((400 - 32 - 12) / 2);
+    expect(box.closeButton?.x).toBe(400 - 16 - 32);
+  });
+
+  it('keeps a modal box at its box width when the backdrop is resized', () => {
+    const box = msgbox({ modal: true, width: 400, height: 300, boxWidth: 200, text: 'Hi' });
+    box.width = 500;
+    box.render(createFakeCanvasContext());
+    expect(box.box.width).toBe(200);
+    expect(box.box.x).toBe(150);
+  });
+});

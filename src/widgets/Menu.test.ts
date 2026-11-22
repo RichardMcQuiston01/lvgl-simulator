@@ -267,3 +267,18 @@ describe('Menu sidebar', () => {
     expect(sidebar.width).toBe(80);
   });
 });
+
+describe('Menu header after it has been laid out', () => {
+  it('keeps the title within the header when the menu narrows', () => {
+    const { view } = twoLevel({ alwaysShowBack: true });
+    view.render(createFakeCanvasContext());
+    view.width = 200;
+    view.render(createFakeCanvasContext());
+    const title = view.header.children[1];
+    const back = view.header.children[0];
+    // 4px left and 8px right padding, one 4px gap and the 32px back button.
+    expect(title?.width).toBe(200 - 12 - 4 - 32);
+    expect((title?.x ?? 0) + (title?.width ?? 0)).toBeLessThanOrEqual(200 - 8);
+    expect(back?.x).toBe(4);
+  });
+});

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ALL_TILE_DIRECTIONS,
   nearestTile,
+  reachableTiles,
   resolveDirections,
   tileAt,
   tileRange,
@@ -87,5 +88,29 @@ describe('nearestTile', () => {
   it('falls back to the first tile for a zero size, and has none without tiles', () => {
     expect(nearestTile(tiles, 10, 10, 0, 0)).toBe(tiles[0]);
     expect(nearestTile([], 0, 0, 100, 50)).toBeUndefined();
+  });
+});
+
+describe('reachableTiles', () => {
+  const tiles = [tile(0, 0), tile(1, 0), tile(0, 1), tile(1, 1)];
+
+  it('is the tile itself and each existing neighbour it allows, never a diagonal', () => {
+    const reachable = reachableTiles(tiles[0] as TileInfo, tiles);
+    expect(reachable.map((entry) => [entry.col, entry.row])).toEqual([
+      [0, 0],
+      [1, 0],
+      [0, 1],
+    ]);
+  });
+
+  it('leaves out a neighbour the tile forbids, or that does not exist', () => {
+    const restricted = [tile(0, 0, resolveDirections({ right: false })), tile(1, 0), tile(0, 1)];
+    expect(
+      reachableTiles(restricted[0] as TileInfo, restricted).map((entry) => [entry.col, entry.row]),
+    ).toEqual([
+      [0, 0],
+      [0, 1],
+    ]);
+    expect(reachableTiles(tiles[3] as TileInfo, tiles)).toHaveLength(3);
   });
 });

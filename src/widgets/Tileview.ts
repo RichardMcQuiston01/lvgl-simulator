@@ -6,6 +6,7 @@ import { defaultTheme } from '../theme/defaultTheme.js';
 import { Container } from './Container.js';
 import {
   nearestTile,
+  reachableTiles,
   resolveDirections,
   tileAt,
   tileRange,
@@ -39,6 +40,8 @@ export class Tileview extends LvObject {
   private readonly animations: AnimationEngine | undefined;
   private moving: AnimationHandle | undefined;
   private settling = false;
+  /** While an animated move runs, the span between where it started and where it ends. */
+  private moveRange: ScrollRange | undefined;
 
   /** Creates an empty tile view. */
   constructor(options: TileviewOptions) {
@@ -136,6 +139,13 @@ export class Tileview extends LvObject {
     }
     const fromX = this.scrollX;
     const fromY = this.scrollY;
+    // The destination's own range may not include where the move starts, so allow the whole span.
+    this.moveRange = {
+      minX: Math.min(fromX, x),
+      maxX: Math.max(fromX, x),
+      minY: Math.min(fromY, y),
+      maxY: Math.max(fromY, y),
+    };
     this.moving = this.animations.start({
       from: 0,
       to: 1,
@@ -146,6 +156,7 @@ export class Tileview extends LvObject {
       },
       onComplete: () => {
         this.moving = undefined;
+        this.moveRange = undefined;
         this.scrollTo(x, y);
         this.announce();
       },
@@ -155,6 +166,9 @@ export class Tileview extends LvObject {
 
   /** The offsets the view can reach from the active tile: its neighbours it allows, nothing else. */
   override getScrollRange(): ScrollRange {
+    if (this.moveRange) {
+      return this.moveRange;
+    }
     return tileRange(this.active, this.infos, this.width, this.height);
   }
 
@@ -180,7 +194,9 @@ export class Tileview extends LvObject {
 
   /** Makes the tile nearest the scroll position active, snapping onto it. */
   private settle(): void {
-    const target = nearestTile(this.infos, this.scrollX, this.scrollY, this.width, this.height);
+    // A swipe ends on the active tile or one neighbour it allows, never a diagonal or farther tile.
+    const candidates = this.active ? reachableTiles(this.active, this.infos) : this.infos;
+    const target = nearestTile(candidates, this.scrollX, this.scrollY, this.width, this.height);
     if (!target) {
       return;
     }
@@ -203,6 +219,7 @@ export class Tileview extends LvObject {
   private cancelMoving(): void {
     this.moving?.cancel();
     this.moving = undefined;
+    this.moveRange = undefined;
   }
 
   /** Sizes every tile to the view and keeps the active tile in view, following a resize. */

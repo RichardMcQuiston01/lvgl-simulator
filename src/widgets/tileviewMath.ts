@@ -71,6 +71,19 @@ export function tileRange(
   };
 }
 
+/** The tiles a swipe from `active` can end on: `active` itself and each existing neighbour it allows moving to. */
+export function reachableTiles(active: TileInfo, tiles: readonly TileInfo[]): TileInfo[] {
+  const { col, row, directions } = active;
+  const candidates: (TileInfo | undefined)[] = [
+    active,
+    directions.left ? tileAt(tiles, col - 1, row) : undefined,
+    directions.right ? tileAt(tiles, col + 1, row) : undefined,
+    directions.top ? tileAt(tiles, col, row - 1) : undefined,
+    directions.bottom ? tileAt(tiles, col, row + 1) : undefined,
+  ];
+  return candidates.filter((tile): tile is TileInfo => tile !== undefined);
+}
+
 /** The tile nearest the scroll offset `(scrollX, scrollY)`, or `undefined` with no tiles. */
 export function nearestTile(
   tiles: readonly TileInfo[],

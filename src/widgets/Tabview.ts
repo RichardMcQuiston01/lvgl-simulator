@@ -66,6 +66,7 @@ export class Tabview extends LvObject implements PointerDraggable {
   private releasedTab: number | undefined;
   private readonly animations: AnimationEngine | undefined;
   private switching: AnimationHandle | undefined;
+  private snapping = false;
 
   /** Creates a tab view, adding a page for each of `options.tabs`. */
   constructor(options: TabviewOptions) {
@@ -120,6 +121,12 @@ export class Tabview extends LvObject implements PointerDraggable {
     });
     super.addChild(this.scroller);
     this.scroller.addEventListener('scrollEnd', () => this.commit(this.displayedIndex));
+    this.scroller.addEventListener('scroll', () => {
+      // A scroll no drag is driving (a horizontal wheel) has no scrollEnd, so settle it here.
+      if (!this.scroller.scrolling && !this.switching && !this.snapping) {
+        this.snapToDisplayed();
+      }
+    });
 
     this.addEventListener('pressed', () => {
       this.releasedTab = undefined;
@@ -268,6 +275,15 @@ export class Tabview extends LvObject implements PointerDraggable {
         this.committedIndex * content.width,
       );
     }
+  }
+
+  /** Snaps the pages onto the one nearest the scroll position and makes it the active tab. */
+  private snapToDisplayed(): void {
+    const index = this.displayedIndex;
+    this.snapping = true;
+    this.scroller.scrollTo(index * this.pageWidth, 0);
+    this.snapping = false;
+    this.commit(index);
   }
 
   /** Makes `index` the active tab, firing `valueChanged` if it changed. */

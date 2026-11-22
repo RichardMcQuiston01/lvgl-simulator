@@ -144,9 +144,12 @@ describe('Tabview switching', () => {
     if (!scroller) {
       throw new Error('missing scroller');
     }
+    // The interaction controller marks the scroller as scrolling while a drag is in progress.
+    scroller.scrolling = true;
     scroller.scrollTo(310, 0);
     expect(view.activeIndex).toBe(0);
     expect(view.displayedIndex).toBe(1);
+    scroller.scrolling = false;
     scroller.dispatchEvent('scrollEnd');
     expect(view.activeIndex).toBe(1);
     expect(listener).toHaveBeenCalledTimes(1);
@@ -220,7 +223,11 @@ describe('Tabview painting', () => {
     const view = tabview();
     // Three tabs share a 300px bar, so each is 100 wide; the mark is 3px tall on the bar's lower edge.
     expect(view.indicatorBounds).toEqual({ x: 0, y: 37, width: 100, height: 3 });
-    view.children[0]?.scrollTo(150, 0);
+    const scroller = view.children[0];
+    if (scroller) {
+      scroller.scrolling = true;
+    }
+    scroller?.scrollTo(150, 0);
     // Halfway through the 300px page, halfway between the first and second tab.
     expect(view.indicatorBounds).toEqual({ x: 50, y: 37, width: 100, height: 3 });
     view.setActive(2);
@@ -254,5 +261,27 @@ describe('Tabview painting', () => {
     const context = createFakeCanvasContext();
     tabview({ tabs: [] }).render(context);
     expect(vi.mocked(context.fillText)).not.toHaveBeenCalled();
+  });
+});
+
+describe('Tabview wheel and programmatic scrolling', () => {
+  it('commits a tab reached by scrolling the pages without a drag, such as a horizontal wheel', () => {
+    const view = tabview();
+    const listener = vi.fn();
+    view.addEventListener('valueChanged', listener);
+    const scroller = view.children[0];
+    scroller?.scrollBy(300, 0);
+    view.render(createFakeCanvasContext());
+    expect(view.activeIndex).toBe(1);
+    expect(view.displayedIndex).toBe(1);
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it('snaps a wheel scroll that stops between pages onto the nearer one', () => {
+    const view = tabview();
+    view.children[0]?.scrollBy(100, 0);
+    view.render(createFakeCanvasContext());
+    expect(view.activeIndex).toBe(0);
+    expect(view.children[0]?.scrollX).toBe(0);
   });
 });

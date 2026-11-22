@@ -264,6 +264,7 @@ export type { TilePosition, TileviewOptions } from './widgets/Tileview.js';
 export {
   ALL_TILE_DIRECTIONS,
   nearestTile,
+  reachableTiles,
   resolveDirections,
   tileAt,
   tileRange,
