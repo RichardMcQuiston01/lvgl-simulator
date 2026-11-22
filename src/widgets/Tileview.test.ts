@@ -178,12 +178,9 @@ describe('Tileview scrolling', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  it('snaps a wheel scroll onto a tile', () => {
+  it('snaps a wheel scroll of more than half a tile onto the nearest tile', () => {
     const view = plus();
     view.setActiveTile(1, 1);
-    view.scrollBy(30, 0);
-    expect(view.activeTile).toEqual({ col: 1, row: 1 });
-    expect(view.scrollX).toBe(100);
     view.scrollBy(60, 0);
     expect(view.scrollX).toBe(200);
     expect(view.activeTile).toEqual({ col: 2, row: 1 });
@@ -287,5 +284,46 @@ describe('Tileview animation against a drag', () => {
     animations.tick(now);
     expect(view.scrollX).toBe(midway);
     expect(animations.activeCount).toBe(0);
+  });
+});
+
+describe('Tileview wheel steps and taking over from an easing move', () => {
+  it('steps one tile for a wheel notch smaller than half a tile', () => {
+    const view = plus();
+    view.setActiveTile(1, 1);
+    view.scrollBy(30, 0);
+    expect(view.activeTile).toEqual({ col: 2, row: 1 });
+    expect(view.scrollX).toBe(200);
+  });
+
+  it('steps vertically too, and stays put when the neighbour in that direction is not allowed', () => {
+    const view = new Tileview({ width: 100, height: 50 });
+    view.addTile(0, 0, { bottom: false });
+    view.addTile(0, 1);
+    view.scrollBy(0, 10);
+    expect(view.activeTile).toEqual({ col: 0, row: 0 });
+    expect(view.scrollY).toBe(0);
+  });
+
+  it('follows the pointer from where the user took over an easing move, without jumping', () => {
+    let now = 0;
+    const animations = createAnimationEngine({ now: () => now, scheduler: null });
+    const view = new Tileview({ width: 100, height: 50, animations });
+    view.addTile(0, 0);
+    view.addTile(1, 0, { left: false });
+    view.setActiveTile(1, 0, true);
+    now = 60;
+    animations.tick(now);
+    const takenOver = view.scrollX;
+    expect(takenOver).toBeGreaterThan(0);
+    expect(takenOver).toBeLessThan(100);
+    view.dispatchEvent('scrollBegin');
+    view.scrolling = true;
+    // The first drag update moves a little, which must not jump to the destination.
+    view.scrollBy(-5, 0);
+    expect(view.scrollX).toBeCloseTo(takenOver - 5, 5);
+    view.scrolling = false;
+    view.dispatchEvent('scrollEnd');
+    expect(view.scrollX % 100).toBe(0);
   });
 });

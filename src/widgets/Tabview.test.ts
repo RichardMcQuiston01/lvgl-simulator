@@ -277,12 +277,29 @@ describe('Tabview wheel and programmatic scrolling', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  it('snaps a wheel scroll that stops between pages onto the nearer one', () => {
+  it('steps one page for a wheel notch smaller than half a page, in the direction of the scroll', () => {
     const view = tabview();
-    view.children[0]?.scrollBy(100, 0);
+    const scroller = view.children[0];
+    // A notch of 100px on a 300px page would round back to the first page if it snapped to the nearest.
+    scroller?.scrollBy(100, 0);
     view.render(createFakeCanvasContext());
+    expect(view.activeIndex).toBe(1);
+    expect(scroller?.scrollX).toBe(300);
+    scroller?.scrollBy(-100, 0);
+    expect(view.activeIndex).toBe(0);
+  });
+
+  it('keeps a wheel at the first page where there is nothing before it', () => {
+    const view = tabview();
+    view.children[0]?.scrollBy(-100, 0);
     expect(view.activeIndex).toBe(0);
     expect(view.children[0]?.scrollX).toBe(0);
+  });
+
+  it('settles a wheel move of more than half a page on the nearest page', () => {
+    const view = tabview();
+    view.children[0]?.scrollBy(500, 0);
+    expect(view.activeIndex).toBe(2);
   });
 });
 

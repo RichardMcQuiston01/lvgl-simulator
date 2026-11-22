@@ -58,12 +58,12 @@ export class Tileview extends LvObject {
     });
     this.animations = options.animations;
     // Dragging the view takes over from an easing move, which would otherwise fight the drag.
-    this.addEventListener('scrollBegin', () => this.cancelMoving());
+    this.addEventListener('scrollBegin', () => this.takeOverFromMove());
     this.addEventListener('scrollEnd', () => this.settle());
     this.addEventListener('scroll', () => {
       // Scrolls the controller is not driving (the mouse wheel) have no scrollEnd, so settle them here.
       if (!this.scrolling && !this.settling && !this.moving) {
-        this.settle();
+        this.settleScrolled();
       }
     });
     this.addEventListener('key', (event) => {
@@ -199,9 +199,46 @@ export class Tileview extends LvObject {
     // A swipe ends on the active tile or one neighbour it allows, never a diagonal or farther tile.
     const candidates = this.active ? reachableTiles(this.active, this.infos) : this.infos;
     const target = nearestTile(candidates, this.scrollX, this.scrollY, this.width, this.height);
-    if (!target) {
+    if (target) {
+      this.settleOn(target);
+    }
+  }
+
+  /**
+   * Settles a scroll no drag drove (a wheel). A move shorter than half a tile
+   * steps to the neighbour in its direction, when there is one the tile allows,
+   * rather than rounding back to where it started.
+   */
+  private settleScrolled(): void {
+    const from = this.active;
+    if (!from) {
       return;
     }
+    const dx = this.scrollX - from.col * this.width;
+    const dy = this.scrollY - from.row * this.height;
+    const nearest = nearestTile(
+      reachableTiles(from, this.infos),
+      this.scrollX,
+      this.scrollY,
+      this.width,
+      this.height,
+    );
+    if (nearest !== from || (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5)) {
+      this.settle();
+      return;
+    }
+    const horizontal = Math.abs(dx) >= Math.abs(dy);
+    const col = from.col + (horizontal ? Math.sign(dx) : 0);
+    const row = from.row + (horizontal ? 0 : Math.sign(dy));
+    const neighbour = reachableTiles(from, this.infos).find(
+      (tile) => tile.col === col && tile.row === row,
+    );
+    this.settleOn(neighbour ?? from);
+  }
+
+  /** Makes `target` the active tile and snaps onto it, announcing the change. */
+  private settleOn(target: TileInfo): void {
+    this.moveRange = undefined;
     this.settling = true;
     this.active = target;
     this.scrollTo(target.col * this.width, target.row * this.height);
@@ -215,6 +252,31 @@ export class Tileview extends LvObject {
       this.announced = this.active;
       this.dispatchEvent('valueChanged');
     }
+  }
+
+  /**
+   * Hands an easing move over to the user's drag. The tile nearest where the
+   * view is becomes active, and the span the view may drag through is widened
+   * to include where it is, so the first drag update follows the pointer
+   * instead of jumping to the old destination. It ends when the drag settles.
+   */
+  private takeOverFromMove(): void {
+    if (!this.moving) {
+      return;
+    }
+    this.moving.cancel();
+    this.moving = undefined;
+    const near = nearestTile(this.infos, this.scrollX, this.scrollY, this.width, this.height);
+    if (near) {
+      this.active = near;
+    }
+    const own = tileRange(this.active, this.infos, this.width, this.height);
+    this.moveRange = {
+      minX: Math.min(own.minX, this.scrollX),
+      maxX: Math.max(own.maxX, this.scrollX),
+      minY: Math.min(own.minY, this.scrollY),
+      maxY: Math.max(own.maxY, this.scrollY),
+    };
   }
 
   /** Stops a tile-change animation where it is. */

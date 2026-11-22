@@ -281,7 +281,12 @@ export class Tabview extends LvObject implements PointerDraggable {
 
   /** Snaps the pages onto the one nearest the scroll position and makes it the active tab. */
   private snapToDisplayed(): void {
-    const index = this.displayedIndex;
+    let index = this.displayedIndex;
+    const delta = this.scroller.scrollX - this.committedIndex * this.pageWidth;
+    // A move shorter than half a page (one wheel notch) steps a page in its direction, rather than rounding back.
+    if (index === this.committedIndex && Math.abs(delta) > 0.5) {
+      index = Math.min(this.pageList.length - 1, Math.max(0, index + Math.sign(delta)));
+    }
     this.snapping = true;
     this.scroller.scrollTo(index * this.pageWidth, 0);
     this.snapping = false;
