@@ -6,6 +6,7 @@
   - `win`, `tabview` and `tileview` scene nodes build their `children` into the content area, each tab page and each tile; `menu` pages refer to each other by `id`, and a missing page, or a section nested in a section, fails with a message naming it.
   - Fixed: a scroll released after the pointer had rested still coasted with its last drag velocity (so holding a swipe still and letting go could throw a list or tab view several pages). The flick is now dropped when more than 100ms passed since the last move.
   - Fixed: a `flexGrow` child only ever grew, so it kept space it had grown into when a sibling was added or its container narrowed and overflowed (a `Win` or `Menu` header's title pushed a later button out of the header). Growth now restarts from the child's own size each layout; a size you set yourself becomes the new starting size.
+  - Fixed: dragging a `Tabview` or `Tileview` while it eases to a tab or tile now takes over from the easing instead of fighting it, and changing a `MenuItem`'s `target` after it is created now changes where a click goes.
   - Known limits: `Msgbox` wraps its first frame with an estimate of the font's width, `Tileview` has no per-tile transition animation beyond its optional eased moves, `Menu` has no animated page transition and supports one level of sections, and `Win` has its header on top only.
 
 ## 0.5.0 - 2026-11-20

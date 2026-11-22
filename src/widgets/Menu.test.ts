@@ -282,3 +282,32 @@ describe('Menu header after it has been laid out', () => {
     expect(back?.x).toBe(4);
   });
 });
+
+describe('Menu item targets', () => {
+  it('opens the page the item points at when clicked, not the one it had when created', () => {
+    const { view, root, display, sound } = twoLevel();
+    const item = root.entries[0] as ReturnType<typeof root.addItem>;
+    expect(item.target).toBe(display);
+    item.target = sound;
+    item.dispatchEvent('clicked');
+    expect(view.currentPage).toBe(sound);
+  });
+
+  it('stops navigating when the target is cleared', () => {
+    const { view, root, display } = twoLevel();
+    const item = root.entries[0] as ReturnType<typeof root.addItem>;
+    item.target = undefined;
+    item.dispatchEvent('clicked');
+    expect(view.currentPage).not.toBe(display);
+  });
+
+  it('navigates from a plain item once it is given a target', () => {
+    const { view, display } = twoLevel();
+    const plain = display.entries[0] as ReturnType<typeof display.addItem>;
+    const other = view.createPage('Other');
+    view.push(display);
+    plain.target = other;
+    plain.dispatchEvent('clicked');
+    expect(view.currentPage).toBe(other);
+  });
+});

@@ -120,6 +120,8 @@ export class Tabview extends LvObject implements PointerDraggable {
       clickable: false,
     });
     super.addChild(this.scroller);
+    // Dragging the pages takes over from an easing tab switch, which would otherwise fight the drag.
+    this.scroller.addEventListener('scrollBegin', () => this.cancelSwitching());
     this.scroller.addEventListener('scrollEnd', () => this.commit(this.displayedIndex));
     this.scroller.addEventListener('scroll', () => {
       // A scroll no drag is driving (a horizontal wheel) has no scrollEnd, so settle it here.

@@ -57,6 +57,8 @@ export class Tileview extends LvObject {
       },
     });
     this.animations = options.animations;
+    // Dragging the view takes over from an easing move, which would otherwise fight the drag.
+    this.addEventListener('scrollBegin', () => this.cancelMoving());
     this.addEventListener('scrollEnd', () => this.settle());
     this.addEventListener('scroll', () => {
       // Scrolls the controller is not driving (the mouse wheel) have no scrollEnd, so settle them here.

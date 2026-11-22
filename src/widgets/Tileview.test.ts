@@ -270,3 +270,22 @@ describe('Tileview diagonal swipes and animated moves', () => {
     expect(view.scrollX).toBe(200);
   });
 });
+
+describe('Tileview animation against a drag', () => {
+  it('stops easing to a tile when the user starts dragging', () => {
+    let now = 0;
+    const animations = createAnimationEngine({ now: () => now, scheduler: null });
+    const view = plus({ animations });
+    view.setActiveTile(1, 1);
+    view.setActiveTile(2, 1, true);
+    now = 100;
+    animations.tick(now);
+    const midway = view.scrollX;
+    expect(midway).toBeGreaterThan(100);
+    view.dispatchEvent('scrollBegin');
+    now = 2000;
+    animations.tick(now);
+    expect(view.scrollX).toBe(midway);
+    expect(animations.activeCount).toBe(0);
+  });
+});

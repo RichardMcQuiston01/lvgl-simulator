@@ -285,3 +285,22 @@ describe('Tabview wheel and programmatic scrolling', () => {
     expect(view.children[0]?.scrollX).toBe(0);
   });
 });
+
+describe('Tabview animation against a drag', () => {
+  it('stops easing to a tab when the user starts dragging the pages', () => {
+    let now = 0;
+    const animations = createAnimationEngine({ now: () => now, scheduler: null });
+    const view = tabview({ animations });
+    view.setActive(2, true);
+    now = 100;
+    animations.tick(now);
+    const scroller = view.children[0];
+    const midway = scroller?.scrollX ?? 0;
+    expect(midway).toBeGreaterThan(0);
+    scroller?.dispatchEvent('scrollBegin');
+    now = 2000;
+    animations.tick(now);
+    expect(scroller?.scrollX).toBe(midway);
+    expect(view.activeIndex).toBe(0);
+  });
+});

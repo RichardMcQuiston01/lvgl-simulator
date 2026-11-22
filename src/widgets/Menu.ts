@@ -81,10 +81,13 @@ export class MenuColumn extends Container {
   /** Appends a pressable row and returns it. Mirrors `lv_menu_cont_create` with a label. */
   addItem(text: string, options: MenuItemOptions = {}): MenuItem {
     const item = new MenuItem(text, this.itemHeight, options);
-    const target = options.page;
-    if (target) {
-      item.addEventListener('clicked', () => this.open?.(this, target));
-    }
+    // The destination is read at click time, so changing `item.target` later changes where it goes.
+    item.addEventListener('clicked', () => {
+      const target = item.target;
+      if (target) {
+        this.open?.(this, target);
+      }
+    });
     return this.append(item);
   }
 
