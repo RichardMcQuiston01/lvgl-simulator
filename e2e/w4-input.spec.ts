@@ -75,6 +75,51 @@ test.describe('W4 container widgets in a real browser', () => {
     expect(await read(page, (state) => state.tabs.activeIndex)).toBe(0);
   });
 
+  test('a stream of small horizontal wheel events steps a tab view one page, not one per event', async ({
+    page,
+  }) => {
+    const over = await read(page, (state) => {
+      const page0 = state.tabs.pages[0];
+      return page0 ? state.centre(page0) : { x: 0, y: 0 };
+    });
+    const box = await page.locator('canvas').boundingBox();
+    if (!box) {
+      throw new Error('The canvas has no bounding box.');
+    }
+    await page.mouse.move(box.x + over.x, box.y + over.y);
+    // A trackpad sends a quick stream of small events.
+    for (let event = 0; event < 8; event += 1) {
+      await page.mouse.wheel(8, 0);
+      await page.waitForTimeout(16);
+    }
+    await expect.poll(() => read(page, (state) => state.tabs.activeIndex)).toBe(1);
+    expect(await read(page, (state) => state.tabChanges)).toBe(1);
+
+    // After a pause, a new gesture steps one more.
+    await page.waitForTimeout(400);
+    for (let event = 0; event < 8; event += 1) {
+      await page.mouse.wheel(8, 0);
+      await page.waitForTimeout(16);
+    }
+    await expect.poll(() => read(page, (state) => state.tabs.activeIndex)).toBe(2);
+    expect(await read(page, (state) => state.tabChanges)).toBe(2);
+  });
+
+  test('a stream of small horizontal wheel events steps a tile view one tile', async ({ page }) => {
+    const over = await read(page, (state) => state.centre(state.tiles));
+    const box = await page.locator('canvas').boundingBox();
+    if (!box) {
+      throw new Error('The canvas has no bounding box.');
+    }
+    await page.mouse.move(box.x + over.x, box.y + over.y);
+    for (let event = 0; event < 8; event += 1) {
+      await page.mouse.wheel(8, 0);
+      await page.waitForTimeout(16);
+    }
+    await expect.poll(() => read(page, (state) => state.tiles.activeTile?.col)).toBe(1);
+    expect(await read(page, (state) => state.tileChanges)).toBe(1);
+  });
+
   test('a tile view swipes one tile at a time and stops at the last', async ({ page }) => {
     const start = await read(page, (state) => state.centre(state.tiles));
     await swipe(page, start, -110);
